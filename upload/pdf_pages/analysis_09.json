@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "The page displays two distinct design mockups against a solid light blue background.  \n\n### Left Mockup (Light Blue Rectangle):  \n- **Background**: A light blue rectangle with a subtle white speckled texture.  \n- **Top-Right Corner**: The \"Wesal\" logo, consisting of Arabic text \"وسال\" (stylized in a light blue/teal color), the word \"wesal\" in smaller, lighter gray text beneath it, and a heart-shaped icon with an interlocking design (matching the Arabic text’s color).  \n- **Bottom-Left Corner**: The URL \"www.wesal.com\" in a light gray color.  \n\n\n### Right Mockup (White Rectangle):  \n- **Top Section**:  \n  - A horizontal teal stripe (two thin parallel lines) with a dark navy blue vertical bar overlapping the left end of the stripe.  \n  - To the right of the stripe: The \"Wesal\" logo (identical to the left mockup: Arabic text \"وسال\", \"wesal\" text, and heart icon).  \n- **Middle Section**: A large, faint (low-opacity) heart shape (matching the logo’s color) centered on the white background.  \n- **Bottom Section**:  \n  - A dark teal horizontal bar with a dark navy blue vertical bar overlapping the right end of the bar.  \n  - Within the teal bar:  \n    - Left side: A yellow location pin icon followed by the text \"123 Anywhere St., Any City, ST 12345\" and a yellow globe icon followed by \"www.wesal.com\".  \n    - Right side: A yellow envelope icon followed by \"wesal@reallygreatsite.com\" and a yellow phone icon followed by \"+20 10 409 945 655\".  \n  - Above the teal bar (on the white background): A handwritten-style blue signature \"mohaned\", with the printed name \"mohaned\" and title \"General Manager\" in black text below it.  \n\n\nAll elements are arranged in a clean, modern layout with consistent color usage (light blue, teal, dark navy, yellow, and white) and repeated branding elements (logo, color palette, and design motifs like the heart and striped bars).",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1776606479,
+  "id": "20260419214732bbfa4081b2114d14",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "20260419214732bbfa4081b2114d14",
+  "usage": {
+    "completion_tokens": 467,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 6062,
+    "prompt_tokens_details": {
+      "cached_tokens": 6
+    },
+    "total_tokens": 6529
+  }
+}

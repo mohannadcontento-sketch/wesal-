@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "The page features a light blue background. On the left side, there is an image of a large billboard mounted on a building with a light brown facade and glass windows. The billboard has a light blue background and displays a smartphone graphic on the left side. The smartphone screen shows a circular logo with a heart-like design. To the right of the smartphone, there is Arabic text in a dark teal color: \"وليس كل ما يُقال\" (which translates to \"Not everything that is said\") and below that, more Arabic text: \"يحتاج إلى إثبات\" (which translates to \"needs proof\"). Above the Arabic text, in smaller font, is the word \"wesal\" in lowercase, accompanied by the same circular logo with a heart-like design. The billboard is lit by several spotlights mounted on the building's roof, and in the foreground, there are blurred silhouettes of people looking at the billboard.  \n\nOn the right side, there is an image of a collection of stationery items arranged on a light gray background. The items include: a green three-ring binder with a light blue cover, which has the text \"Essays & Critical Papers\" in dark teal on the left side and the same circular logo with a heart-like design. Inside the binder, there is a white sheet of paper with a dark teal strip at the bottom. To the right of the binder, there is a light blue sheet of paper with the text \"Essays & Critical Papers\" in dark teal and the circular logo. Below this, there is a dark blue business card with white text, including the word \"wesal\" and the circular logo. In front of the binder, there is a small light blue card with the \"wesal\" logo and text, placed on a wooden block. To the right of the business card, there is a light blue envelope with the \"wesal\" logo printed on it. All stationery items feature the consistent \"wesal\" branding with the circular logo, using dark teal text and logos on light blue or white backgrounds, and the green binder has a dark teal accent strip. The overall layout is clean and organized, showcasing brand applications across outdoor advertising and stationery.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1776606624,
+  "id": "20260419214948905155b1d5834814",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "20260419214948905155b1d5834814",
+  "usage": {
+    "completion_tokens": 453,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 6062,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 6515
+  }
+}

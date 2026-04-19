@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "The page is titled \"Social media\" in large, gray text at the top left. The background is a solid light blue color. Below the title, there are three rectangular social media post mockups arranged horizontally, each with a light teal background and the \"Wesal\" logo (Arabic text \"وسل\" with a heart icon) at the top.  \n\n**Left Post Mockup:**  \n- Contains Arabic text: \"وسل\" (large, gray) and \"بعد كل ما مرت به من ألم\" (smaller, gray).  \n- Visual: A man in a gray shirt and dark pants lies on a bed with white pillows and a beige blanket, holding a smartphone. A bedside table with a blood pressure monitor and a tablet is visible. Behind him, there’s a graphic of a hospital building and medical monitors.  \n\n**Middle Post Mockup:**  \n- Contains Arabic text: \"الإرشاد الطبي\" (large, gray) and \"مع كل ما تمر به من ألم كل ما تحتاجه هو إرشاد طبي\" (smaller, gray).  \n- Visual: A doctor in a white coat, blue pants, and white shoes carries a large stack of books on his back and holds a brown briefcase. A faint heart icon is in the background. At the bottom, the URL \"www.wesal.com\" is in gray.  \n\n**Right Post Mockup:**  \n- Contains Arabic text: \"وسل\" (top, gray) and \"للمساعدة الطبية\" (large, gray) with \"MEDICAL HEALTH CARE\" in white below it.  \n- Visual: An illustrated doctor in a white coat, blue hair, and a white mask holds a medical bottle. To the right, there’s a dark teal box with five white stars, the \"Wesal\" logo, and Arabic text \"أفضل الخدمات\" (Best Services) and \"أفضل الأطباء\" (Best Doctors). Below the doctor, there are two white boxes with Arabic text and numbers: \"الاستشارات الطبية\" (Medical Consultations) with \"3\" and \"الإرشاد الطبي\" (Medical Guidance) with \"4\" on the left, and \"الإسعافات الأولية\" (First Aid) with \"1\" and \"الإسعافات الطبية\" (Medical Emergencies) with \"2\" on the right. At the bottom right, the handle \"@wasla\" and Arabic text \"اتصل بنا\" (Contact Us) are in white.  \n\nAll elements are laid out in a clean, grid-like structure with consistent color schemes of light blue, light teal, gray, and white, emphasizing a medical and supportive theme.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1776606422,
+  "id": "2026041921462910b9f9c9edcb498a",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "2026041921462910b9f9c9edcb498a",
+  "usage": {
+    "completion_tokens": 574,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 6062,
+    "prompt_tokens_details": {
+      "cached_tokens": 27
+    },
+    "total_tokens": 6636
+  }
+}

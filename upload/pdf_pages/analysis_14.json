@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "The page displays a design mockup of two business cards for the 'Wesal' social media platform, set against a light blue background. The overall layout consists of a central white rectangular area containing the two cards, with the top card positioned above the bottom card.  \n\n**Top Card**:  \n- Background color: Light cyan (#e6f9fa).  \n- Contains the Arabic text \"وسال\" (Wesal) in a teal-colored font, positioned to the left of a heart-shaped logo. The logo is a light blue heart with an inner design resembling two interlocking shapes (possibly representing connection or unity). Below the Arabic text, the English word \"wesal\" appears in a smaller, lighter teal font.  \n\n**Bottom Card**:  \n- Background color: Dark navy blue (#1a2a3a).  \n- Features a QR code in the top-left corner (black and white).  \n- Arabic text \"وسال\" is displayed in white in the top-right corner.  \n- Below the QR code, white text lists contact information:  \n  - Phone number: \"+20 10 409 456 55\"  \n  - Website: \"www.wesal.com\"  \n  - Email: \"wesal@gmail.com\"  \n- In the bottom-right corner, there is a light cyan (matching the top card’s background) graphic of two interlocking heart shapes (similar to the logo’s inner design).  \n\nThe entire composition is centered on the page, with the white card area contrasting against the light blue background. No additional text, numbers, or design elements are present outside the described cards.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1776606653,
+  "id": "20260419215034f7b964e302cd4291",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "20260419215034f7b964e302cd4291",
+  "usage": {
+    "completion_tokens": 336,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 6062,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 6398
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "The page has a light blue background. In the top right corner, there is the Arabic text \"وسال\" in a teal color, with the English word \"wesal\" in a smaller, lighter teal font directly below it. To the right of this text, there is a blue heart-shaped icon with a white outline and a small white heart inside it. On the left side of the page, there is an illustration of a smartphone with a black border. The phone screen is a light gray color, and on the screen, there is a blue heart-shaped icon with a white outline and a small white heart inside it, matching the icon in the top right. The phone has a blue dot at the top left of the screen, representing a front camera, and a white line at the top center, representing a speaker. Below the phone, there is Arabic text in the same teal color as the other text on the page. The text is arranged in two lines: the first line reads \"لا يوجد\" and the second line reads \"إلى الآن أي مستخدمين\". The overall design is clean and minimalistic, with a focus on the brand name and the heart icon, which is a key element of the design.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1776606537,
+  "id": "202604192148366846bdf1650945cf",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "202604192148366846bdf1650945cf",
+  "usage": {
+    "completion_tokens": 251,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 6062,
+    "prompt_tokens_details": {
+      "cached_tokens": 27
+    },
+    "total_tokens": 6313
+  }
+}

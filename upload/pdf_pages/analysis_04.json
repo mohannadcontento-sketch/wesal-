@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "The page has a light blue background. At the top left, the word \"Logo\" is displayed in a light blue color (hex code approximate: #a8d0e6), using a sans-serif font with a medium weight. Below this, centered horizontally, is the logo design. The logo consists of two main elements: on the left, Arabic text \"وسال\" in a teal color (hex code approximate: #5a9ea6) with a modern, slightly bold sans-serif typeface; directly beneath the Arabic text is the English word \"wesal\" in the same teal color, using a lighter, regular-weight sans-serif font. To the right of the Arabic text is a heart-shaped icon in the same light blue color as the \"Logo\" text, featuring two interlocking circular loops inside the heart, creating a symmetrical design. The overall layout is clean and minimal, with ample negative space around the logo elements.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1776606263,
+  "id": "202604192144125331f18f294d4b37",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "202604192144125331f18f294d4b37",
+  "usage": {
+    "completion_tokens": 194,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 6101,
+    "prompt_tokens_details": {
+      "cached_tokens": 6
+    },
+    "total_tokens": 6295
+  }
+}

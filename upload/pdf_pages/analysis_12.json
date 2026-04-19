@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "The page displays a design/branding document for the 'Wesal' social media platform, with a light blue (#87CEEB or similar soft blue) background. The layout consists of two main rectangular sections:  \n\n1. **Left Section**: A dark navy blue (#1E3A5F or similar deep blue) rectangle.  \n   - Top-left: A black QR code (standard square matrix code).  \n   - Center: Arabic text \"وسال\" in white, stylized font.  \n   - Bottom-left: Three lines of white text:  \n     - \"+20 10 409 456 55\" (phone number)  \n     - \"www.wesal.com\" (website)  \n     - \"wesal@gmail.com\" (email)  \n   - Bottom-right: A white heart-shaped logo with an interlocking design (matching the logo on the right section).  \n\n2. **Right Section**: A light cyan (#E0F7FA or similar pale blue) rectangle.  \n   - Center: Arabic text \"وسال\" in a teal (#5F9EA0 or similar muted blue-green) stylized font.  \n   - Below the Arabic text: The word \"wesal\" in lowercase, teal font.  \n   - Right of the text: A light blue (#87CEEB or similar soft blue) heart-shaped logo with an interlocking design (three loops forming a symmetrical pattern inside the heart).  \n\nThe two rectangles are positioned side-by-side, with the left rectangle slightly lower than the right one, creating a balanced, modern layout. The overall design emphasizes brand consistency through repeated logo elements and color coordination.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1776606562,
+  "id": "2026041921490191f7c969a00e4107",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "2026041921490191f7c969a00e4107",
+  "usage": {
+    "completion_tokens": 343,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 6062,
+    "prompt_tokens_details": {
+      "cached_tokens": 27
+    },
+    "total_tokens": 6405
+  }
+}

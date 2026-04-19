@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "The page has a light blue background. At the top left, the text \"Icon:\" appears in a light blue font. Below this text, there are four square icons arranged in a 2x2 grid on the left side of the page. The top - left icon is a dark navy - blue square with a white heart - shaped logo featuring an interwoven design. The top - right icon is a dark teal square with a light blue heart - shaped logo with the same interwoven design. The bottom - left icon is a light blue square with a slightly darker blue heart - shaped logo with the interwoven design. The bottom - right icon is a medium teal square with a dark teal heart - shaped logo with the interwoven design. On the right side of the page, there are four larger rounded square icons arranged in a 2x2 grid. The top - left rounded square is dark teal, containing the Arabic text \"وسال\" in a light blue font, the word \"wesal\" in a smaller light blue font below it, and a light blue heart - shaped logo with the interwoven design to the right of the text. The top - right rounded square is a medium teal color, with the Arabic text \"وسال\" in white, the word \"wesal\" in white below it, and a light blue heart - shaped logo with the interwoven design to the right of the text. The bottom - left rounded square is dark navy - blue, with the Arabic text \"وسال\" in light blue, the word \"wesal\" in light blue below it, and a white heart - shaped logo with the interwoven design to the right of the text. The bottom - right rounded square is light blue, with the Arabic text \"وسال\" in dark navy - blue, the word \"wesal\" in dark navy - blue below it, and a white heart - shaped logo with the interwoven design to the right of the text.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1776606325,
+  "id": "20260419214505ee4dc8572c914953",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "20260419214505ee4dc8572c914953",
+  "usage": {
+    "completion_tokens": 409,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 6062,
+    "prompt_tokens_details": {
+      "cached_tokens": 6
+    },
+    "total_tokens": 6471
+  }
+}

@@ -1,0 +1,206 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: 'Inter', 'Cairo', sans-serif;
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Wesal Brand Colors */
+  --color-wesal-primary: #004346;
+  --color-wesal-secondary: #508991;
+  --color-wesal-dark: #172A3A;
+  --color-wesal-light: #E6F2F5;
+  --color-wesal-accent: #A8D0E6;
+  --color-wesal-success: #7ED321;
+  --color-wesal-warning: #F5A623;
+  --color-wesal-danger: #E74C3C;
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: #F8F9FA;
+  --foreground: #172A3A;
+  --card: #FFFFFF;
+  --card-foreground: #172A3A;
+  --popover: #FFFFFF;
+  --popover-foreground: #172A3A;
+  --primary: #004346;
+  --primary-foreground: #FFFFFF;
+  --secondary: #E6F2F5;
+  --secondary-foreground: #004346;
+  --muted: #E6F2F5;
+  --muted-foreground: #508991;
+  --accent: #508991;
+  --accent-foreground: #FFFFFF;
+  --destructive: #E74C3C;
+  --border: #E0E7EB;
+  --input: #E0E7EB;
+  --ring: #508991;
+  --chart-1: #004346;
+  --chart-2: #508991;
+  --chart-3: #172A3A;
+  --chart-4: #A8D0E6;
+  --chart-5: #E6F2F5;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #172A3A;
+  --sidebar-primary: #004346;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #E6F2F5;
+  --sidebar-accent-foreground: #004346;
+  --sidebar-border: #E0E7EB;
+  --sidebar-ring: #508991;
+}
+
+.dark {
+  --background: #0A1628;
+  --foreground: #E6F2F5;
+  --card: #132238;
+  --card-foreground: #E6F2F5;
+  --popover: #132238;
+  --popover-foreground: #E6F2F5;
+  --primary: #508991;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1A3040;
+  --secondary-foreground: #E6F2F5;
+  --muted: #1A3040;
+  --muted-foreground: #A8D0E6;
+  --accent: #004346;
+  --accent-foreground: #FFFFFF;
+  --destructive: #FF6B6B;
+  --border: #1A3040;
+  --input: #1A3040;
+  --ring: #508991;
+  --chart-1: #508991;
+  --chart-2: #A8D0E6;
+  --chart-3: #E6F2F5;
+  --chart-4: #004346;
+  --chart-5: #172A3A;
+  --sidebar: #0A1628;
+  --sidebar-foreground: #E6F2F5;
+  --sidebar-primary: #508991;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #1A3040;
+  --sidebar-accent-foreground: #E6F2F5;
+  --sidebar-border: #1A3040;
+  --sidebar-ring: #508991;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Cairo', 'Inter', sans-serif;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #508991;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #004346;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  font-family: 'Cairo', sans-serif;
+}
+
+/* Wesal specific animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(80, 137, 145, 0.4); }
+  50% { box-shadow: 0 0 0 15px rgba(80, 137, 145, 0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+/* Emergency button pulse */
+@keyframes emergency-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+}
+
+.emergency-pulse {
+  animation: emergency-pulse 2s infinite;
+}

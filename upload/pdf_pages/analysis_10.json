@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "The page has a light blue background. It is divided into two rectangular sections by a thin vertical line running down the center.  \n\n### Left Section:  \n- Contains the \"wesal\" logo:  \n  - Arabic text: \"وسال\" (stylized, dark teal color).  \n  - Below the Arabic text, the word \"wesal\" in lowercase, dark teal font.  \n  - To the right of the text, a light blue heart-shaped icon with a stylized design (resembling a pretzel or intertwined loops) inside it.  \n\n\n### Right Section:  \n- Top-right corner: Text \"WESAL LITERATURE\" in uppercase, small dark gray font, followed by \"LIT 193-B\" in smaller dark gray font.  \n- Below that, centered: \"1ST SEMESTER\" in uppercase, dark gray font.  \n- Large, bold text: \"Essays & Critical Papers\" in a teal color (matching the logo’s text color), with \"Essays &\" on the first line, \"Critical\" on the second, and \"Papers\" on the third.  \n- Bottom-right corner: A smaller version of the light blue heart-shaped icon (matching the left section’s icon).  \n- Below the icon: Text \"LECTURER: PROF.\" in uppercase, dark gray font, followed by \"ISHANI GARG\" in smaller dark gray font.  \n\n\n### Overall Layout:  \n- The left section is slightly narrower than the right section.  \n- Both sections have a light gray (off-white) background, contrasting with the outer light blue background.  \n- The design is minimalistic, with clean lines and ample white space.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1776606511,
+  "id": "20260419214804910ea43869a140b9",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "20260419214804910ea43869a140b9",
+  "usage": {
+    "completion_tokens": 349,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 6062,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 6411
+  }
+}

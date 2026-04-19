@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "The page is titled \"Logo Usage Guidelines:\" in dark teal text at the top left. The background is a light blue color. The page is divided vertically by a dark teal line down the center, creating two columns.  \n\n**Left Column (Incorrect Usage - \"خطأ\" with a red \"X\" above it):**  \n- Contains three lines of Arabic text, each followed by a red \"X\" symbol:  \n  1. \"تغيير ألوان الشعار الأصلية\" (Changing the original colors of the logo)  \n  2. \"تغيير حجم الخط الأصلي للشعار\" (Changing the original font size of the logo)  \n  3. \"تغيير حجم الخط الأصلي للشعار\" (Changing the original font size of the logo) (Note: This line is a duplicate of the second line.)  \n\n**Right Column (Correct Usage - \"صحيح\" with a green checkmark above it):**  \n- Contains three lines of Arabic text, each followed by a green checkmark symbol:  \n  1. \"استخدام الشعار بالألوان الأصلية فقط\" (Using the logo with original colors only)  \n  2. \"استخدام الشعار بحجم الخط الأصلي فقط\" (Using the logo with original font size only)  \n  3. \"الشعار = الألوان الأصلية + حجم الخط الأصلي فقط\" (Logo = Original colors + Original font size only)",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1776606359,
+  "id": "2026041921454512df4ffc4d1d4dd5",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "2026041921454512df4ffc4d1d4dd5",
+  "usage": {
+    "completion_tokens": 315,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 6062,
+    "prompt_tokens_details": {
+      "cached_tokens": 27
+    },
+    "total_tokens": 6377
+  }
+}
