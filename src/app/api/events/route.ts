@@ -47,8 +47,8 @@ export async function GET(request: NextRequest) {
       status: e.event_date > new Date().toISOString().split('T')[0]
         ? (e.status === 'approved' ? 'available' : 'coming_soon')
         : 'past',
-      color: e.doctor?.avatar_color || 'bg-teal-100 text-teal-700',
-      initial: e.doctor?.avatar_initial || e.speaker_name?.charAt(0) || '?',
+      color: (e.doctor as any)?.[0]?.avatar_color || 'bg-teal-100 text-teal-700',
+      initial: (e.doctor as any)?.[0]?.avatar_initial || e.speaker_name?.charAt(0) || '?',
     })) || [];
 
     return NextResponse.json({ events: formattedEvents });
@@ -94,8 +94,6 @@ export async function POST(request: NextRequest) {
     }
 
     // تحديث عدد المسجلين
-    await supabase!.rpc('', {}).catch(() => {});
-    // Fallback: manual update
     await supabase!
       .from('events')
       .update({ registered_count: (event?.registered_count || 0) + 1 })

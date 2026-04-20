@@ -323,7 +323,7 @@ export function ConsultationsPage() {
                       // تفعيل التراكر للمريض بعد الحجز
                       const session = getSession();
                       if (session) {
-                        setSession({ ...session, trackerEnabled: true, followingDoctorId: selectedDoctor.id });
+                        setSession({ ...session, trackerEnabled: true, followingDoctorId: String(selectedDoctor.id) });
                       }
                       setSelectedDoctor(null);
                       setSelectedTime(null);

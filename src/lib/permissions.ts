@@ -2,6 +2,12 @@
 // وصال (Wesal) — نظام الصلاحيات والأدوار
 // ============================================================
 
+// ─── نوع الصلاحيات ───
+type PermissionKey = 'post' | 'comment' | 'likeHelpful' | 'save' | 'report' | 'tracker' |
+  'consultations' | 'viewEvents' | 'registerEvents' | 'viewProfile' |
+  'adminPanel' | 'moderate' | 'viewAllTracker' | 'approveContent' |
+  'manageDoctors' | 'manageUsers' | 'safetyAccess' | 'deleteOwnAccount';
+
 export type UserRole = 'patient' | 'doctor' | 'admin' | 'moderator' | 'trainee';
 
 export interface UserSession {
@@ -21,26 +27,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, {
   label: string;
   badge: string;
   badgeColor: string;
-  can: {
-    post: boolean;        // نشر في المجتمع
-    comment: boolean;     // تعليق
-    likeHelpful: boolean; // لايك + مفيد
-    save: boolean;        // حفظ منشور
-    report: boolean;      // بلاغ
-    tracker: boolean;     // وصول التراكر (فقط لو الدكتور فعّله)
-    consultations: boolean; // حجز استشارات
-    viewEvents: boolean;  // رؤية الفعاليات
-    registerEvents: boolean; // تسجيل في فعاليات
-    viewProfile: boolean;
-    adminPanel: boolean;  // لوحة إدارة
-    moderate: boolean;    // مراجعة بلاغات + محتوى
-    viewAllTracker: boolean; // رؤية تراكر المرضى (دكتور)
-    approveContent: boolean; // موافقة محتوى (أدمن/مشرف)
-    manageDoctors: boolean; // إدارة الدكاترة (أدمن)
-    manageUsers: boolean;  // إدارة المستخدمين (أدمن)
-    safetyAccess: boolean; // بروتوكول الطوارئ الكامل
-    deleteOwnAccount: boolean;
-  };
+  can: Record<PermissionKey, boolean>;
   limits: {
     postsPerDay: number;
     commentsPerDay: number;
@@ -193,7 +180,7 @@ export function clearSession(): void {
   _session = null;
 }
 
-export function hasPermission(permission: keyof UserSession['can']): boolean {
+export function hasPermission(permission: PermissionKey): boolean {
   if (!_session) return false;
   const rolePerms = ROLE_PERMISSIONS[_session.role];
   if (permission === 'tracker') {

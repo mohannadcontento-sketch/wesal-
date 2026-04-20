@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Menu, User, LogOut, LayoutDashboard, Shield, MessageCircle, ClipboardList, Calendar, Home, Activity } from 'lucide-react';
+import { Menu, User, LogOut, LayoutDashboard, Shield, MessageCircle, ClipboardList, Calendar, Home, Activity, type LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
@@ -23,8 +23,8 @@ export function Navbar({ currentPage, onNavigate, onAuthClick, isLoggedIn, userR
   const roleInfo = ROLE_PERMISSIONS[userRole];
 
   // روابط الـ Navigation حسب الدور
-  const getNavLinks = () => {
-    const links = [];
+  const getNavLinks = (): { id: string; label: string; icon: LucideIcon }[] => {
+    const links: { id: string; label: string; icon: LucideIcon }[] = [];
 
     if (isLoggedIn) {
       links.push({ id: 'community', label: 'المجتمع', icon: Home });

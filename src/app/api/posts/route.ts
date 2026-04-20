@@ -39,9 +39,9 @@ export async function GET(request: NextRequest) {
       helpfuls: post.helpfuls_count || 0,
       comments: post.comments_count || 0,
       time: formatRelativeTime(post.created_at),
-      author: post.users?.anon_id || 'مجهول',
-      authorInitial: post.users?.anon_id?.charAt(0) || 'م',
-      authorColor: post.users?.avatar_color || 'bg-gray-100 text-gray-700',
+      author: (post.users as any)?.[0]?.anon_id || 'مجهول',
+      authorInitial: (post.users as any)?.[0]?.anon_id?.charAt(0) || 'م',
+      authorColor: (post.users as any)?.[0]?.avatar_color || 'bg-gray-100 text-gray-700',
     })) || [];
 
     return NextResponse.json({ posts: formattedPosts });

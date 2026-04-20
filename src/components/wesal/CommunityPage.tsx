@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import {
   Heart, ThumbsUp, MessageCircle, Bookmark, Flag, MoreHorizontal, Send,
-  Plus, Image, BarChart3, Search, Bell, TrendingUp, Award, Users
+  Plus, Image as ImageIcon, BarChart3, Search, Bell, TrendingUp, Award, Users, Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -247,7 +247,7 @@ export function CommunityPage() {
           <div className="flex items-center justify-between pt-1">
             <div className="flex items-center gap-1">
               <button onClick={() => setShowEmojis(!showEmojis)} className="p-2 rounded-lg hover:bg-secondary text-lg transition-colors">😊</button>
-              <button className="p-2 rounded-lg hover:bg-secondary text-muted-foreground transition-colors" aria-label="إضافة صورة"><Image size={18} /></button>
+              <button className="p-2 rounded-lg hover:bg-secondary text-muted-foreground transition-colors" aria-label="إضافة صورة"><ImageIcon size={18} /></button>
               <input ref={fileInputRef} type="file" className="hidden" accept="image/*" />
               <p className="text-[10px] text-muted-foreground mr-1">مجهول وآمن</p>
             </div>

@@ -38,9 +38,9 @@ export async function GET(
       helpfuls: c.helpful_count || 0,
       parentId: c.parent_id,
       time: formatRelativeTime(c.created_at),
-      author: c.users?.anon_id || 'مجهول',
-      authorInitial: c.users?.anon_id?.charAt(0) || 'م',
-      authorColor: c.users?.avatar_color || 'bg-gray-100 text-gray-700',
+      author: (c.users as any)?.[0]?.anon_id || 'مجهول',
+      authorInitial: (c.users as any)?.[0]?.anon_id?.charAt(0) || 'م',
+      authorColor: (c.users as any)?.[0]?.avatar_color || 'bg-gray-100 text-gray-700',
     })) || [];
 
     return NextResponse.json({ comments: formattedComments });

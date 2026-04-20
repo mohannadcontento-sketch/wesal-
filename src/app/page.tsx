@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Navbar } from '@/components/wesal/Navbar';
 import { Footer } from '@/components/wesal/Footer';
@@ -35,7 +35,7 @@ export default function Home() {
     const session: UserSession = {
       userId: crypto.randomUUID(),
       anonId,
-      nickname,
+      nickname: nickname || '',
       role,
       avatarColor: colors[Math.floor(Math.random() * colors.length)],
       trackerEnabled: false, // الدكتور يفعّله
@@ -62,15 +62,25 @@ export default function Home() {
     }
   }, [isLoggedIn, handleNavigate]);
 
+  // Listen for custom navigation events from child components
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail) handleNavigate(detail);
+    };
+    window.addEventListener('wesal:navigate', handler);
+    return () => window.removeEventListener('wesal:navigate', handler);
+  }, [handleNavigate]);
+
   const renderPage = () => {
     // Landing page = بس قبل تسجيل الدخول
     if (!isLoggedIn && currentPage === 'landing') {
-      return <LandingPage onGetStarted={() => setAuthOpen(true)} />;
+      return <LandingPage onGetStarted={() => setAuthOpen(true)} onNavigate={handleNavigate} />;
     }
 
     switch (currentPage) {
       case 'landing':
-        return <LandingPage onGetStarted={() => setAuthOpen(true)} />;
+        return <LandingPage onGetStarted={() => setAuthOpen(true)} onNavigate={handleNavigate} />;
       case 'community':
         return <CommunityPage />;
       case 'tracker':
