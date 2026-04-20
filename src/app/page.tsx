@@ -12,7 +12,8 @@ import { TrackerPage } from '@/components/wesal/TrackerPage';
 import { ConsultationsPage } from '@/components/wesal/ConsultationsPage';
 import { EventsPage } from '@/components/wesal/EventsPage';
 import { ProfilePage } from '@/components/wesal/ProfilePage';
-import { getSession, setSession, clearSession, hasPermission, type UserSession, type UserRole } from '@/lib/permissions';
+import { getSession, setSession, clearSession, hasPermission, type UserSession } from '@/lib/permissions';
+import { AdminPanel } from '@/components/wesal/AdminPanel';
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => !!getSession());
@@ -29,14 +30,14 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  const handleAuthSuccess = useCallback((role: UserRole = 'patient', nickname?: string) => {
+  const handleAuthSuccess = useCallback((nickname?: string) => {
     const anonId = nickname || 'مسافر #' + Math.floor(Math.random() * 9000 + 1000);
     const colors = ['bg-teal-100 text-teal-700', 'bg-purple-100 text-purple-700', 'bg-amber-100 text-amber-700'];
     const session: UserSession = {
       userId: crypto.randomUUID(),
       anonId,
       nickname: nickname || '',
-      role,
+      role: 'patient',
       avatarColor: colors[Math.floor(Math.random() * colors.length)],
       trackerEnabled: false, // الدكتور يفعّله
       tier: 'new',
@@ -91,6 +92,8 @@ export default function Home() {
         return <EventsPage />;
       case 'profile':
         return <ProfilePage onLogout={handleLogout} />;
+      case 'admin':
+        return <AdminPanel />;
       default:
         return <CommunityPage />;
     }

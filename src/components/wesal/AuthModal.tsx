@@ -1,12 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Phone, Shield, Heart, Check, Stethoscope, Users, GraduationCap, User } from 'lucide-react';
+import { Phone, Shield, Heart, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { WesalLogo } from './WesalLogo';
-import { ROLE_PERMISSIONS, type UserRole } from '@/lib/permissions';
 import {
   Dialog,
   DialogContent,
@@ -18,16 +17,8 @@ import {
 interface AuthModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: (role: UserRole, nickname?: string) => void;
+  onSuccess: (nickname?: string) => void;
 }
-
-const roleOptions: { role: UserRole; icon: typeof User; label: string; desc: string }[] = [
-  { role: 'patient', icon: User, label: 'مستخدم عادي', desc: 'مجهول بالكامل — نشر + مجتمع + استشارات' },
-  { role: 'doctor', icon: Stethoscope, label: 'دكتور معتمد', desc: 'لوحة مرضى + تقارير + تفعيل التراكر' },
-  { role: 'admin', icon: Shield, label: 'مدير النظام', desc: 'إدارة كاملة + طوارئ + صلاحيات شاملة' },
-  { role: 'moderator', icon: Users, label: 'مشرف محتوى', desc: 'مراجعة بلاغات + فلتر + موافقة محتوى' },
-  { role: 'trainee', icon: GraduationCap, label: 'طالب تربية', desc: 'محتوى تعليمي محدود تحت إشراف' },
-];
 
 export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
   const [phone, setPhone] = useState('');
@@ -35,7 +26,6 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
   const [otp, setOtp] = useState('');
   const [nickname, setNickname] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<UserRole>('patient');
 
   const handleSendOtp = () => {
     if (phone.length >= 10) setOtpSent(true);
@@ -43,13 +33,13 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
 
   const handleVerifyAndRegister = () => {
     if (otp.length === 6 && agreedToTerms) {
-      onSuccess(selectedRole, nickname || undefined);
+      onSuccess(nickname || undefined);
     }
   };
 
   const handleLogin = () => {
     if (phone.length >= 10 && otp.length === 6) {
-      onSuccess(selectedRole, nickname || undefined);
+      onSuccess(nickname || undefined);
     }
   };
 
@@ -59,7 +49,6 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
     setOtp('');
     setPhone('');
     setNickname('');
-    setSelectedRole('patient');
   };
 
   return (
@@ -92,42 +81,6 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
                 <p className="text-xs text-foreground/70">
                   التسجيل مجهول بالكامل — اسمك الحقيقي مش بيظهر لأي حد
                 </p>
-              </div>
-
-              {/* Role Selection */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">اختر نوع الحساب</label>
-                <div className="grid grid-cols-1 gap-2">
-                  {roleOptions.map((opt) => {
-                    const info = ROLE_PERMISSIONS[opt.role];
-                    return (
-                      <button
-                        key={opt.role}
-                        onClick={() => setSelectedRole(opt.role)}
-                        className={`flex items-center gap-3 p-3 rounded-xl border-2 text-right transition-all ${
-                          selectedRole === opt.role
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-accent/40'
-                        }`}
-                      >
-                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                          selectedRole === opt.role ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'
-                        }`}>
-                          <opt.icon size={18} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="font-bold text-foreground text-xs">{opt.label}</p>
-                            {info.badge && (
-                              <span className="text-[9px]">{info.badge}</span>
-                            )}
-                          </div>
-                          <p className="text-[10px] text-muted-foreground leading-relaxed">{opt.desc}</p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
               </div>
 
               {/* Nickname */}
