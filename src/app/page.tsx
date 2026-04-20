@@ -43,7 +43,13 @@ export default function Home() {
             clearSession();
             setIsLoggedIn(false);
             setCurrentPage('landing');
+          } else {
+            // الجلسة fresh — نحدث البيانات
+            setSession(freshSession);
           }
+          setAuthLoading(false);
+        }).catch(() => {
+          // حتى لو الـ API فشل، لسه مسجل عشان localStorage فيه session
           setAuthLoading(false);
         });
         return;
@@ -72,19 +78,40 @@ export default function Home() {
   }, []);
 
   const handleAuthSuccess = useCallback(async () => {
-    // نجح الـ OTP verification — نجيب الـ profile من API
+    // نجح الـ OTP verification — أول حاجة نعلّق الجلسة
+    setAuthOpen(false);
+    setCurrentPage('community');
+    setIsLoggedIn(true);
+
+    // بعدين نجيب الـ profile في الخلفية
     try {
       const session = await checkAuthSession();
       if (session) {
         setSession(session);
-        setIsLoggedIn(true);
+      } else {
+        // Profile مش موجود بعد — نعمل واحد مؤقت عشان الـ UI يشتغل
+        const tempSession: UserSession = {
+          userId: '',
+          anonId: 'مسافر',
+          nickname: 'مسافر',
+          role: 'patient',
+          avatarColor: 'bg-teal-100 text-teal-700',
+          trackerEnabled: false,
+          tier: 'new',
+          streakDays: 0,
+          reputationScore: 0,
+        };
+        setSession(tempSession);
+
+        // نحاول مرة تانية بعد ثانية (علشان الترايجر يشتغل)
+        setTimeout(async () => {
+          const retry = await checkAuthSession();
+          if (retry) setSession(retry);
+        }, 2000);
       }
     } catch {
-      // لو حصل مشكلة في جلب الـ profile
-      setIsLoggedIn(true);
+      // Profile fetch failed — مش مشكلة، المستخدم لسه مسجل
     }
-    setAuthOpen(false);
-    setCurrentPage('community');
   }, []);
 
   const handleLogout = useCallback(async () => {
@@ -124,7 +151,13 @@ export default function Home() {
   }
 
   const renderPage = () => {
-    if (!isLoggedIn && currentPage === 'landing') {
+    // لو مش مسجل دخول وعايز يبقى في صفحة المجتمع → نوجهه لصفحة الهبوط
+    if (!isLoggedIn && currentPage !== 'landing') {
+      setCurrentPage('landing');
+      return <LandingPage onGetStarted={() => setAuthOpen(true)} onNavigate={handleNavigate} />;
+    }
+
+    if (!isLoggedIn) {
       return <LandingPage onGetStarted={() => setAuthOpen(true)} onNavigate={handleNavigate} />;
     }
 
