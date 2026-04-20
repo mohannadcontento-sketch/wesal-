@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Star, Phone, MessageCircle, CheckCircle, Clock, Search, Filter, Stethoscope, Users, Baby, Home } from 'lucide-react';
+import { getSession, setSession } from '@/lib/permissions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -318,6 +319,15 @@ export function ConsultationsPage() {
                   <Button
                     disabled={!selectedTime}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-40"
+                    onClick={() => {
+                      // تفعيل التراكر للمريض بعد الحجز
+                      const session = getSession();
+                      if (session) {
+                        setSession({ ...session, trackerEnabled: true, followingDoctorId: selectedDoctor.id });
+                      }
+                      setSelectedDoctor(null);
+                      setSelectedTime(null);
+                    }}
                   >
                     تأكيد الحجز
                   </Button>

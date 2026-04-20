@@ -10,6 +10,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
+import { getSession, ROLE_PERMISSIONS } from '@/lib/permissions';
+
+interface ProfilePageProps {
+  onLogout?: () => void;
+}
 import {
   AlertDialog,
   AlertDialogContent,
@@ -20,10 +25,13 @@ import {
   AlertDialogCancel,
 } from '@/components/ui/alert-dialog';
 
-export function ProfilePage() {
+export function ProfilePage({ onLogout }: ProfilePageProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [dailyReminder, setDailyReminder] = useState(true);
+
+  const session = getSession();
+  const roleInfo = session ? ROLE_PERMISSIONS[session.role] : null;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
@@ -35,14 +43,28 @@ export function ProfilePage() {
             <User size={40} />
           </div>
           <div className="text-center sm:text-right flex-1">
-            <h1 className="text-2xl font-bold">مسافر #2487</h1>
+            <h1 className="text-2xl font-bold">{session?.anonId || 'مسافر #0000'}</h1>
             <p className="text-white/60 text-sm mt-1">عضو منذ مارس ٢٠٢٦</p>
-            <div className="flex items-center gap-2 mt-3 justify-center sm:justify-start">
+            <div className="flex items-center gap-2 mt-3 justify-center sm:justify-start flex-wrap">
               <Badge className="bg-green-500/20 text-green-300 hover:bg-green-500/20 border-green-500/30 gap-1">
                 <Award size={14} />
                 نشط
               </Badge>
-              <span className="text-white/50 text-xs">المستوى الثاني من أصل أربعة</span>
+              {roleInfo?.badge && (
+                <Badge className={`${roleInfo.badgeColor} text-[10px]`}>
+                  {roleInfo.badge}
+                </Badge>
+              )}
+              {session?.trackerEnabled && (
+                <Badge className="bg-blue-500/20 text-blue-300 hover:bg-blue-500/20 border-blue-500/30 text-[10px]">
+                  📊 التراكر مفعّل
+                </Badge>
+              )}
+              {!session?.trackerEnabled && (
+                <Badge className="bg-white/10 text-white/50 text-[10px]">
+                  📊 التراكر معطّل
+                </Badge>
+              )}
             </div>
           </div>
         </div>
@@ -205,6 +227,15 @@ export function ProfilePage() {
                 <Trash2 size={16} />
                 احذف حسابي وبياناتي
               </Button>
+              {onLogout && (
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-sm gap-2 text-muted-foreground hover:text-foreground"
+                  onClick={onLogout}
+                >
+                  تسجيل الخروج
+                </Button>
+              )}
               <p className="text-[10px] text-muted-foreground text-center pt-2 leading-relaxed">
                 بياناتك مشفرة ومحمية. لو حذفت حسابك، البيانات بتتكتب نهائياً خلال ٧٢ ساعة.
               </p>
