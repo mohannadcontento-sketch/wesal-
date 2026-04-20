@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Phone, Shield, Heart, Check, Loader2, AlertCircle, ArrowRight, User, X } from 'lucide-react';
+import { Shield, Heart, Check, Loader2, AlertCircle, ArrowRight, User, X, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -23,30 +23,38 @@ interface AuthModalProps {
 }
 
 type ActiveTab = 'register' | 'login';
-type AuthStep = 'phone' | 'otp' | 'nickname';
+type AuthStep = 'form' | 'otp';
 
 // ─── Component ────────────────────────────────────────────────
 export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
   // ── Form state ──
   const [activeTab, setActiveTab] = useState<ActiveTab>('register');
-  const [phone, setPhone] = useState('');
-  const [nickname, setNickname] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [otp, setOtp] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   // ── Flow state ──
-  const [step, setStep] = useState<AuthStep>('phone');
+  const [step, setStep] = useState<AuthStep>('form');
   const [countdown, setCountdown] = useState(0);
 
   // ── Loading state ──
-  const [sendingOtp, setSendingOtp] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
 
   // ── Error state ──
-  const [phoneError, setPhoneError] = useState('');
-  const [nicknameError, setNicknameError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [otpError, setOtpError] = useState('');
   const [generalError, setGeneralError] = useState('');
+
+  // ── Success message ──
+  const [successMessage, setSuccessMessage] = useState('');
 
   // ── OTP Input Refs ──
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -59,20 +67,26 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
   }, [countdown]);
 
   // ── Helpers ──
-  const isValidPhone = (p: string) => /^01[0-2,5]{1}[0-9]{8}$/.test(p.replace(/\s/g, ''));
-  const cleanPhone = (p: string) => p.replace(/\s/g, '');
+  const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+  const isValidPassword = (p: string) => p.length >= 8;
 
   const resetState = useCallback(() => {
-    setPhone('');
-    setNickname('');
+    setUsername('');
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
+    setShowPassword(false);
     setOtp('');
-    setStep('phone');
-    setSendingOtp(false);
+    setStep('form');
+    setLoading(false);
     setVerifying(false);
-    setPhoneError('');
-    setNicknameError('');
+    setUsernameError('');
+    setEmailError('');
+    setPasswordError('');
+    setConfirmPasswordError('');
     setOtpError('');
     setGeneralError('');
+    setSuccessMessage('');
     setAgreedToTerms(false);
     setCountdown(0);
   }, []);
@@ -88,108 +102,176 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
     return `${m}:${sec.toString().padStart(2, '0')}`;
   };
 
-  // ── Send OTP ──
-  const handleSendOtp = async () => {
-    setPhoneError('');
+  // ════════════════════════════════════════════════════════════
+  //  REGISTER: إنشاء حساب جديد
+  // ════════════════════════════════════════════════════════════
+  const handleRegister = async () => {
+    setUsernameError('');
+    setEmailError('');
+    setPasswordError('');
+    setConfirmPasswordError('');
     setGeneralError('');
 
-    // فحص Supabase
     if (!isSupabaseConfigured()) {
       setGeneralError('النظام مش متوصل بقاعدة البيانات بعد — تواصل مع الدعم');
       return;
     }
 
-    // فحص الـ phone
-    if (!isValidPhone(phone)) {
-      setPhoneError('رقم الموبايل مش صحيح — لازم يبدأ بـ 010 أو 011 أو 012 أو 015');
-      return;
+    // Validation
+    let hasError = false;
+    if (!username.trim() || username.trim().length < 3) {
+      setUsernameError('الاسم المستعار لازم 3 حروف على الأقل');
+      hasError = true;
     }
-
-    // فحص الـ nickname للتسجيل
-    if (activeTab === 'register') {
-      if (!nickname.trim()) {
-        setNicknameError('الرجاء اختيار اسم مستعار');
-        return;
-      }
-      if (nickname.trim().length < 3) {
-        setNicknameError('الاسم المستعار لازم 3 حروف على الأقل');
-        return;
-      }
+    if (!isValidEmail(email)) {
+      setEmailError('البريد الإلكتروني مش صحيح');
+      hasError = true;
     }
+    if (!isValidPassword(password)) {
+      setPasswordError('كلمة المرور لازم 8 حروف على الأقل');
+      hasError = true;
+    }
+    if (password !== confirmPassword) {
+      setConfirmPasswordError('كلمتي المرور مش متطابقين');
+      hasError = true;
+    }
+    if (!agreedToTerms) {
+      setGeneralError('لازم توافق على الشروط والسياسات عشان تكمل');
+      hasError = true;
+    }
+    if (hasError) return;
 
-    setSendingOtp(true);
+    setLoading(true);
     try {
-      const formattedPhone = '+20' + cleanPhone(phone);
-
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: formattedPhone,
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
         options: {
-          data: activeTab === 'register' ? { nickname: nickname.trim() } : {},
+          data: {
+            username: username.trim(),
+          },
         },
       });
 
       if (error) {
-        if (error.message.includes('rate limit') || error.message.includes('too many')) {
-          setGeneralError('انت محاول كتير — استنى دقيقتين وحاول تاني');
-        } else if (error.message.includes('Invalid') || error.message.includes('format')) {
-          setPhoneError('رقم الموبايل مش صحيح');
+        if (error.message.includes('already registered') || error.message.includes('already in use')) {
+          setEmailError('البريد ده مسجل بالفعل — سجّل دخول');
+        } else if (error.message.includes('password')) {
+          setPasswordError('كلمة المرور ضعيفة — لازم 8 حروف على الأقل');
         } else {
-          setGeneralError('حصل مشكلة أثناء إرسال الكود: ' + error.message);
+          setGeneralError('حصل مشكلة: ' + error.message);
         }
         return;
       }
 
-      // نجاح — نتقل لخطوة إدخال الكود
-      setStep('otp');
-      setCountdown(60);
-      setOtp('');
-      setOtpError('');
+      // لو Supabase اشتغل بنجاح
+      if (data.user && !data.session) {
+        // Email confirmation مطلوب — نتقل لخطوة الـ OTP
+        setStep('otp');
+        setCountdown(60);
+        setOtp('');
+        setSuccessMessage('تم إرسال كود التأكيد على بريدك الإلكتروني');
+      } else if (data.session) {
+        // حساب مفعل تلقائياً (auto-confirm)
+        onSuccess();
+      }
     } catch {
       setGeneralError('مش قادر نوصل للسيرفر — تأكد إن الإنترنت شغال');
     } finally {
-      setSendingOtp(false);
+      setLoading(false);
     }
   };
 
-  // ── Verify OTP ──
+  // ════════════════════════════════════════════════════════════
+  //  LOGIN: تسجيل دخول بالإيميل + الباسورد
+  // ════════════════════════════════════════════════════════════
+  const handleLogin = async () => {
+    setEmailError('');
+    setPasswordError('');
+    setGeneralError('');
+
+    if (!isSupabaseConfigured()) {
+      setGeneralError('النظام مش متوصل بقاعدة البيانات بعد');
+      return;
+    }
+
+    let hasError = false;
+    if (!isValidEmail(email)) {
+      setEmailError('البريد الإلكتروني مش صحيح');
+      hasError = true;
+    }
+    if (!password) {
+      setPasswordError('كلمة المرور مطلوبة');
+      hasError = true;
+    }
+    if (hasError) return;
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+
+      if (error) {
+        if (error.message.includes('Invalid login') || error.message.includes('invalid credentials')) {
+          setGeneralError('البريد أو كلمة المرور غلط');
+        } else if (error.message.includes('Email not confirmed')) {
+          // البريد مش متأكد — نتقل لخطوة الـ OTP
+          setStep('otp');
+          setCountdown(0);
+          setOtp('');
+          setSuccessMessage('لازم تؤكد بريدك الإلكتروني الأول — كود التأكيد أُرسل مرة أخرى');
+          // نعيد إرسال التأكيد
+          await supabase.auth.resend({
+            type: 'signup',
+            email: email.trim(),
+          });
+        } else {
+          setGeneralError('حصل مشكلة: ' + error.message);
+        }
+        return;
+      }
+
+      onSuccess();
+    } catch {
+      setGeneralError('مش قادر نوصل للسيرفر');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ════════════════════════════════════════════════════════════
+  //  VERIFY OTP — تأكيد الكود اللي وصل على الإيميل
+  // ════════════════════════════════════════════════════════════
   const handleVerifyOtp = async () => {
     setOtpError('');
     setGeneralError('');
 
-    // فحص الـ OTP
     if (otp.length !== 6) {
       setOtpError('ادخل الكود كامل — 6 أرقام');
       return;
     }
 
-    // فحص الشروط للتسجيل
-    if (activeTab === 'register' && !agreedToTerms) {
-      setGeneralError('لازم توافق على الشروط والسياسات عشان تكمل');
-      return;
-    }
-
     setVerifying(true);
     try {
-      const formattedPhone = '+20' + cleanPhone(phone);
-
       const { data, error } = await supabase.auth.verifyOtp({
-        phone: formattedPhone,
+        email: email.trim(),
         token: otp,
-        type: 'sms',
+        type: 'email',
       });
 
       if (error) {
         if (error.message.includes('expired') || error.message.includes('invalid')) {
-          setOtpError('الكود غلط أو انتهت صلاحيته — أعد إرسال كود جديد');
+          setOtpError('الكود غلط أو انتهت صلاحيته — أعد الإرسال');
         } else {
           setOtpError('حصل مشكلة في التحقق — حاول تاني');
         }
         return;
       }
 
-      // نجاح — المستخدم دخل
-      // تحديث النickname في الـ profile لو التسجيل
-      if (activeTab === 'register' && nickname.trim() && data.session) {
+      // نجاح — تحديث الـ nickname في الـ profile
+      if (data.session && username.trim()) {
         try {
           await fetch('/api/auth/profile', {
             method: 'PATCH',
@@ -197,11 +279,9 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${data.session.access_token}`,
             },
-            body: JSON.stringify({ nickname: nickname.trim() }),
+            body: JSON.stringify({ nickname: username.trim() }),
           });
-        } catch {
-          // لو تحديث النickname فشل، مش مشكلة كبيرة
-        }
+        } catch { /* ignore */ }
       }
 
       onSuccess();
@@ -216,26 +296,18 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
   const handleOtpChange = (value: string, index: number) => {
     const digits = value.replace(/\D/g, '');
     const newOtp = otp.padEnd(6, '').split('');
-
     for (let i = 0; i < digits.length && (index + i) < 6; i++) {
       newOtp[index + i] = digits[i];
     }
-
     const result = newOtp.join('').slice(0, 6);
     setOtp(result);
     setOtpError('');
-
-    // Transfer focus to next input
     const nextIndex = Math.min(index + digits.length, 5);
     if (digits.length > 0 && nextIndex < 6) {
       otpRefs.current[nextIndex]?.focus();
     }
-
-    // Auto-verify when all 6 digits are entered
     if (result.length === 6) {
-      setTimeout(() => {
-        otpRefs.current[5]?.blur();
-      }, 100);
+      setTimeout(() => otpRefs.current[5]?.blur(), 100);
     }
   };
 
@@ -250,13 +322,12 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
     if (countdown > 0) return;
     setOtp('');
     setOtpError('');
-    setSendingOtp(true);
+    setLoading(true);
 
     try {
-      const formattedPhone = '+20' + cleanPhone(phone);
       const { error } = await supabase.auth.resend({
-        type: 'sms',
-        phone: formattedPhone,
+        type: 'signup',
+        email: email.trim(),
       });
 
       if (error) {
@@ -265,10 +336,11 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
       }
 
       setCountdown(60);
+      setSuccessMessage('تم إعادة إرسال كود التأكيد على بريدك');
     } catch {
-      setGeneralError('حصل مشكلة — حاول تاني');
+      setGeneralError('حصل مشكلة');
     } finally {
-      setSendingOtp(false);
+      setLoading(false);
     }
   };
 
@@ -282,7 +354,6 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
       >
         {/* ── Header ── */}
         <div className="bg-gradient-to-l from-[#004346] to-[#172A3A] px-5 py-5 sm:px-8 sm:py-6 text-center flex-shrink-0 relative">
-          {/* Close button */}
           <button
             onClick={handleClose}
             className="absolute left-3 top-3 sm:left-4 sm:top-4 text-white/60 hover:text-white transition-colors p-1"
@@ -292,50 +363,48 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
           </button>
 
           <DialogHeader>
-            <DialogTitle className="sr-only">
-              {step === 'otp' ? 'تأكيد رقم الموبايل' : 'تسجيل الدخول أو إنشاء حساب'}
-            </DialogTitle>
-            <DialogDescription className="sr-only">
-              وصال — منصتك للصحة النفسية الآمنة
-            </DialogDescription>
+            <DialogTitle className="sr-only">تسجيل الدخول أو إنشاء حساب</DialogTitle>
+            <DialogDescription className="sr-only">وصال — منصتك للصحة النفسية الآمنة</DialogDescription>
           </DialogHeader>
 
           {step === 'otp' ? (
             <>
               <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-white/10 flex items-center justify-center">
-                <Phone size={22} className="text-white/90" />
+                <Mail size={22} className="text-white/90" />
               </div>
-              <p className="text-white/80 text-sm font-medium">
-                تأكيد رقم الموبايل
-              </p>
-              <p className="text-white/50 text-xs mt-1" dir="ltr">
-                +20 {cleanPhone(phone)}
-              </p>
+              <p className="text-white/80 text-sm font-medium">تأكيد البريد الإلكتروني</p>
+              <p className="text-white/50 text-xs mt-1" dir="ltr">{email}</p>
             </>
           ) : (
             <>
               <WesalLogo size="md" variant="light" />
-              <p className="text-white/70 text-sm mt-2">
-                رفيقك الذكي للصحة النفسية الآمنة
-              </p>
+              <p className="text-white/70 text-sm mt-2">رفيقك الذكي للصحة النفسية الآمنة</p>
             </>
           )}
         </div>
 
         {/* ── Body ── */}
         <div className="p-5 sm:p-6 overflow-y-auto flex-1">
-          {/* ═══════ OTP Step ═══════ */}
+          {/* ═══════════ OTP Verification Step ═══════════ */}
           {step === 'otp' ? (
             <div className="space-y-5 animate-fade-in">
+              {/* Success message */}
+              {successMessage && !generalError && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-3.5 flex items-start gap-2.5">
+                  <Check size={16} className="text-green-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-green-700 leading-relaxed">{successMessage}</p>
+                </div>
+              )}
+
               {/* Info badge */}
               <div className="bg-[#508991]/10 border border-[#508991]/20 rounded-xl p-3.5 flex items-start gap-3">
                 <Shield size={16} className="text-[#508991] flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-foreground/70 leading-relaxed">
-                  دخلنا كود تأكيد على رقم الموبايل بتاعك. لو مكانتش لاقيه، افحص رسائل الـ Spam
+                  دخلنا كود تأكيد على بريدك الإلكتروني. لو مكانتش لاقيه، افحص مجلد الـ Spam أو Junk
                 </p>
               </div>
 
-              {/* Error banner */}
+              {/* Error */}
               {generalError && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-start gap-2 animate-fade-in">
                   <AlertCircle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
@@ -343,11 +412,9 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
                 </div>
               )}
 
-              {/* OTP Digits Input */}
+              {/* OTP Digits */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground block text-center">
-                  كود التأكيد
-                </label>
+                <label className="text-sm font-medium text-foreground block text-center">كود التأكيد</label>
                 <div className="flex justify-center gap-2.5 sm:gap-3" dir="ltr">
                   {[0, 1, 2, 3, 4, 5].map((i) => (
                     <input
@@ -374,123 +441,68 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
               </div>
 
               {/* Resend */}
-              <div className="text-center space-y-2">
+              <div className="text-center">
                 {countdown > 0 ? (
                   <p className="text-xs text-muted-foreground">
                     ممكن تعيد الإرسال بعد{' '}
-                    <span className="text-[#508991] font-medium tabular-nums">
-                      {formatCountdown(countdown)}
-                    </span>
+                    <span className="text-[#508991] font-medium tabular-nums">{formatCountdown(countdown)}</span>
                   </p>
                 ) : (
                   <button
                     type="button"
                     onClick={handleResendOtp}
-                    disabled={sendingOtp}
+                    disabled={loading}
                     className="text-sm text-[#508991] hover:text-primary transition-colors font-medium disabled:opacity-50"
                   >
-                    {sendingOtp ? 'جاري الإرسال...' : 'إعادة إرسال الكود'}
+                    {loading ? 'جاري الإرسال...' : 'إعادة إرسال الكود'}
                   </button>
                 )}
               </div>
 
-              {/* Terms (register only) */}
-              {activeTab === 'register' && (
-                <div className="flex items-start gap-2.5 py-1">
-                  <input
-                    type="checkbox"
-                    id="terms-verify"
-                    checked={agreedToTerms}
-                    onChange={(e) => {
-                      setAgreedToTerms(e.target.checked);
-                      setGeneralError('');
-                    }}
-                    className="mt-0.5 accent-[#004346] h-4 w-4 rounded"
-                  />
-                  <label
-                    htmlFor="terms-verify"
-                    className="text-[11px] text-muted-foreground leading-relaxed cursor-pointer"
-                  >
-                    أوافق على{' '}
-                    <span className="text-[#508991] underline underline-offset-2">
-                      سياسة الخصوصية
-                    </span>{' '}
-                    و{' '}
-                    <span className="text-[#508991] underline underline-offset-2">
-                      شروط الاستخدام
-                    </span>
-                  </label>
-                </div>
-              )}
-
               {/* Verify Button */}
               <Button
                 onClick={handleVerifyOtp}
-                disabled={
-                  otp.length !== 6 ||
-                  verifying ||
-                  (activeTab === 'register' && !agreedToTerms)
-                }
+                disabled={otp.length !== 6 || verifying}
                 className="w-full bg-[#004346] hover:bg-[#004346]/90 text-white disabled:opacity-40 h-12 rounded-xl text-sm font-medium"
               >
                 {verifying ? (
-                  <>
-                    <Loader2 size={18} className="animate-spin ml-2" />
-                    جاري التحقق...
-                  </>
+                  <><Loader2 size={18} className="animate-spin ml-2" />جاري التحقق...</>
                 ) : (
-                  <>
-                    <Check size={16} className="ml-2" />
-                    تأكيد
-                  </>
+                  <><Check size={16} className="ml-2" />تأكيد البريد الإلكتروني</>
                 )}
               </Button>
 
-              {/* Back button */}
+              {/* Back */}
               <button
                 type="button"
-                onClick={() => {
-                  setStep('phone');
-                  setOtp('');
-                  setOtpError('');
-                  setGeneralError('');
-                }}
+                onClick={() => { setStep('form'); setOtp(''); setOtpError(''); setGeneralError(''); setSuccessMessage(''); }}
                 className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1.5 py-1"
               >
                 <ArrowRight size={14} className="rotate-180" />
-                رجوع وتغيير الرقم
+                رجوع
               </button>
             </div>
           ) : (
-            /* ═══════ Phone + Register/Login Step ═══════ */
+            /* ═══════════ Form Step (Register + Login) ═══════════ */
             <Tabs
               value={activeTab}
-              onValueChange={(v) => {
-                setActiveTab(v as ActiveTab);
-                resetState();
-              }}
+              onValueChange={(v) => { setActiveTab(v as ActiveTab); resetState(); }}
               className="w-full"
             >
               <TabsList className="grid w-full grid-cols-2 mb-5 h-11 rounded-xl">
-                <TabsTrigger value="register" className="text-sm rounded-lg">
-                  حساب جديد
-                </TabsTrigger>
-                <TabsTrigger value="login" className="text-sm rounded-lg">
-                  تسجيل الدخول
-                </TabsTrigger>
+                <TabsTrigger value="register" className="text-sm rounded-lg">حساب جديد</TabsTrigger>
+                <TabsTrigger value="login" className="text-sm rounded-lg">تسجيل الدخول</TabsTrigger>
               </TabsList>
 
-              {/* ════════════════ Register Tab ════════════════ */}
-              <TabsContent value="register" className="space-y-4 animate-fade-in mt-0">
-                {/* Anonymous Badge */}
-                <div className="bg-[#508991]/10 border border-[#508991]/20 rounded-xl p-3.5 flex items-center gap-3">
-                  <Shield size={18} className="text-[#508991] flex-shrink-0" />
-                  <p className="text-xs text-foreground/70 leading-relaxed">
-                    التسجيل مجهول بالكامل — اسمك الحقيقي مش بيظهر لأي حد
+              {/* ════════════ REGISTER TAB ════════════ */}
+              <TabsContent value="register" className="space-y-3.5 animate-fade-in mt-0">
+                <div className="bg-[#508991]/10 border border-[#508991]/20 rounded-xl p-3 flex items-center gap-3">
+                  <Shield size={16} className="text-[#508991] flex-shrink-0" />
+                  <p className="text-[11px] text-foreground/70 leading-relaxed">
+                    بياناتك آمنة ومشفرة — هويتك بتكون مجهولة في المجتمع
                   </p>
                 </div>
 
-                {/* Error banner */}
                 {generalError && (
                   <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-start gap-2 animate-fade-in">
                     <AlertCircle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
@@ -498,112 +510,141 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
                   </div>
                 )}
 
-                {/* Nickname */}
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-foreground">
-                    اسم مستعار
-                  </label>
+                {/* Username */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-foreground">اسم مستعار</label>
                   <div className="relative">
-                    <User
-                      size={18}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
-                    />
+                    <User size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                     <Input
-                      placeholder="اختار اسم مستعار يناسبك..."
-                      value={nickname}
-                      onChange={(e) => {
-                        setNickname(e.target.value);
-                        setNicknameError('');
-                      }}
-                      autoComplete="nickname"
+                      placeholder="اختار اسم مستعار..."
+                      value={username}
+                      onChange={(e) => { setUsername(e.target.value); setUsernameError(''); }}
+                      autoComplete="username"
                       className="pr-11 bg-background border-border text-foreground text-base h-12 rounded-xl"
                     />
                   </div>
-                  {nicknameError && (
+                  {usernameError && (
                     <p className="text-xs text-red-500 flex items-center gap-1 animate-fade-in">
-                      <AlertCircle size={13} className="flex-shrink-0" />
-                      {nicknameError}
+                      <AlertCircle size={13} className="flex-shrink-0" />{usernameError}
                     </p>
                   )}
                 </div>
 
-                {/* Phone */}
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-foreground">رقم الموبايل</label>
+                {/* Email */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-foreground">البريد الإلكتروني</label>
                   <div className="relative">
-                    <Phone
-                      size={18}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
-                    />
+                    <Mail size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                     <Input
-                      placeholder="010XXXXXXXX"
-                      value={phone}
-                      onChange={(e) => {
-                        setPhone(e.target.value.replace(/\D/g, '').slice(0, 11));
-                        setPhoneError('');
-                      }}
-                      type="tel"
-                      inputMode="numeric"
-                      autoComplete="tel"
+                      placeholder="example@email.com"
+                      value={email}
+                      onChange={(e) => { setEmail(e.target.value); setEmailError(''); }}
+                      type="email"
+                      autoComplete="email"
                       className="pr-11 bg-background border-border text-foreground text-base h-12 rounded-xl"
                       dir="ltr"
                     />
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">
-                      +20
-                    </span>
                   </div>
-                  {phoneError && (
+                  {emailError && (
                     <p className="text-xs text-red-500 flex items-center gap-1 animate-fade-in">
-                      <AlertCircle size={13} className="flex-shrink-0" />
-                      {phoneError}
+                      <AlertCircle size={13} className="flex-shrink-0" />{emailError}
                     </p>
                   )}
-                  <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                    <Check size={12} className="text-[#508991]" />
-                    الرقم بيتشفر فوراً ومش بيُخزّن كنص واضح
-                  </p>
                 </div>
 
-                {/* Send OTP Button */}
+                {/* Password */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-foreground">كلمة المرور</label>
+                  <div className="relative">
+                    <Lock size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                    <Input
+                      placeholder="٨ حروف على الأقل"
+                      value={password}
+                      onChange={(e) => { setPassword(e.target.value); setPasswordError(''); }}
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      className="pr-11 pl-11 bg-background border-border text-foreground text-base h-12 rounded-xl"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {passwordError && (
+                    <p className="text-xs text-red-500 flex items-center gap-1 animate-fade-in">
+                      <AlertCircle size={13} className="flex-shrink-0" />{passwordError}
+                    </p>
+                  )}
+                </div>
+
+                {/* Confirm Password */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-foreground">تأكيد كلمة المرور</label>
+                  <div className="relative">
+                    <Lock size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                    <Input
+                      placeholder="أعد كتابة كلمة المرور"
+                      value={confirmPassword}
+                      onChange={(e) => { setConfirmPassword(e.target.value); setConfirmPasswordError(''); }}
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      className="pr-11 bg-background border-border text-foreground text-base h-12 rounded-xl"
+                    />
+                  </div>
+                  {confirmPasswordError && (
+                    <p className="text-xs text-red-500 flex items-center gap-1 animate-fade-in">
+                      <AlertCircle size={13} className="flex-shrink-0" />{confirmPasswordError}
+                    </p>
+                  )}
+                </div>
+
+                {/* Terms */}
+                <div className="flex items-start gap-2.5">
+                  <input
+                    type="checkbox"
+                    id="terms-reg"
+                    checked={agreedToTerms}
+                    onChange={(e) => { setAgreedToTerms(e.target.checked); setGeneralError(''); }}
+                    className="mt-0.5 accent-[#004346] h-4 w-4 rounded"
+                  />
+                  <label htmlFor="terms-reg" className="text-[11px] text-muted-foreground leading-relaxed cursor-pointer">
+                    أوافق على{' '}
+                    <span className="text-[#508991] underline underline-offset-2">سياسة الخصوصية</span>{' '}
+                    و{' '}
+                    <span className="text-[#508991] underline underline-offset-2">شروط الاستخدام</span>
+                  </label>
+                </div>
+
+                {/* Register Button */}
                 <Button
-                  onClick={handleSendOtp}
-                  disabled={
-                    sendingOtp ||
-                    !nickname.trim() ||
-                    nickname.trim().length < 3 ||
-                    !isValidPhone(phone)
-                  }
+                  onClick={handleRegister}
+                  disabled={loading || !username.trim() || !email.trim() || !password || !confirmPassword || !agreedToTerms}
                   className="w-full bg-[#508991] hover:bg-[#508991]/90 text-white disabled:opacity-40 h-12 rounded-xl text-sm font-medium"
                 >
-                  {sendingOtp ? (
-                    <>
-                      <Loader2 size={18} className="animate-spin ml-2" />
-                      جاري إرسال الكود...
-                    </>
+                  {loading ? (
+                    <><Loader2 size={18} className="animate-spin ml-2" />جاري إنشاء الحساب...</>
                   ) : (
-                    <>
-                      <Phone size={16} className="ml-2" />
-                      إرسال كود التأكيد
-                    </>
+                    <><Heart size={16} className="ml-2" />إنشاء حساب جديد</>
                   )}
                 </Button>
 
-                <p className="text-center text-[11px] text-muted-foreground pt-1">
-                  مجاني بالكامل — بدون بطاقة ائتمان
+                <p className="text-center text-[11px] text-muted-foreground pt-0.5">
+                  هتبعتلك كود تأكيد على بريدك الإلكتروني
                 </p>
               </TabsContent>
 
-              {/* ════════════════ Login Tab ════════════════ */}
+              {/* ════════════ LOGIN TAB ════════════ */}
               <TabsContent value="login" className="space-y-4 animate-fade-in mt-0">
-                {/* Shield Badge */}
-                <div className="bg-[#508991]/10 border border-[#508991]/20 rounded-xl p-3.5 flex items-center gap-3">
-                  <Shield size={18} className="text-[#508991] flex-shrink-0" />
-                  <p className="text-xs text-foreground/70 leading-relaxed">
-                    تسجيل دخول بأمان باستخدام كود على الموبايل
+                <div className="bg-[#508991]/10 border border-[#508991]/20 rounded-xl p-3 flex items-center gap-3">
+                  <Shield size={16} className="text-[#508991] flex-shrink-0" />
+                  <p className="text-[11px] text-foreground/70 leading-relaxed">
+                    تسجيل دخول بأمان باستخدام البريد وكلمة المرور
                   </p>
                 </div>
 
-                {/* Error banner */}
                 {generalError && (
                   <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-start gap-2 animate-fade-in">
                     <AlertCircle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
@@ -611,57 +652,72 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
                   </div>
                 )}
 
-                {/* Phone */}
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-foreground">رقم الموبايل</label>
+                {/* Email */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-foreground">البريد الإلكتروني</label>
                   <div className="relative">
-                    <Phone
-                      size={18}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
-                    />
+                    <Mail size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                     <Input
-                      placeholder="010XXXXXXXX"
-                      value={phone}
-                      onChange={(e) => {
-                        setPhone(e.target.value.replace(/\D/g, '').slice(0, 11));
-                        setPhoneError('');
-                      }}
-                      type="tel"
-                      inputMode="numeric"
-                      autoComplete="tel"
+                      placeholder="example@email.com"
+                      value={email}
+                      onChange={(e) => { setEmail(e.target.value); setEmailError(''); }}
+                      type="email"
+                      autoComplete="email"
                       className="pr-11 bg-background border-border text-foreground text-base h-12 rounded-xl"
                       dir="ltr"
                     />
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">
-                      +20
-                    </span>
                   </div>
-                  {phoneError && (
+                  {emailError && (
                     <p className="text-xs text-red-500 flex items-center gap-1 animate-fade-in">
-                      <AlertCircle size={13} className="flex-shrink-0" />
-                      {phoneError}
+                      <AlertCircle size={13} className="flex-shrink-0" />{emailError}
                     </p>
                   )}
                 </div>
 
-                {/* Send OTP Button */}
+                {/* Password */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-foreground">كلمة المرور</label>
+                  <div className="relative">
+                    <Lock size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                    <Input
+                      placeholder="كلمة المرور بتاعتك"
+                      value={password}
+                      onChange={(e) => { setPassword(e.target.value); setPasswordError(''); }}
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="current-password"
+                      className="pr-11 pl-11 bg-background border-border text-foreground text-base h-12 rounded-xl"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {passwordError && (
+                    <p className="text-xs text-red-500 flex items-center gap-1 animate-fade-in">
+                      <AlertCircle size={13} className="flex-shrink-0" />{passwordError}
+                    </p>
+                  )}
+                </div>
+
+                {/* Login Button */}
                 <Button
-                  onClick={handleSendOtp}
-                  disabled={sendingOtp || !isValidPhone(phone)}
-                  className="w-full bg-[#508991] hover:bg-[#508991]/90 text-white disabled:opacity-40 h-12 rounded-xl text-sm font-medium"
+                  onClick={handleLogin}
+                  disabled={loading || !email.trim() || !password}
+                  className="w-full bg-[#004346] hover:bg-[#004346]/90 text-white disabled:opacity-40 h-12 rounded-xl text-sm font-medium"
                 >
-                  {sendingOtp ? (
-                    <>
-                      <Loader2 size={18} className="animate-spin ml-2" />
-                      جاري إرسال الكود...
-                    </>
+                  {loading ? (
+                    <><Loader2 size={18} className="animate-spin ml-2" />جاري تسجيل الدخول...</>
                   ) : (
-                    <>
-                      <Phone size={16} className="ml-2" />
-                      إرسال كود التأكيد
-                    </>
+                    <><Shield size={16} className="ml-2" />تسجيل الدخول</>
                   )}
                 </Button>
+
+                <p className="text-center text-[11px] text-muted-foreground pt-0.5">
+                  مجاني بالكامل — بدون بطاقة ائتمان
+                </p>
               </TabsContent>
             </Tabs>
           )}
