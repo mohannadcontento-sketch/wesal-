@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   LayoutDashboard,
   Users,
@@ -29,6 +29,7 @@ import {
   Bell,
   Lock,
   Globe,
+  Zap,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -67,6 +68,7 @@ interface MockUser {
   trackerEnabled: boolean;
   dailyFollowUp: boolean;
   supervisor: string | null;
+  supervisorId?: string | null;
   streakDays: number;
   reputation: number;
   postsCount: number;
@@ -131,6 +133,55 @@ const recentActivity = [
   { id: '5', text: 'د. أحمد أكد حجز مع بدر #5543', time: 'منذ ساعة', type: 'booking' as const },
   { id: '6', text: 'ليالي #7012 سجّلت حساب جديد', time: 'منذ ساعتين', type: 'user' as const },
 ];
+
+// ─── API Functions ───
+const API_BASE = '/api/admin';
+
+async function fetchAdminUsers(): Promise<MockUser[]> {
+  try {
+    const res = await fetch(`${API_BASE}/users`);
+    const data = await res.json();
+    if (data.users && data.users.length > 0) {
+      return data.users.map((u: any) => ({
+        id: u.id,
+        anonId: u.anonId,
+        nickname: u.nickname,
+        role: u.role as UserRole,
+        tier: u.tier,
+        trackerEnabled: u.trackerEnabled,
+        dailyFollowUp: u.dailyFollowUp,
+        supervisor: u.supervisor,
+        supervisorId: u.supervisorId,
+        streakDays: u.streakDays,
+        reputation: u.reputation,
+        postsCount: u.postsCount,
+        joinDate: u.joinDate,
+        moodScore: u.moodScore,
+      }));
+    }
+  } catch { /* fallback */ }
+  return initialUsers;
+}
+
+async function fetchAdminReports(): Promise<MockReport[]> {
+  try {
+    const res = await fetch(`${API_BASE}/reports`);
+    const data = await res.json();
+    if (data.reports && data.reports.length > 0) {
+      return data.reports.map((r: any) => ({
+        id: r.id,
+        content: r.content,
+        reporter: r.reporter,
+        reason: r.reason,
+        riskScore: r.riskScore,
+        status: r.status,
+        date: r.date,
+        userAnonId: r.targetAnonId,
+      }));
+    }
+  } catch { /* fallback */ }
+  return initialReports;
+}
 
 // ─── Role & Tier Labels ───
 const roleLabels: Record<UserRole, string> = {
@@ -256,6 +307,28 @@ export function AdminPanel() {
   const [reportFilter, setReportFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
   const [supervisorDialog, setSupervisorDialog] = useState<{ open: boolean; userId: string }>({ open: false, userId: '' });
   const [journalDialog, setJournalDialog] = useState<{ open: boolean; user: MockUser | null }>({ open: false, user: null });
+  const [isLoading, setIsLoading] = useState(true);
+
+  async function loadData() {
+    setIsLoading(true);
+    try {
+      const [usersData, reportsData] = await Promise.all([
+        fetchAdminUsers(),
+        fetchAdminReports(),
+      ]);
+      setUsers(usersData);
+      setReports(reportsData);
+    } catch {
+      // Keep initial mock data
+    }
+    setIsLoading(false);
+  }
+
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    loadData();
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // ─── Settings state ───
   const [settings, setSettings] = useState({
@@ -277,25 +350,66 @@ export function AdminPanel() {
   const totalPosts = users.reduce((sum, u) => sum + u.postsCount, 0);
 
   // ─── Handlers ───
-  const changeUserRole = (userId: string, newRole: UserRole) => {
+  const changeUserRole = async (userId: string, newRole: UserRole) => {
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u));
+    try {
+      await fetch(`${API_BASE}/users`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, updates: { user_type: newRole } }),
+      });
+    } catch { /* keep local state */ }
   };
 
-  const toggleTracker = (userId: string) => {
-    setUsers(prev => prev.map(u => u.id === userId ? { ...u, trackerEnabled: !u.trackerEnabled } : u));
+  const toggleTracker = async (userId: string) => {
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+    const newValue = !user.trackerEnabled;
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, trackerEnabled: newValue } : u));
+    try {
+      await fetch(`${API_BASE}/users`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, updates: { tracker_enabled: newValue } }),
+      });
+    } catch { /* keep local state */ }
   };
 
-  const toggleDailyFollowUp = (userId: string) => {
-    setUsers(prev => prev.map(u => u.id === userId ? { ...u, dailyFollowUp: !u.dailyFollowUp } : u));
+  const toggleDailyFollowUp = async (userId: string) => {
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+    const newValue = !user.dailyFollowUp;
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, dailyFollowUp: newValue } : u));
+    try {
+      await fetch(`${API_BASE}/users`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, updates: { daily_follow_up: newValue } }),
+      });
+    } catch { /* keep local state */ }
   };
 
-  const assignSupervisor = (userId: string, supervisorName: string) => {
-    setUsers(prev => prev.map(u => u.id === userId ? { ...u, supervisor: supervisorName || null } : u));
+  const assignSupervisor = async (userId: string, supervisorId: string) => {
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, supervisorId: supervisorId || null, supervisor: supervisors.find(s => s.id === supervisorId)?.anonId || null } : u));
     setSupervisorDialog({ open: false, userId: '' });
+    try {
+      await fetch(`${API_BASE}/users`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, updates: { supervisor_id: supervisorId || null } }),
+      });
+    } catch { /* keep local state */ }
   };
 
-  const updateReportStatus = (reportId: string, status: 'approved' | 'rejected') => {
+  const updateReportStatus = async (reportId: string, status: 'approved' | 'rejected') => {
     setReports(prev => prev.map(r => r.id === reportId ? { ...r, status } : r));
+    try {
+      await fetch(`${API_BASE}/reports`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reportId, status }),
+      });
+    } catch { /* keep local state */ }
   };
 
   const deleteReport = (reportId: string) => {
@@ -1240,7 +1354,7 @@ export function AdminPanel() {
             {supervisors.map(sup => (
               <button
                 key={sup.id}
-                onClick={() => assignSupervisor(supervisorDialog.userId, sup.nickname)}
+                onClick={() => assignSupervisor(supervisorDialog.userId, sup.id)}
                 className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:bg-gray-50 hover:border-[#004346]/30 transition-all text-right"
               >
                 <div className={`w-9 h-9 rounded-full flex items-center justify-center ${roleColors[sup.role]}`}>
@@ -1367,10 +1481,4 @@ function SettingToggle({ icon, label, description, checked, onChange }: {
   );
 }
 
-function Zap({ size, className }: { size: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
-    </svg>
-  );
-}
+// ─── StatCard Component ───

@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Calendar, Clock, Users, MapPin, CheckCircle, Bell, Video, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { fetchEvents, registerForEvent, cancelEventRegistration } from '@/lib/api';
+import { getSession } from '@/lib/permissions';
 
 interface Event {
-  id: number;
+  id: string | number;
   title: string;
   speaker: string;
   speakerSpecialty: string;
@@ -95,16 +97,68 @@ const mockEvents: Event[] = [
 ];
 
 export function EventsPage() {
-  const [registeredEvents, setRegisteredEvents] = useState<number[]>([]);
+  const [registeredEvents, setRegisteredEvents] = useState<string[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const upcomingEvents = mockEvents.filter(e => e.status !== 'past');
-  const pastEvents = mockEvents.filter(e => e.status === 'past');
+  async function loadEvents() {
+    setIsLoading(true);
+    try {
+      const res = await fetchEvents();
+      if (res.events && res.events.length > 0) {
+        setEvents(res.events.map((e: any) => ({
+          id: e.id,
+          title: e.title,
+          speaker: e.speaker,
+          speakerSpecialty: e.speakerSpecialty || '',
+          date: e.date,
+          time: e.time,
+          registered: e.registered || 0,
+          capacity: e.capacity || 100,
+          status: e.status || 'available',
+          type: e.type || 'ندوة مجانية',
+          color: e.color || 'bg-teal-100 text-teal-700',
+          initial: e.initial || e.speaker?.charAt(0) || '?',
+        })));
+      } else {
+        setEvents(mockEvents);
+      }
+    } catch {
+      setEvents(mockEvents);
+    }
+    setIsLoading(false);
+  }
 
-  const handleRegister = (eventId: number) => {
-    if (registeredEvents.includes(eventId)) {
-      setRegisteredEvents(registeredEvents.filter(id => id !== eventId));
-    } else {
-      setRegisteredEvents([...registeredEvents, eventId]);
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    loadEvents();
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  const upcomingEvents = events.filter(e => e.status !== 'past');
+  const pastEvents = events.filter(e => e.status === 'past');
+
+  const handleRegister = async (eventId: string | number) => {
+    const session = getSession();
+    if (!session) return;
+
+    const isRegistered = registeredEvents.includes(String(eventId));
+
+    try {
+      if (isRegistered) {
+        await cancelEventRegistration(session.userId, String(eventId));
+        setRegisteredEvents(prev => prev.filter(id => id !== String(eventId)));
+      } else {
+        await registerForEvent(session.userId, String(eventId));
+        setRegisteredEvents(prev => [...prev, String(eventId)]);
+      }
+    } catch {
+      // Fallback: toggle locally
+      if (isRegistered) {
+        setRegisteredEvents(prev => prev.filter(id => id !== String(eventId)));
+      } else {
+        setRegisteredEvents(prev => [...prev, String(eventId)]);
+      }
     }
   };
 
@@ -133,7 +187,7 @@ export function EventsPage() {
         <h2 className="text-xl font-bold text-foreground mb-4">الفعاليات القادمة</h2>
         <div className="space-y-4">
           {upcomingEvents.map((event) => {
-            const isRegistered = registeredEvents.includes(event.id);
+            const isRegistered = registeredEvents.includes(String(event.id));
             const fillPercent = Math.round((event.registered / event.capacity) * 100);
 
             return (

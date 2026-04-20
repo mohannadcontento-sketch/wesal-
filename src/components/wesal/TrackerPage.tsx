@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Brain, TrendingUp, Award, Sparkles, Lock, CheckCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { getSession, setSession } from '@/lib/permissions';
+import { submitMood, fetchTrackerLogs, analyzeMood } from '@/lib/api';
 
 const moodEmojis = [
   { emoji: '😢', label: 'سيء جداً', value: 1 },
@@ -17,7 +18,7 @@ const moodEmojis = [
   { emoji: '😄', label: 'رائع', value: 9 },
 ];
 
-const weeklyData = [
+const fallbackWeeklyData = [
   { day: 'السبت', score: 4, color: 'bg-amber-400' },
   { day: 'الأحد', score: 5, color: 'bg-amber-400' },
   { day: 'الاثنين', score: 3, color: 'bg-red-400' },
@@ -27,6 +28,13 @@ const weeklyData = [
   { day: 'الجمعة', score: 6, color: 'bg-accent' },
 ];
 
+function scoreToColor(score: number): string {
+  if (score <= 3) return 'bg-red-400';
+  if (score <= 5) return 'bg-amber-400';
+  if (score <= 7) return 'bg-accent';
+  return 'bg-teal-500';
+}
+
 export function TrackerPage() {
   const session = getSession();
   const trackerEnabled = session?.trackerEnabled || false;
@@ -35,10 +43,64 @@ export function TrackerPage() {
   const [moodScore, setMoodScore] = useState(5);
   const [journalText, setJournalText] = useState('');
   const [showAnalysis, setShowAnalysis] = useState(false);
+  const [weeklyData, setWeeklyData] = useState(fallbackWeeklyData);
+  const [streak, setStreak] = useState(12);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
-    if (!trackerEnabled) return;
-    setShowAnalysis(true);
+  // Load tracker data from API on mount
+  useEffect(() => {
+    if (!trackerEnabled || !session) return;
+    fetchTrackerLogs(session.userId, 7)
+      .then(res => {
+        if (res.logs && res.logs.length > 0) {
+          const mapped = res.logs.map((log: any) => ({
+            day: log.day || log.date || '',
+            score: log.score ?? log.moodScore ?? 0,
+            color: scoreToColor(log.score ?? log.moodScore ?? 0),
+          }));
+          setWeeklyData(mapped);
+        }
+        if (res.streak !== undefined) {
+          setStreak(res.streak);
+        }
+      })
+      .catch(() => {
+        // Fallback: keep default weekly data
+      });
+  }, [trackerEnabled]);
+
+  const handleSubmit = async () => {
+    if (!trackerEnabled || !selectedMood) return;
+    const sess = getSession();
+    if (!sess) return;
+
+    setLoading(true);
+    try {
+      await submitMood({
+        userId: sess.userId,
+        moodScore: selectedMood,
+        moodEmoji: moodEmojis.find(m => m.value === selectedMood)?.emoji,
+        journalText: journalText,
+      });
+      setShowAnalysis(true);
+      // Refresh data
+      const res = await fetchTrackerLogs(sess.userId, 7);
+      if (res.logs && res.logs.length > 0) {
+        const mapped = res.logs.map((log: any) => ({
+          day: log.day || log.date || '',
+          score: log.score ?? log.moodScore ?? 0,
+          color: scoreToColor(log.score ?? log.moodScore ?? 0),
+        }));
+        setWeeklyData(mapped);
+      }
+      if (res.streak !== undefined) {
+        setStreak(res.streak);
+      }
+    } catch {
+      // Fallback: still show analysis
+      setShowAnalysis(true);
+    }
+    setLoading(false);
   };
 
   // ─── لو التراكر مش مفعّل ───
@@ -171,9 +233,13 @@ export function TrackerPage() {
                 />
               </div>
 
-              <Button onClick={handleSubmit} disabled={!selectedMood || !journalText.trim()} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-40 py-5 text-base">
-                <Brain size={18} className="ml-2" />
-                سجّل مزاجي واحصل على تحليل
+              <Button onClick={handleSubmit} disabled={!selectedMood || !journalText.trim() || loading} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-40 py-5 text-base">
+                {loading ? (
+                  <span className="ml-2 inline-block w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                ) : (
+                  <Brain size={18} className="ml-2" />
+                )}
+                {loading ? 'جاري التسجيل...' : 'سجّل مزاجي واحصل على تحليل'}
               </Button>
             </CardContent>
           </Card>
@@ -244,7 +310,7 @@ export function TrackerPage() {
                 <Award size={32} className="text-amber-300" />
               </div>
               <div>
-                <p className="text-3xl font-bold">١٢</p>
+                <p className="text-3xl font-bold">{streak}</p>
                 <p className="text-white/70 text-sm">يوم متتالي!</p>
               </div>
               <Progress value={80} className="h-2 bg-white/20 [&>div]:bg-amber-400" />

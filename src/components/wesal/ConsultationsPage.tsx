@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Star, Phone, MessageCircle, CheckCircle, Clock, Search, Filter, Stethoscope, Users, Baby, Home } from 'lucide-react';
 import { getSession, setSession } from '@/lib/permissions';
+import { fetchDoctors, bookConsultation } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface Doctor {
-  id: number;
+  id: string | number;
   name: string;
   specialty: string;
   category: string;
@@ -115,8 +116,49 @@ export function ConsultationsPage() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredDoctors = mockDoctors.filter(doc => {
+  async function loadDoctors() {
+    setIsLoading(true);
+    try {
+      const res = await fetchDoctors(activeCategory);
+      if (res.doctors && res.doctors.length > 0) {
+        setDoctors(res.doctors.map((d: any) => ({
+          id: d.id,
+          name: d.name,
+          specialty: d.specialty,
+          category: d.category,
+          rating: d.rating,
+          reviews: d.reviews,
+          sessions: d.sessions,
+          price: d.price,
+          types: d.types || ['chat'],
+          bio: d.bio || '',
+          color: d.color || 'bg-teal-100 text-teal-700',
+          initial: d.initial || d.name?.charAt(0) || '?',
+          availableTimes: d.availableTimes || [],
+        })));
+      } else {
+        setDoctors(mockDoctors);
+      }
+    } catch {
+      setDoctors(mockDoctors);
+    }
+    setIsLoading(false);
+  }
+
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    loadDoctors();
+  }, []);
+
+  useEffect(() => {
+    loadDoctors();
+  }, [activeCategory]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  const filteredDoctors = doctors.filter(doc => {
     const matchesSearch = doc.name.includes(searchQuery) || doc.specialty.includes(searchQuery);
     const matchesCategory = activeCategory === 'all' || doc.category === activeCategory;
     return matchesSearch && matchesCategory;
@@ -319,11 +361,21 @@ export function ConsultationsPage() {
                   <Button
                     disabled={!selectedTime}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-40"
-                    onClick={() => {
-                      // تفعيل التراكر للمريض بعد الحجز
+                    onClick={async () => {
                       const session = getSession();
-                      if (session) {
-                        setSession({ ...session, trackerEnabled: true, followingDoctorId: String(selectedDoctor.id) });
+                      if (session && selectedDoctor && selectedTime) {
+                        try {
+                          await bookConsultation({
+                            patientId: session.userId,
+                            doctorId: String(selectedDoctor.id),
+                            sessionType: 'chat',
+                            selectedTime: selectedTime,
+                          });
+                          // Activate tracker
+                          setSession({ ...session, trackerEnabled: true, followingDoctorId: String(selectedDoctor.id) });
+                        } catch { /* fallback: still activate tracker locally */
+                          setSession({ ...session, trackerEnabled: true, followingDoctorId: String(selectedDoctor.id) });
+                        }
                       }
                       setSelectedDoctor(null);
                       setSelectedTime(null);

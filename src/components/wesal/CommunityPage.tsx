@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Heart, ThumbsUp, MessageCircle, Bookmark, Flag, MoreHorizontal, Send,
   Plus, Image as ImageIcon, BarChart3, Search, Bell, TrendingUp, Award, Users, Clock
@@ -10,10 +10,15 @@ import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import {
+  fetchPosts, createPost, toggleReaction,
+  fetchComments, addComment, submitSafetyReport
+} from '@/lib/api';
+import { getSession } from '@/lib/permissions';
 
 // ─── Types ───
 interface Post {
-  id: number;
+  id: string | number;
   author: string;
   authorInitial: string;
   authorColor: string;
@@ -31,7 +36,7 @@ interface Post {
 }
 
 interface Comment {
-  id: number;
+  id: string | number;
   author: string;
   authorInitial: string;
   authorColor: string;
@@ -43,19 +48,8 @@ interface Comment {
   replies?: Comment[];
 }
 
-// ─── Mock Data ───
-const mockStories = [
-  { id: 1, name: 'نصائح اليوم', emoji: '💡', color: 'bg-gradient-to-br from-amber-400 to-orange-500', isSystem: true },
-  { id: 2, name: 'مسافر #2487', emoji: '😊', color: 'bg-gradient-to-br from-teal-400 to-teal-600' },
-  { id: 3, name: 'نسمة #3194', emoji: '💪', color: 'bg-gradient-to-br from-purple-400 to-purple-600' },
-  { id: 4, name: 'صباح #1523', emoji: '❤️', color: 'bg-gradient-to-br from-rose-400 to-rose-600' },
-  { id: 5, name: 'د. نورهان', emoji: '👩‍⚕️', color: 'bg-gradient-to-br from-blue-400 to-blue-600', isDoctor: true },
-  { id: 6, name: 'فجر #6238', emoji: '✨', color: 'bg-gradient-to-br from-indigo-400 to-indigo-600' },
-  { id: 7, name: 'قمر #4871', emoji: '🌙', color: 'bg-gradient-to-br from-slate-400 to-slate-600' },
-  { id: 8, name: 'بدر #5543', emoji: '🌟', color: 'bg-gradient-to-br from-yellow-400 to-amber-500' },
-];
-
-const mockPosts: Post[] = [
+// ─── Fallback Mock Data ───
+const FALLBACK_POSTS: Post[] = [
   {
     id: 1, author: 'مسافر #2487', authorInitial: 'م', authorColor: 'bg-teal-100 text-teal-700',
     time: 'منذ ساعتين',
@@ -94,19 +88,30 @@ const mockPosts: Post[] = [
   },
 ];
 
-const mockComments: Record<number, Comment[]> = {
-  1: [
+const FALLBACK_COMMENTS: Record<string, Comment[]> = {
+  '1': [
     { id: 101, author: 'ليالي #7012', authorInitial: 'ل', authorColor: 'bg-pink-100 text-pink-700', time: 'منذ ساعة', content: 'أنا كمان كنت حاسسة بنفس الحاجة. اللي ساعدني هو التركيز على حاجة واحدة في كل مرة. وجربت تقسيم اليوم لفترات صغيرة + breaks كل ٥٠ دقيقة. فرق كبير!', helpfuls: 5, likes: 3, replies: [
       { id: 1001, author: 'مسافر #2487', authorInitial: 'م', authorColor: 'bg-teal-100 text-teal-700', time: 'منذ ٣٠ دقيقة', content: 'شكراً ليالي! فكرة التقسيم عملية هجربها النهاردة 💙', helpfuls: 2, likes: 1 },
       { id: 1002, author: 'بدر #5543', authorInitial: 'ب', authorColor: 'bg-indigo-100 text-indigo-700', time: 'منذ ١٥ دقيقة', content: 'أنا بستخدم تقنية Pomodoro — ٢٥ دقيقة شغل + ٥ دقائق راحة. ممتازة!', helpfuls: 1, likes: 0 },
     ] },
     { id: 102, author: 'د. أحمد محمود', authorInitial: 'أ', authorColor: 'bg-teal-100 text-teal-700', time: 'منذ ٣٠ دقيقة', content: 'الضغط في الشغل بيأثر على كل جوانب حياتنا. نصيحتي: حط حدود واضحة بين وقت الشغل والوقت الشخصي. ممكن تبدأ بنص ساعة كل يوم تكون "وقتك" بس. ولو الاستمرار صعب، استشارة واحدة ممكن تساعدك تلاقي جذور الضغط.', helpfuls: 12, likes: 8, isDoctor: true },
   ],
-  5: [
+  '5': [
     { id: 501, author: 'بدر #5543', authorInitial: 'ب', authorColor: 'bg-indigo-100 text-indigo-700', time: 'منذ ٤٥ دقيقة', content: 'التنفس العميق قبل النوم ساعدني كتير. جرب تطبيق ٤-٧-٨: شهيق ٤ ثواني، حبس ٧ ثواني، زفير ٨ ثواني. كررها ٤ مرات. مع الوقت بتعود المخ يسترخي.', helpfuls: 8, likes: 5 },
     { id: 502, author: 'ليالي #7012', authorInitial: 'ل', authorColor: 'bg-pink-100 text-pink-700', time: 'منذ ٢٠ دقيقة', content: 'أنا كنت بنفس المشكلة! اللي فعلاً ساعدني هو: مش أستخدم الموبايل ساعة قبل النوم، وكتابة ٣ حاجات شاكرة عليها. الدكتور قال إن السهر على الموبايل بيخلي المخ في حالة "تنبيه" ومش بيقدر ينتقل للنوم.', helpfuls: 6, likes: 4 },
   ],
 };
+
+const mockStories = [
+  { id: 1, name: 'نصائح اليوم', emoji: '💡', color: 'bg-gradient-to-br from-amber-400 to-orange-500', isSystem: true },
+  { id: 2, name: 'مسافر #2487', emoji: '😊', color: 'bg-gradient-to-br from-teal-400 to-teal-600' },
+  { id: 3, name: 'نسمة #3194', emoji: '💪', color: 'bg-gradient-to-br from-purple-400 to-purple-600' },
+  { id: 4, name: 'صباح #1523', emoji: '❤️', color: 'bg-gradient-to-br from-rose-400 to-rose-600' },
+  { id: 5, name: 'د. نورهان', emoji: '👩‍⚕️', color: 'bg-gradient-to-br from-blue-400 to-blue-600', isDoctor: true },
+  { id: 6, name: 'فجر #6238', emoji: '✨', color: 'bg-gradient-to-br from-indigo-400 to-indigo-600' },
+  { id: 7, name: 'قمر #4871', emoji: '🌙', color: 'bg-gradient-to-br from-slate-400 to-slate-600' },
+  { id: 8, name: 'بدر #5543', emoji: '🌟', color: 'bg-gradient-to-br from-yellow-400 to-amber-500' },
+];
 
 const quickEmojis = ['😊', '😔', '💪', '❤️', '🙏', '🤗', '💬', '✨', '😔', '😤', '😴', '🥰'];
 const trendingTopics = [
@@ -120,22 +125,127 @@ const trendingTopics = [
 type FeedTab = 'latest' | 'trending' | 'doctors';
 
 export function CommunityPage() {
+  // ─── State ───
   const [newPost, setNewPost] = useState('');
-  const [posts, setPosts] = useState(mockPosts);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showEmojis, setShowEmojis] = useState(false);
-  const [expandedComments, setExpandedComments] = useState<number | null>(null);
+  const [expandedComments, setExpandedComments] = useState<string | number | null>(null);
   const [newComment, setNewComment] = useState('');
   const [feedTab, setFeedTab] = useState<FeedTab>('latest');
   const [searchQuery, setSearchQuery] = useState('');
+  const [commentsCache, setCommentsCache] = useState<Record<string, Comment[]>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handlePost = () => {
+  // ─── User info from session ───
+  const session = getSession();
+  const userAvatar = session?.avatarColor || 'bg-teal-100 text-teal-700';
+  const userInitial = session?.nickname?.charAt(0) || 'م';
+  const userAnonId = session?.anonId || 'مسافر';
+
+  // ─── Load posts on mount ───
+  const loadPosts = useCallback(async () => {
+    try {
+      const res = await fetchPosts();
+      if (res.posts && res.posts.length > 0) {
+        setPosts(res.posts.map((p: any) => ({
+          id: p.id,
+          author: p.author,
+          authorInitial: p.authorInitial,
+          authorColor: p.authorColor,
+          authorBadge: p.authorBadge,
+          time: p.time,
+          content: p.content,
+          likes: p.likes || 0,
+          helpfuls: p.helpfuls || 0,
+          comments: p.comments || 0,
+          shares: p.shares || 0,
+          isDoctor: p.isDoctor,
+        })));
+      } else {
+        setPosts(FALLBACK_POSTS);
+      }
+    } catch {
+      setPosts(FALLBACK_POSTS);
+    }
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadPosts();
+  }, [loadPosts]);
+
+  // ─── Load comments for a post ───
+  const loadCommentsForPost = useCallback(async (postId: string | number) => {
+    const key = String(postId);
+    if (commentsCache[key]) return;
+    try {
+      const res = await fetchComments(key);
+      if (res.comments && res.comments.length > 0) {
+        setCommentsCache(prev => ({
+          ...prev,
+          [key]: res.comments.map((c: any) => ({
+            id: c.id,
+            author: c.author,
+            authorInitial: c.authorInitial,
+            authorColor: c.authorColor,
+            time: c.time,
+            content: c.content,
+            helpfuls: c.helpfuls || 0,
+            likes: c.likes || 0,
+            isDoctor: c.isDoctor,
+            replies: c.replies,
+          })),
+        }));
+      }
+    } catch {
+      // Use fallback comments if available
+    }
+  }, [commentsCache]);
+
+  // ─── Handle expand comments ───
+  const handleToggleComments = async (postId: string | number) => {
+    const key = String(postId);
+    if (expandedComments === postId) {
+      setExpandedComments(null);
+    } else {
+      setExpandedComments(postId);
+      await loadCommentsForPost(postId);
+    }
+  };
+
+  // ─── Get comments for a post (API cache → fallback) ───
+  const getCommentsForPost = (postId: string | number): Comment[] => {
+    const key = String(postId);
+    if (commentsCache[key]) return commentsCache[key];
+    return FALLBACK_COMMENTS[key] || [];
+  };
+
+  // ─── Create post ───
+  const handlePost = async () => {
     if (!newPost.trim()) return;
+    const session = getSession();
+
+    if (session) {
+      try {
+        const res = await createPost(newPost, session.userId);
+        if (res.success) {
+          setNewPost('');
+          setShowEmojis(false);
+          loadPosts();
+          return;
+        }
+      } catch {
+        // fallback: add locally
+      }
+    }
+
+    // Fallback: add post locally
     const post: Post = {
       id: Date.now(),
-      author: 'مسافر #' + Math.floor(Math.random() * 9000 + 1000),
-      authorInitial: 'م',
-      authorColor: 'bg-teal-100 text-teal-700',
+      author: userAnonId + ' #' + Math.floor(Math.random() * 9000 + 1000),
+      authorInitial: userInitial,
+      authorColor: userAvatar,
       time: 'الآن',
       content: newPost,
       likes: 0, helpfuls: 0, comments: 0, shares: 0,
@@ -145,35 +255,128 @@ export function CommunityPage() {
     setShowEmojis(false);
   };
 
-  const toggleLike = (postId: number) => {
+  // ─── Toggle like ───
+  const toggleLike = async (postId: string | number) => {
+    const session = getSession();
+
+    // Optimistic update
     setPosts(posts.map(p =>
       p.id === postId ? { ...p, liked: !p.liked, likes: p.liked ? p.likes - 1 : p.likes + 1 } : p
     ));
+
+    if (session) {
+      try {
+        await toggleReaction(String(postId), session.userId, 'like');
+      } catch {
+        // Rollback on error
+        setPosts(posts.map(p =>
+          p.id === postId ? { ...p, liked: !p.liked, likes: p.liked ? p.likes - 1 : p.likes + 1 } : p
+        ));
+      }
+    }
   };
 
-  const toggleHelpful = (postId: number) => {
+  // ─── Toggle helpful ───
+  const toggleHelpful = async (postId: string | number) => {
+    const session = getSession();
+
+    // Optimistic update
     setPosts(posts.map(p =>
       p.id === postId ? { ...p, helpful: !p.helpful, helpfuls: p.helpful ? p.helpfuls - 1 : p.helpfuls + 1 } : p
     ));
+
+    if (session) {
+      try {
+        await toggleReaction(String(postId), session.userId, 'helpful');
+      } catch {
+        // Rollback on error
+        setPosts(posts.map(p =>
+          p.id === postId ? { ...p, helpful: !p.helpful, helpfuls: p.helpful ? p.helpfuls - 1 : p.helpfuls + 1 } : p
+        ));
+      }
+    }
   };
 
-  const toggleSave = (postId: number) => {
+  // ─── Toggle save ───
+  const toggleSave = async (postId: string | number) => {
+    const session = getSession();
+
+    // Optimistic update
     setPosts(posts.map(p => p.id === postId ? { ...p, saved: !p.saved } : p));
+
+    if (session) {
+      try {
+        await toggleReaction(String(postId), session.userId, 'save');
+      } catch {
+        // Rollback on error
+        setPosts(posts.map(p => p.id === postId ? { ...p, saved: !p.saved } : p));
+      }
+    }
   };
 
-  const addComment = (postId: number) => {
+  // ─── Add comment ───
+  const handleAddComment = async (postId: string | number) => {
     if (!newComment.trim()) return;
+    const session = getSession();
+
+    if (session) {
+      try {
+        const res = await addComment(String(postId), session.userId, newComment);
+        if (res.success) {
+          setNewComment('');
+          // Invalidate cache and reload comments
+          setCommentsCache(prev => {
+            const next = { ...prev };
+            delete next[String(postId)];
+            return next;
+          });
+          await loadCommentsForPost(postId);
+          loadPosts(); // refresh comment count
+          return;
+        }
+      } catch {
+        // fallback: add locally
+      }
+    }
+
+    // Fallback: add comment locally
     const c: Comment = {
-      id: Date.now(), author: 'مسافر #' + Math.floor(Math.random() * 9000 + 1000),
-      authorInitial: 'م', authorColor: 'bg-teal-100 text-teal-700', time: 'الآن',
-      content: newComment, helpfuls: 0, likes: 0,
+      id: Date.now(),
+      author: userAnonId + ' #' + Math.floor(Math.random() * 9000 + 1000),
+      authorInitial: userInitial,
+      authorColor: userAvatar,
+      time: 'الآن',
+      content: newComment,
+      helpfuls: 0, likes: 0,
     };
-    if (!mockComments[postId]) mockComments[postId] = [];
-    mockComments[postId].push(c);
+
+    const key = String(postId);
+    const existing = getCommentsForPost(postId);
+    setCommentsCache(prev => ({
+      ...prev,
+      [key]: [...existing, c],
+    }));
     setPosts(posts.map(p => p.id === postId ? { ...p, comments: p.comments + 1 } : p));
     setNewComment('');
   };
 
+  // ─── Report ───
+  const handleReport = async (postId: string | number) => {
+    const session = getSession();
+    if (!session) return;
+    try {
+      await submitSafetyReport({
+        reporterId: session.userId,
+        contentType: 'post',
+        contentId: String(postId),
+        reason: 'المستخدم بلّغ عن المنشور',
+      });
+    } catch {
+      // silent fail
+    }
+  };
+
+  // ─── Filtered posts ───
   const filteredPosts = feedTab === 'doctors' ? posts.filter(p => p.isDoctor) : posts;
 
   return (
@@ -212,8 +415,8 @@ export function CommunityPage() {
       <Card className="bg-card border-border mb-5 overflow-hidden">
         <div className="p-4 space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
-              م
+            <div className={`w-10 h-10 rounded-full ${userAvatar} flex items-center justify-center text-sm font-bold ${userAvatar.includes('text-') ? '' : 'text-primary'}`}>
+              {userInitial}
             </div>
             <div
               onClick={() => document.getElementById('post-textarea')?.focus()}
@@ -292,180 +495,202 @@ export function CommunityPage() {
         </div>
       )}
 
+      {/* ─── Loading State ─── */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-16">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-muted-foreground">جاري تحميل المنشورات...</p>
+          </div>
+        </div>
+      )}
+
       {/* ─── Feed ─── */}
-      <div className="space-y-4 pb-20">
-        {filteredPosts.map((post) => (
-          <Card key={post.id} className="bg-card border-border overflow-hidden hover:shadow-md transition-shadow">
-            {/* Post Header */}
-            <div className="p-4 pb-0">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full ${post.authorColor} flex items-center justify-center font-bold text-sm flex-shrink-0`}>
-                  {post.authorInitial}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <p className="font-bold text-foreground text-sm">{post.author}</p>
-                    {post.isDoctor && (
-                      <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 text-[9px] px-1.5 py-0 h-4">✓ معتمد</Badge>
-                    )}
-                    {post.authorBadge && !post.isDoctor && (
-                      <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 text-[9px] px-1.5 py-0 h-4">{post.authorBadge}</Badge>
-                    )}
+      {!isLoading && (
+        <div className="space-y-4 pb-20">
+          {filteredPosts.length === 0 && (
+            <div className="flex flex-col items-center py-16 text-center">
+              <Users size={40} className="text-muted-foreground/40 mb-3" />
+              <p className="text-sm text-muted-foreground">لا توجد منشورات حالياً</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">كن أول من يشارك إحساسه مع المجتمع 💙</p>
+            </div>
+          )}
+          {filteredPosts.map((post) => (
+            <Card key={post.id} className="bg-card border-border overflow-hidden hover:shadow-md transition-shadow">
+              {/* Post Header */}
+              <div className="p-4 pb-0">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full ${post.authorColor} flex items-center justify-center font-bold text-sm flex-shrink-0`}>
+                    {post.authorInitial}
                   </div>
-                  <p className="text-muted-foreground text-[11px]">{post.time}</p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <p className="font-bold text-foreground text-sm">{post.author}</p>
+                      {post.isDoctor && (
+                        <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 text-[9px] px-1.5 py-0 h-4">✓ معتمد</Badge>
+                      )}
+                      {post.authorBadge && !post.isDoctor && (
+                        <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 text-[9px] px-1.5 py-0 h-4">{post.authorBadge}</Badge>
+                      )}
+                    </div>
+                    <p className="text-muted-foreground text-[11px]">{post.time}</p>
+                  </div>
+                  <button className="text-muted-foreground hover:text-foreground p-1 rounded-lg hover:bg-secondary">
+                    <MoreHorizontal size={18} />
+                  </button>
                 </div>
-                <button className="text-muted-foreground hover:text-foreground p-1 rounded-lg hover:bg-secondary">
-                  <MoreHorizontal size={18} />
+              </div>
+
+              {/* Post Content */}
+              <div className="px-4 py-3">
+                <p className="text-foreground/85 text-sm leading-[1.8] whitespace-pre-wrap">
+                  {post.content}
+                </p>
+              </div>
+
+              {/* Engagement Stats */}
+              <div className="px-4 pb-2">
+                <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                  <div className="flex items-center gap-3">
+                    <span>{post.likes + post.helpfuls} تفاعل</span>
+                    <span>{post.comments} تعليق</span>
+                  </div>
+                  {post.shares > 0 && <span>{post.shares} مشاركة</span>}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center border-t border-border mx-2">
+                <button
+                  onClick={() => toggleLike(post.id)}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-medium transition-all rounded-lg mx-1 my-1 ${
+                    post.liked ? 'text-red-500 bg-red-50' : 'text-muted-foreground hover:bg-secondary/50'
+                  }`}
+                >
+                  <Heart size={18} fill={post.liked ? 'currentColor' : 'none'} />
+                  <span className="hidden sm:inline">أعجبني</span>
+                </button>
+                <button
+                  onClick={() => toggleHelpful(post.id)}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-medium transition-all rounded-lg mx-1 my-1 ${
+                    post.helpful ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:bg-secondary/50'
+                  }`}
+                >
+                  <ThumbsUp size={18} />
+                  <span className="hidden sm:inline">مفيد</span>
+                </button>
+                <button
+                  onClick={() => handleToggleComments(post.id)}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-medium transition-all rounded-lg mx-1 my-1 ${
+                    expandedComments === post.id ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:bg-secondary/50'
+                  }`}
+                >
+                  <MessageCircle size={18} />
+                  <span className="hidden sm:inline">تعليق</span>
+                </button>
+                <button
+                  onClick={() => toggleSave(post.id)}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-medium transition-all rounded-lg mx-1 my-1 ${
+                    post.saved ? 'text-amber-500 bg-amber-50' : 'text-muted-foreground hover:bg-secondary/50'
+                  }`}
+                >
+                  <Bookmark size={18} fill={post.saved ? 'currentColor' : 'none'} />
+                </button>
+                <button
+                  onClick={() => handleReport(post.id)}
+                  className="flex items-center justify-center py-3 px-2 text-xs text-muted-foreground hover:bg-red-50 hover:text-red-500 transition-all rounded-lg my-1"
+                >
+                  <Flag size={16} />
                 </button>
               </div>
-            </div>
 
-            {/* Post Content */}
-            <div className="px-4 py-3">
-              <p className="text-foreground/85 text-sm leading-[1.8] whitespace-pre-wrap">
-                {post.content}
-              </p>
-            </div>
-
-            {/* Engagement Stats */}
-            <div className="px-4 pb-2">
-              <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                <div className="flex items-center gap-3">
-                  <span>{post.likes + post.helpfuls} تفاعل</span>
-                  <span>{post.comments} تعليق</span>
-                </div>
-                {post.shares > 0 && <span>{post.shares} مشاركة</span>}
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center border-t border-border mx-2">
-              <button
-                onClick={() => toggleLike(post.id)}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-medium transition-all rounded-lg mx-1 my-1 ${
-                  post.liked ? 'text-red-500 bg-red-50' : 'text-muted-foreground hover:bg-secondary/50'
-                }`}
-              >
-                <Heart size={18} fill={post.liked ? 'currentColor' : 'none'} />
-                <span className="hidden sm:inline">أعجبني</span>
-              </button>
-              <button
-                onClick={() => toggleHelpful(post.id)}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-medium transition-all rounded-lg mx-1 my-1 ${
-                  post.helpful ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:bg-secondary/50'
-                }`}
-              >
-                <ThumbsUp size={18} />
-                <span className="hidden sm:inline">مفيد</span>
-              </button>
-              <button
-                onClick={() => setExpandedComments(expandedComments === post.id ? null : post.id)}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-medium transition-all rounded-lg mx-1 my-1 ${
-                  expandedComments === post.id ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:bg-secondary/50'
-                }`}
-              >
-                <MessageCircle size={18} />
-                <span className="hidden sm:inline">تعليق</span>
-              </button>
-              <button
-                onClick={() => toggleSave(post.id)}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-medium transition-all rounded-lg mx-1 my-1 ${
-                  post.saved ? 'text-amber-500 bg-amber-50' : 'text-muted-foreground hover:bg-secondary/50'
-                }`}
-              >
-                <Bookmark size={18} fill={post.saved ? 'currentColor' : 'none'} />
-              </button>
-              <button className="flex items-center justify-center py-3 px-2 text-xs text-muted-foreground hover:bg-red-50 hover:text-red-500 transition-all rounded-lg my-1">
-                <Flag size={16} />
-              </button>
-            </div>
-
-            {/* Comments Section */}
-            {expandedComments === post.id && (
-              <div className="border-t border-border p-4 space-y-3 animate-fade-in bg-secondary/20">
-                {/* Existing Comments */}
-                {(mockComments[post.id] || []).map((comment) => (
-                  <div key={comment.id} className="space-y-2.5">
-                    <div className="flex gap-2.5">
-                      <div className={`w-8 h-8 rounded-full ${comment.authorColor} flex items-center justify-center font-bold text-[11px] flex-shrink-0`}>
-                        {comment.authorInitial}
-                      </div>
-                      <div className="flex-1">
-                        <div className="bg-card rounded-xl p-3 border border-border/50">
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <span className="font-bold text-foreground text-xs">{comment.author}</span>
-                            {comment.isDoctor && (
-                              <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 text-[8px] px-1 py-0 h-3.5">✓ معتمد</Badge>
-                            )}
-                            <span className="text-muted-foreground text-[10px]">{comment.time}</span>
+              {/* Comments Section */}
+              {expandedComments === post.id && (
+                <div className="border-t border-border p-4 space-y-3 animate-fade-in bg-secondary/20">
+                  {/* Existing Comments */}
+                  {getCommentsForPost(post.id).map((comment) => (
+                    <div key={comment.id} className="space-y-2.5">
+                      <div className="flex gap-2.5">
+                        <div className={`w-8 h-8 rounded-full ${comment.authorColor} flex items-center justify-center font-bold text-[11px] flex-shrink-0`}>
+                          {comment.authorInitial}
+                        </div>
+                        <div className="flex-1">
+                          <div className="bg-card rounded-xl p-3 border border-border/50">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <span className="font-bold text-foreground text-xs">{comment.author}</span>
+                              {comment.isDoctor && (
+                                <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 text-[8px] px-1 py-0 h-3.5">✓ معتمد</Badge>
+                              )}
+                              <span className="text-muted-foreground text-[10px]">{comment.time}</span>
+                            </div>
+                            <p className="text-foreground/80 text-xs leading-relaxed">{comment.content}</p>
                           </div>
-                          <p className="text-foreground/80 text-xs leading-relaxed">{comment.content}</p>
-                        </div>
-                        <div className="flex items-center gap-4 mt-1 px-2">
-                          <button className="text-[10px] text-muted-foreground hover:text-red-500 flex items-center gap-0.5">
-                            <Heart size={11} /> {comment.likes}
-                          </button>
-                          <button className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-0.5">
-                            <ThumbsUp size={11} /> مفيد {comment.helpfuls}
-                          </button>
-                          <button className="text-[10px] text-muted-foreground hover:text-foreground">رد</button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Replies */}
-                    {comment.replies?.map((reply) => (
-                      <div key={reply.id} className="mr-10 flex gap-2">
-                        <div className={`w-6 h-6 rounded-full ${reply.authorColor} flex items-center justify-center font-bold text-[9px] flex-shrink-0`}>
-                          {reply.authorInitial}
-                        </div>
-                        <div className="flex-1 bg-card rounded-lg p-2.5 border border-border/50">
-                          <div className="flex items-center gap-1.5 mb-0.5">
-                            <span className="font-bold text-foreground text-[10px]">{reply.author}</span>
-                            <span className="text-muted-foreground text-[9px]">{reply.time}</span>
-                          </div>
-                          <p className="text-foreground/80 text-[11px] leading-relaxed">{reply.content}</p>
-                          <div className="flex items-center gap-3 mt-1">
-                            <button className="text-[9px] text-muted-foreground hover:text-red-500 flex items-center gap-0.5">
-                              <Heart size={10} /> {reply.likes}
+                          <div className="flex items-center gap-4 mt-1 px-2">
+                            <button className="text-[10px] text-muted-foreground hover:text-red-500 flex items-center gap-0.5">
+                              <Heart size={11} /> {comment.likes}
                             </button>
-                            <button className="text-[9px] text-muted-foreground hover:text-foreground">رد</button>
+                            <button className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-0.5">
+                              <ThumbsUp size={11} /> مفيد {comment.helpfuls}
+                            </button>
+                            <button className="text-[10px] text-muted-foreground hover:text-foreground">رد</button>
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ))}
 
-                {/* Add Comment */}
-                <div className="flex gap-2 items-center pt-1">
-                  <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary flex-shrink-0">
-                    م
-                  </div>
-                  <div className="flex-1 flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="اكتب تعليقك..."
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && addComment(post.id)}
-                      className="flex-1 bg-card border border-border rounded-full px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-accent"
-                    />
-                    <Button
-                      size="sm"
-                      onClick={() => addComment(post.id)}
-                      disabled={!newComment.trim()}
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 w-8 p-0 rounded-full disabled:opacity-30 flex items-center justify-center"
-                    >
-                      <Send size={14} />
-                    </Button>
+                      {/* Replies */}
+                      {comment.replies?.map((reply) => (
+                        <div key={reply.id} className="mr-10 flex gap-2">
+                          <div className={`w-6 h-6 rounded-full ${reply.authorColor} flex items-center justify-center font-bold text-[9px] flex-shrink-0`}>
+                            {reply.authorInitial}
+                          </div>
+                          <div className="flex-1 bg-card rounded-lg p-2.5 border border-border/50">
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                              <span className="font-bold text-foreground text-[10px]">{reply.author}</span>
+                              <span className="text-muted-foreground text-[9px]">{reply.time}</span>
+                            </div>
+                            <p className="text-foreground/80 text-[11px] leading-relaxed">{reply.content}</p>
+                            <div className="flex items-center gap-3 mt-1">
+                              <button className="text-[9px] text-muted-foreground hover:text-red-500 flex items-center gap-0.5">
+                                <Heart size={10} /> {reply.likes}
+                              </button>
+                              <button className="text-[9px] text-muted-foreground hover:text-foreground">رد</button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+
+                  {/* Add Comment */}
+                  <div className="flex gap-2 items-center pt-1">
+                    <div className={`w-7 h-7 rounded-full ${userAvatar} flex items-center justify-center text-[10px] font-bold ${userAvatar.includes('text-') ? '' : 'text-primary'} flex-shrink-0`}>
+                      {userInitial}
+                    </div>
+                    <div className="flex-1 flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="اكتب تعليقك..."
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddComment(post.id)}
+                        className="flex-1 bg-card border border-border rounded-full px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-accent"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => handleAddComment(post.id)}
+                        disabled={!newComment.trim()}
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 w-8 p-0 rounded-full disabled:opacity-30 flex items-center justify-center"
+                      >
+                        <Send size={14} />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </Card>
-        ))}
-      </div>
+              )}
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

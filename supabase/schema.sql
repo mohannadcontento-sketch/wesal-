@@ -307,24 +307,40 @@ CREATE POLICY "delete_saved" ON saved_posts FOR DELETE USING (auth.uid() = user_
 -- 5. Functions (دوال مساعدة)
 -- ============================================================
 
--- دالة لتحديث عدد التفاعلات في المنشور
+-- دالة لتحديث عدد التفاعلات في المنشور والتعليقات
 CREATE OR REPLACE FUNCTION update_post_counts()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF TG_OP = 'INSERT' THEN
-    UPDATE posts SET
-      likes_count = (SELECT COUNT(*) FROM post_reactions WHERE post_id = NEW.post_id AND reaction_type = 'like'),
-      helpfuls_count = (SELECT COUNT(*) FROM post_reactions WHERE post_id = NEW.post_id AND reaction_type = 'helpful'),
-      comments_count = (SELECT COUNT(*) FROM comments WHERE post_id = NEW.post_id AND status = 'published')
-    WHERE id = NEW.post_id;
-    RETURN NEW;
-  ELSIF TG_OP = 'DELETE' THEN
-    UPDATE posts SET
-      likes_count = (SELECT COUNT(*) FROM post_reactions WHERE post_id = OLD.post_id AND reaction_type = 'like'),
-      helpfuls_count = (SELECT COUNT(*) FROM post_reactions WHERE post_id = OLD.post_id AND reaction_type = 'helpful'),
-      comments_count = (SELECT COUNT(*) FROM comments WHERE post_id = OLD.post_id AND status = 'published')
-    WHERE id = OLD.post_id;
-    RETURN OLD;
+  -- Handle comment_reactions: update helpful_count on comments
+  IF TG_TABLE_NAME = 'comment_reactions' THEN
+    IF TG_OP = 'INSERT' THEN
+      UPDATE comments SET
+        helpful_count = (SELECT COUNT(*) FROM comment_reactions WHERE comment_id = NEW.comment_id)
+      WHERE id = NEW.comment_id;
+      RETURN NEW;
+    ELSIF TG_OP = 'DELETE' THEN
+      UPDATE comments SET
+        helpful_count = (SELECT COUNT(*) FROM comment_reactions WHERE comment_id = OLD.comment_id)
+      WHERE id = OLD.comment_id;
+      RETURN OLD;
+    END IF;
+  -- Handle post_reactions and comments: update counts on posts
+  ELSE
+    IF TG_OP = 'INSERT' THEN
+      UPDATE posts SET
+        likes_count = (SELECT COUNT(*) FROM post_reactions WHERE post_id = NEW.post_id AND reaction_type = 'like'),
+        helpfuls_count = (SELECT COUNT(*) FROM post_reactions WHERE post_id = NEW.post_id AND reaction_type = 'helpful'),
+        comments_count = (SELECT COUNT(*) FROM comments WHERE post_id = NEW.post_id AND status = 'published')
+      WHERE id = NEW.post_id;
+      RETURN NEW;
+    ELSIF TG_OP = 'DELETE' THEN
+      UPDATE posts SET
+        likes_count = (SELECT COUNT(*) FROM post_reactions WHERE post_id = OLD.post_id AND reaction_type = 'like'),
+        helpfuls_count = (SELECT COUNT(*) FROM post_reactions WHERE post_id = OLD.post_id AND reaction_type = 'helpful'),
+        comments_count = (SELECT COUNT(*) FROM comments WHERE post_id = OLD.post_id AND status = 'published')
+      WHERE id = OLD.post_id;
+      RETURN OLD;
+    END IF;
   END IF;
   RETURN NULL;
 END;
@@ -336,6 +352,10 @@ FOR EACH ROW EXECUTE FUNCTION update_post_counts();
 
 CREATE TRIGGER trigger_update_comment_counts
 AFTER INSERT OR UPDATE OR DELETE ON comments
+FOR EACH ROW EXECUTE FUNCTION update_post_counts();
+
+CREATE TRIGGER trigger_update_comment_reaction_counts
+AFTER INSERT OR DELETE ON comment_reactions
 FOR EACH ROW EXECUTE FUNCTION update_post_counts();
 
 -- دالة لتحديث streak days
@@ -387,5 +407,116 @@ INSERT INTO events (title, description, speaker_name, speaker_specialty, event_t
 ('فهم الاكتئاب: أسبابه وعلاجه', 'ندوة تعريفية عن الاكتئاب وأحدث طرق العلاج', 'د. خالد إبراهيم', 'طبيب نفسي', 'ندوة مجانية', '2026-05-03', '٨ مساءً', 0, 100, 'approved');
 
 -- ============================================================
--- ✅ تم! الكود ده كله جاهز — انسخه والصقه في Supabase SQL Editor
+-- 7. إضافات جديدة: أعمدة مستخدمين + جداول جديدة + سياسات
+-- ============================================================
+
+-- ✅ إضافة أعمدة جديدة لجدول المستخدمين
+ALTER TABLE users ADD COLUMN IF NOT EXISTS tracker_enabled BOOLEAN DEFAULT false;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS daily_follow_up BOOLEAN DEFAULT false;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS supervisor_id UUID REFERENCES users(id);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_banned BOOLEAN DEFAULT false;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_active TIMESTAMPTZ DEFAULT NOW();
+
+-- ✅ جدول سجل المتابعة اليومية
+CREATE TABLE daily_follow_up_logs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  supervisor_id UUID REFERENCES users(id),
+  mood_score INT CHECK (mood_score >= 1 AND mood_score <= 10),
+  check_in_text TEXT,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'missed', 'escalated')),
+  supervisor_notes TEXT,
+  created_at DATE DEFAULT CURRENT_DATE,
+  checked_at TIMESTAMPTZ
+);
+
+-- ✅ جدول تفاعلات التعليقات
+CREATE TABLE comment_reactions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  comment_id UUID NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
+  reaction_type TEXT NOT NULL CHECK (reaction_type IN ('like', 'helpful')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, comment_id, reaction_type)
+);
+
+-- ✅ جدول وسم المستخدمين
+CREATE TABLE user_tags (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  tag TEXT NOT NULL,
+  tagged_by UUID REFERENCES users(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, tag)
+);
+
+-- ✅ جدول تقييمات الاستشارات
+CREATE TABLE booking_reviews (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  consultation_id UUID NOT NULL REFERENCES consultations(id) ON DELETE CASCADE,
+  reviewer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  review_text TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(consultation_id, reviewer_id)
+);
+
+
+-- ============================================================
+-- 8. Indexes للجداول الجديدة
+-- ============================================================
+
+CREATE INDEX idx_daily_follow_up_user ON daily_follow_up_logs(user_id);
+CREATE INDEX idx_daily_follow_up_date ON daily_follow_up_logs(created_at);
+CREATE INDEX idx_daily_follow_up_status ON daily_follow_up_logs(status);
+CREATE INDEX idx_comment_reactions_comment ON comment_reactions(comment_id);
+CREATE INDEX idx_comment_reactions_user ON comment_reactions(user_id);
+CREATE INDEX idx_user_tags_user ON user_tags(user_id);
+CREATE INDEX idx_booking_reviews_consultation ON booking_reviews(consultation_id);
+
+
+-- ============================================================
+-- 9. RLS Policies للجداول الجديدة
+-- ============================================================
+
+ALTER TABLE daily_follow_up_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE comment_reactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_tags ENABLE ROW LEVEL SECURITY;
+ALTER TABLE booking_reviews ENABLE ROW LEVEL SECURITY;
+
+-- ---------- Daily Follow Up Logs ----------
+CREATE POLICY "select_own_follow_ups" ON daily_follow_up_logs FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "select_supervisor_follow_ups" ON daily_follow_up_logs FOR SELECT USING (
+  auth.uid() IN (SELECT supervisor_id FROM users WHERE id = daily_follow_up_logs.user_id)
+);
+CREATE POLICY "admin_all_follow_ups" ON daily_follow_up_logs FOR ALL USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND user_type = 'admin')
+);
+CREATE POLICY "insert_own_follow_up" ON daily_follow_up_logs FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "update_supervisor_follow_up" ON daily_follow_up_logs FOR UPDATE USING (
+  auth.uid() = supervisor_id
+);
+
+-- ---------- Comment Reactions ----------
+CREATE POLICY "select_comment_reactions" ON comment_reactions FOR SELECT USING (true);
+CREATE POLICY "insert_own_comment_reaction" ON comment_reactions FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "delete_own_comment_reaction" ON comment_reactions FOR DELETE USING (auth.uid() = user_id);
+
+-- ---------- User Tags ----------
+CREATE POLICY "select_own_tags" ON user_tags FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "admin_manage_tags" ON user_tags FOR ALL USING (
+  EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND user_type = 'admin')
+);
+
+-- ---------- Booking Reviews ----------
+CREATE POLICY "select_own_reviews" ON booking_reviews FOR SELECT USING (auth.uid() = reviewer_id);
+CREATE POLICY "insert_own_review" ON booking_reviews FOR INSERT WITH CHECK (auth.uid() = reviewer_id);
+CREATE POLICY "select_doctor_reviews" ON booking_reviews FOR SELECT USING (
+  auth.uid() IN (SELECT patient_id FROM consultations WHERE id = booking_reviews.consultation_id)
+  OR auth.uid() IN (SELECT user_id FROM doctors WHERE id IN (SELECT doctor_id FROM consultations WHERE id = booking_reviews.consultation_id))
+);
+
+
+-- ============================================================
+-- ✅ تم التحديث! الكود ده كله جاهز — انسخه والصقه في Supabase SQL Editor
 -- ============================================================
