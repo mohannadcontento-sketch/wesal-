@@ -1,18 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { requireAuth } from '@/lib/supabase-server';
 
-// ─── POST /api/safety — بلاغ أمان ───
+// ─── POST /api/safety — بلاغ أمان (محتاج تسجيل دخول) ───
 export async function POST(request: NextRequest) {
   try {
     if (!isSupabaseConfigured()) {
       return NextResponse.json({ success: false, error: 'Supabase not configured' }, { status: 503 });
     }
 
-    const { reporterId, contentType, contentId, targetUserId, reason, riskScore } = await request.json();
+    const { user, response: authError } = await requireAuth(request);
+    if (authError) return authError;
+    if (!user) return NextResponse.json({ success: false, error: 'لازم تسجل دخول' }, { status: 401 });
 
-    if (!reporterId || !contentType || !reason) {
+    const { contentType, contentId, targetUserId, reason, riskScore } = await request.json();
+
+    if (!contentType || !reason) {
       return NextResponse.json({ success: false, error: 'البيانات مطلوبة' }, { status: 400 });
     }
+
+    const reporterId = user.id; // users.id = auth.uid()
 
     const reportData: Record<string, unknown> = {
       reporter_id: reporterId,

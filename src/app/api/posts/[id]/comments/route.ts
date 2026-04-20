@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { requireAuth } from '@/lib/supabase-server';
 
-// ─── GET /api/posts/[id]/comments — جلب التعليقات ───
+// ─── GET /api/posts/[id]/comments — جلب التعليقات (مفتوح للكل) ───
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -49,7 +50,7 @@ export async function GET(
   }
 }
 
-// ─── POST /api/posts/[id]/comments — إضافة تعليق ───
+// ─── POST /api/posts/[id]/comments — إضافة تعليق (محتاج تسجيل دخول) ───
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -59,12 +60,18 @@ export async function POST(
       return NextResponse.json({ success: false, error: 'Supabase not configured' }, { status: 503 });
     }
 
-    const { id: postId } = await params;
-    const { content, userId, parentId } = await request.json();
+    const { user, response: authError } = await requireAuth(request);
+    if (authError) return authError;
+    if (!user) return NextResponse.json({ success: false, error: 'لازم تسجل دخول' }, { status: 401 });
 
-    if (!content || !userId) {
+    const { id: postId } = await params;
+    const { content, parentId } = await request.json();
+
+    if (!content) {
       return NextResponse.json({ success: false, error: 'المحتوى مطلوب' }, { status: 400 });
     }
+
+    const userId = user.id; // users.id = auth.uid()
 
     const { data: comment, error } = await supabase!
       .from('comments')
@@ -80,9 +87,6 @@ export async function POST(
     if (error) {
       return NextResponse.json({ success: false, error: 'حصل خطأ' }, { status: 500 });
     }
-
-    // تحديث عدد التعليقات في المنشور
-    await supabase!.rpc('update_post_counts_fn');
 
     return NextResponse.json({ success: true, comment });
   } catch (error) {

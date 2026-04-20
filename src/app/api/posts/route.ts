@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { requireAuth } from '@/lib/supabase-server';
 
-// ─── GET /api/posts — جلب المنشورات ───
+// ─── GET /api/posts — جلب المنشورات (مفتوح للكل) ───
 export async function GET(request: NextRequest) {
   try {
     if (!isSupabaseConfigured()) {
@@ -42,6 +43,7 @@ export async function GET(request: NextRequest) {
       author: (post.users as any)?.[0]?.anon_id || 'مجهول',
       authorInitial: (post.users as any)?.[0]?.anon_id?.charAt(0) || 'م',
       authorColor: (post.users as any)?.[0]?.avatar_color || 'bg-gray-100 text-gray-700',
+      userId: post.user_id,
     })) || [];
 
     return NextResponse.json({ posts: formattedPosts });
@@ -50,18 +52,27 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// ─── POST /api/posts — إنشاء منشور ───
+// ─── POST /api/posts — إنشاء منشور (محتاج تسجيل دخول) ───
 export async function POST(request: NextRequest) {
   try {
     if (!isSupabaseConfigured()) {
       return NextResponse.json({ success: false, error: 'Supabase not configured' }, { status: 503 });
     }
 
-    const { content, userId } = await request.json();
+    // التحقق من المستخدم
+    const { user, response: authError } = await requireAuth(request);
+    if (authError) return authError;
+    if (!user) return NextResponse.json({ success: false, error: 'لازم تسجل دخول' }, { status: 401 });
 
-    if (!content || !userId) {
+    const body = await request.json();
+    const { content } = body;
+
+    if (!content) {
       return NextResponse.json({ success: false, error: 'المحتوى مطلوب' }, { status: 400 });
     }
+
+    // user.id = users.id (بسبب الـ trigger)
+    const userId = user.id;
 
     // فحص المحتوى — كلمات محظورة بسيطة
     const blockedWords = ['انتحار', 'أقتل', 'أموت', 'القضاء على'];
@@ -100,18 +111,21 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// ─── DELETE /api/posts?id=xxx — حذف منشور ───
+// ─── DELETE /api/posts?id=xxx — حذف منشور (محتاج تسجيل دخول) ───
 export async function DELETE(request: NextRequest) {
   try {
     if (!isSupabaseConfigured()) {
       return NextResponse.json({ success: false, error: 'Supabase not configured' }, { status: 503 });
     }
 
+    const { user, response: authError } = await requireAuth(request);
+    if (authError) return authError;
+    if (!user) return NextResponse.json({ success: false, error: 'لازم تسجل دخول' }, { status: 401 });
+
     const { searchParams } = new URL(request.url);
     const postId = searchParams.get('id');
-    const userId = searchParams.get('userId');
 
-    if (!postId || !userId) {
+    if (!postId) {
       return NextResponse.json({ success: false, error: 'معرف المنشور مطلوب' }, { status: 400 });
     }
 
@@ -119,7 +133,7 @@ export async function DELETE(request: NextRequest) {
       .from('posts')
       .delete()
       .eq('id', postId)
-      .eq('user_id', userId);
+      .eq('user_id', user.id); // بس صاحب المنشور يقدر يحذفه
 
     if (error) {
       return NextResponse.json({ success: false, error: 'حصل خطأ أثناء الحذف' }, { status: 500 });

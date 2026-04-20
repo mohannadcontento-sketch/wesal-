@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { requireAuth } from '@/lib/supabase-server';
 
-// ─── GET /api/events — جلب الفعاليات ───
+// ─── GET /api/events — جلب الفعاليات (مفتوح للكل) ───
 export async function GET(request: NextRequest) {
   try {
     if (!isSupabaseConfigured()) {
@@ -57,18 +58,24 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// ─── POST /api/events/register — تسجيل في فعالية ───
+// ─── POST /api/events — تسجيل في فعالية (محتاج تسجيل دخول) ───
 export async function POST(request: NextRequest) {
   try {
     if (!isSupabaseConfigured()) {
       return NextResponse.json({ success: false, error: 'Supabase not configured' }, { status: 503 });
     }
 
-    const { userId, eventId } = await request.json();
+    const { user, response: authError } = await requireAuth(request);
+    if (authError) return authError;
+    if (!user) return NextResponse.json({ success: false, error: 'لازم تسجل دخول' }, { status: 401 });
 
-    if (!userId || !eventId) {
+    const { eventId } = await request.json();
+
+    if (!eventId) {
       return NextResponse.json({ success: false, error: 'البيانات مطلوبة' }, { status: 400 });
     }
+
+    const userId = user.id; // users.id = auth.uid()
 
     // التحقق من المساحة
     const { data: event } = await supabase!
@@ -105,18 +112,24 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// ─── DELETE /api/events/register — إلغاء التسجيل ───
+// ─── DELETE /api/events — إلغاء التسجيل (محتاج تسجيل دخول) ───
 export async function DELETE(request: NextRequest) {
   try {
     if (!isSupabaseConfigured()) {
       return NextResponse.json({ success: false, error: 'Supabase not configured' }, { status: 503 });
     }
 
-    const { userId, eventId } = await request.json();
+    const { user, response: authError } = await requireAuth(request);
+    if (authError) return authError;
+    if (!user) return NextResponse.json({ success: false, error: 'لازم تسجل دخول' }, { status: 401 });
 
-    if (!userId || !eventId) {
+    const { eventId } = await request.json();
+
+    if (!eventId) {
       return NextResponse.json({ success: false, error: 'البيانات مطلوبة' }, { status: 400 });
     }
+
+    const userId = user.id;
 
     const { error } = await supabase!
       .from('event_registrations')

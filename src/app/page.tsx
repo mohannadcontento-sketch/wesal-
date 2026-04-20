@@ -12,16 +12,57 @@ import { TrackerPage } from '@/components/wesal/TrackerPage';
 import { ConsultationsPage } from '@/components/wesal/ConsultationsPage';
 import { EventsPage } from '@/components/wesal/EventsPage';
 import { ProfilePage } from '@/components/wesal/ProfilePage';
-import { getSession, setSession, clearSession, hasPermission, type UserSession } from '@/lib/permissions';
+import {
+  getSession, setSession, clearSession, hasPermission,
+  checkAuthSession, signOut, loadSessionFromStorage,
+  type UserSession, type UserRole,
+} from '@/lib/permissions';
 import { AdminPanel } from '@/components/wesal/AdminPanel';
 
 export default function Home() {
-  const [isLoggedIn, setIsLoggedIn] = useState(() => !!getSession());
-  const [currentPage, setCurrentPage] = useState(() => getSession() ? 'community' : 'landing');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentPage, setCurrentPage] = useState('landing');
   const [authOpen, setAuthOpen] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  // ── التحقق من الجلسة عند تحميل الصفحة ──
+  useEffect(() => {
+    async function initAuth() {
+      // أول حاجة: نشوف لو فيه session محفوظ في الذاكرة/ localStorage
+      const savedSession = loadSessionFromStorage();
+      if (savedSession) {
+        setSession(savedSession);
+        setIsLoggedIn(true);
+        setCurrentPage('community');
+        setAuthLoading(false);
+
+        // في الخلفية: نتأكد إن الـ Supabase session لسه active
+        checkAuthSession().then((freshSession) => {
+          if (!freshSession) {
+            // الـ Supabase session انتهى — نسجل خروج
+            clearSession();
+            setIsLoggedIn(false);
+            setCurrentPage('landing');
+          }
+          setAuthLoading(false);
+        });
+        return;
+      }
+
+      // محاولة استعادة الجلسة من Supabase Auth
+      const session = await checkAuthSession();
+      if (session) {
+        setSession(session);
+        setIsLoggedIn(true);
+        setCurrentPage('community');
+      }
+      setAuthLoading(false);
+    }
+
+    initAuth();
+  }, []);
 
   const handleNavigate = useCallback((page: string) => {
-    // فحص صلاحيات الوصول
     if (page === 'tracker' && !hasPermission('tracker')) {
       alert('التراكر متاح بس للمرضى المتابعين مع دكتور. الدكتور هيفعّله ليك بعد ما تحجز جلسة.');
       return;
@@ -30,27 +71,24 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  const handleAuthSuccess = useCallback((nickname?: string) => {
-    const anonId = nickname || 'مسافر #' + Math.floor(Math.random() * 9000 + 1000);
-    const colors = ['bg-teal-100 text-teal-700', 'bg-purple-100 text-purple-700', 'bg-amber-100 text-amber-700'];
-    const session: UserSession = {
-      userId: crypto.randomUUID(),
-      anonId,
-      nickname: nickname || '',
-      role: 'patient',
-      avatarColor: colors[Math.floor(Math.random() * colors.length)],
-      trackerEnabled: false, // الدكتور يفعّله
-      tier: 'new',
-      streakDays: 0,
-    };
-    setSession(session);
-    setIsLoggedIn(true);
+  const handleAuthSuccess = useCallback(async () => {
+    // نجح الـ OTP verification — نجيب الـ profile من API
+    try {
+      const session = await checkAuthSession();
+      if (session) {
+        setSession(session);
+        setIsLoggedIn(true);
+      }
+    } catch {
+      // لو حصل مشكلة في جلب الـ profile
+      setIsLoggedIn(true);
+    }
     setAuthOpen(false);
-    setCurrentPage('community'); // المجتمع = الصفحة الرئيسية بعد الدخول
+    setCurrentPage('community');
   }, []);
 
-  const handleLogout = useCallback(() => {
-    clearSession();
+  const handleLogout = useCallback(async () => {
+    await signOut();
     setIsLoggedIn(false);
     setCurrentPage('landing');
   }, []);
@@ -73,8 +111,19 @@ export default function Home() {
     return () => window.removeEventListener('wesal:navigate', handler);
   }, [handleNavigate]);
 
+  // ── Loading state ──
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-3">
+          <div className="w-10 h-10 border-3 border-[#508991] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm text-muted-foreground">جاري التحميل...</p>
+        </div>
+      </div>
+    );
+  }
+
   const renderPage = () => {
-    // Landing page = بس قبل تسجيل الدخول
     if (!isLoggedIn && currentPage === 'landing') {
       return <LandingPage onGetStarted={() => setAuthOpen(true)} onNavigate={handleNavigate} />;
     }
@@ -108,7 +157,7 @@ export default function Home() {
         onNavigate={handleNavigate}
         onAuthClick={handleAuthClick}
         isLoggedIn={isLoggedIn}
-        userRole={session?.role}
+        userRole={session?.role as UserRole | undefined}
         trackerEnabled={session?.trackerEnabled || false}
         onLogout={handleLogout}
       />

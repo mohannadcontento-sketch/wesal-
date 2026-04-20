@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { requireAuth } from '@/lib/supabase-server';
 
-// ─── GET /api/consultations — جلب الدكاترة ───
+// ─── GET /api/consultations — جلب الدكاترة (مفتوح للكل) ───
 export async function GET(request: NextRequest) {
   try {
     if (!isSupabaseConfigured()) {
@@ -49,18 +50,24 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// ─── POST /api/consultations — حجز جلسة ───
+// ─── POST /api/consultations — حجز جلسة (محتاج تسجيل دخول) ───
 export async function POST(request: NextRequest) {
   try {
     if (!isSupabaseConfigured()) {
       return NextResponse.json({ success: false, error: 'Supabase not configured' }, { status: 503 });
     }
 
-    const { patientId, doctorId, sessionType, selectedTime } = await request.json();
+    const { user, response: authError } = await requireAuth(request);
+    if (authError) return authError;
+    if (!user) return NextResponse.json({ success: false, error: 'لازم تسجل دخول' }, { status: 401 });
 
-    if (!patientId || !doctorId || !sessionType) {
+    const { doctorId, sessionType, selectedTime } = await request.json();
+
+    if (!doctorId || !sessionType) {
       return NextResponse.json({ success: false, error: 'البيانات مطلوبة' }, { status: 400 });
     }
+
+    const patientId = user.id; // users.id = auth.uid()
 
     const { data: consultation, error } = await supabase!
       .from('consultations')

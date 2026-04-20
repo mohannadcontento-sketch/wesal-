@@ -1,6 +1,8 @@
 // ============================================================
 // وصال (Wesal) — نظام الصلاحيات والأدوار
 // ============================================================
+// Session management moved to auth-context.tsx
+// ============================================================
 
 // ─── نوع الصلاحيات ───
 type PermissionKey = 'post' | 'comment' | 'likeHelpful' | 'save' | 'report' | 'tracker' |
@@ -16,10 +18,11 @@ export interface UserSession {
   nickname: string;
   role: UserRole;
   avatarColor: string;
-  trackerEnabled: boolean; // الدكتور هو اللي يفعّله
+  trackerEnabled: boolean;
   followingDoctorId?: string;
   tier: string;
   streakDays: number;
+  reputationScore: number;
 }
 
 // ─── صلاحيات كل دور ───
@@ -43,7 +46,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, {
       likeHelpful: true,
       save: true,
       report: true,
-      tracker: false, // يحتاج الدكتور يفعّله
+      tracker: false,
       consultations: true,
       viewEvents: true,
       registerEvents: true,
@@ -69,18 +72,18 @@ export const ROLE_PERMISSIONS: Record<UserRole, {
       likeHelpful: true,
       save: true,
       report: true,
-      tracker: true, // الدكتور عنده تراكره الخاص
-      consultations: false, // هو اللي بيقدم الاستشارات
+      tracker: true,
+      consultations: false,
       viewEvents: true,
-      registerEvents: false, // هو اللي بيعمل فعاليات
+      registerEvents: false,
       viewProfile: true,
       adminPanel: false,
       moderate: false,
-      viewAllTracker: true, // يشوف تراكر مرضاه
+      viewAllTracker: true,
       approveContent: false,
       manageDoctors: false,
       manageUsers: false,
-      safetyAccess: true, // بروتوكول طوارئ المرضى
+      safetyAccess: true,
       deleteOwnAccount: true,
     },
     limits: { postsPerDay: 20, commentsPerDay: 100 },
@@ -100,14 +103,14 @@ export const ROLE_PERMISSIONS: Record<UserRole, {
       viewEvents: true,
       registerEvents: true,
       viewProfile: true,
-      adminPanel: true,       // ✅ لوحة إدارة كاملة
-      moderate: true,          // ✅ مراجعة بلاغات
-      viewAllTracker: true,    // ✅ رؤية كل التراكرات
-      approveContent: true,    // ✅ موافقة محتوى
-      manageDoctors: true,     // ✅ إدارة الدكاترة
-      manageUsers: true,       // ✅ إدارة المستخدمين
-      safetyAccess: true,      // ✅ صلاحيات طوارئ كاملة
-      deleteOwnAccount: false, // الأدمن مش بيحذف حسابه
+      adminPanel: true,
+      moderate: true,
+      viewAllTracker: true,
+      approveContent: true,
+      manageDoctors: true,
+      manageUsers: true,
+      safetyAccess: true,
+      deleteOwnAccount: false,
     },
     limits: { postsPerDay: 999, commentsPerDay: 999 },
   },
@@ -127,12 +130,12 @@ export const ROLE_PERMISSIONS: Record<UserRole, {
       registerEvents: true,
       viewProfile: true,
       adminPanel: false,
-      moderate: true,          // ✅ مراجعة بلاغات + فلتر كلمات
+      moderate: true,
       viewAllTracker: false,
-      approveContent: true,    // ✅ موافقة/رفض محتوى
+      approveContent: true,
       manageDoctors: false,
       manageUsers: false,
-      safetyAccess: true,      // ✅ بروتوكول طوارئ
+      safetyAccess: true,
       deleteOwnAccount: true,
     },
     limits: { postsPerDay: 10, commentsPerDay: 50 },
@@ -142,7 +145,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, {
     badge: '🔶 متدرب',
     badgeColor: 'bg-orange-100 text-orange-700',
     can: {
-      post: true,            // محتوى تعليمي محدود
+      post: true,
       comment: true,
       likeHelpful: true,
       save: true,
@@ -165,26 +168,27 @@ export const ROLE_PERMISSIONS: Record<UserRole, {
   },
 };
 
-// ─── Session Store ───
-let _session: UserSession | null = null;
+// ─── Session Functions (re-exported from auth-context) ───
+export {
+  getSession,
+  setSession,
+  clearSession,
+  checkAuthSession,
+  signOut,
+  getAccessToken,
+  loadSessionFromStorage,
+} from './auth-context';
 
-export function getSession(): UserSession | null {
-  return _session;
-}
-
-export function setSession(session: UserSession): void {
-  _session = session;
-}
-
-export function clearSession(): void {
-  _session = null;
-}
+// ─── التحقق من الصلاحيات ───
+import { getSession } from './auth-context';
 
 export function hasPermission(permission: PermissionKey): boolean {
-  if (!_session) return false;
-  const rolePerms = ROLE_PERMISSIONS[_session.role];
+  const session = getSession();
+  if (!session) return false;
+  const rolePerms = ROLE_PERMISSIONS[session.role as UserRole];
+  if (!rolePerms) return false;
   if (permission === 'tracker') {
-    return _session.trackerEnabled && rolePerms.can.tracker;
+    return session.trackerEnabled && rolePerms.can.tracker;
   }
   return rolePerms.can[permission];
 }

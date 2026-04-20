@@ -1,18 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { requireAuth } from '@/lib/supabase-server';
 
-// ─── POST /api/tracker — تسجيل مزاج جديد ───
+// ─── POST /api/tracker — تسجيل مزاج جديد (محتاج تسجيل دخول) ───
 export async function POST(request: NextRequest) {
   try {
     if (!isSupabaseConfigured()) {
       return NextResponse.json({ success: false, error: 'Supabase not configured' }, { status: 503 });
     }
 
-    const { userId, moodScore, moodEmoji, journalText } = await request.json();
+    const { user, response: authError } = await requireAuth(request);
+    if (authError) return authError;
+    if (!user) return NextResponse.json({ success: false, error: 'لازم تسجل دخول' }, { status: 401 });
 
-    if (!userId || !moodScore) {
+    const body = await request.json();
+    const { moodScore, moodEmoji, journalText } = body;
+
+    if (!moodScore) {
       return NextResponse.json({ success: false, error: 'البيانات مطلوبة' }, { status: 400 });
     }
+
+    const userId = user.id; // users.id = auth.uid()
 
     const { data: log, error } = await supabase!
       .from('tracker_logs')
@@ -36,20 +44,20 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// ─── GET /api/tracker?userId=xxx — جلب سجل المزاج ───
+// ─── GET /api/tracker?days=7 — جلب سجل المزاج (محتاج تسجيل دخول) ───
 export async function GET(request: NextRequest) {
   try {
     if (!isSupabaseConfigured()) {
       return NextResponse.json({ logs: [], streak: 0 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-    const days = parseInt(searchParams.get('days') || '7');
+    const { user, response: authError } = await requireAuth(request);
+    if (authError) return authError;
+    if (!user) return NextResponse.json({ logs: [], streak: 0, error: 'لازم تسجل دخول' }, { status: 401 });
 
-    if (!userId) {
-      return NextResponse.json({ logs: [], streak: 0, error: 'userId required' }, { status: 400 });
-    }
+    const { searchParams } = new URL(request.url);
+    const days = parseInt(searchParams.get('days') || '7');
+    const userId = user.id;
 
     // جلب سجل المزاج للأيام الأخيرة
     const since = new Date();
@@ -63,7 +71,7 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: true });
 
     // جلب streak
-    const { data: user } = await supabase!
+    const { data: userProfile } = await supabase!
       .from('users')
       .select('streak_days')
       .eq('id', userId)
@@ -71,7 +79,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       logs: logs || [],
-      streak: user?.streak_days || 0,
+      streak: userProfile?.streak_days || 0,
     });
   } catch (error) {
     return NextResponse.json({ logs: [], streak: 0 }, { status: 500 });

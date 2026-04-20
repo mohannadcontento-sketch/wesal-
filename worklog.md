@@ -59,3 +59,35 @@ Stage Summary:
 - 4 new database tables added to schema.sql
 - 3 new admin API routes created
 - Pushed to GitHub: commit 9301c5e
+
+---
+Task ID: 10
+Agent: Main Agent
+Task: Implement real Supabase Phone OTP authentication system
+
+Work Log:
+- Installed @supabase/ssr for proper cookie-based auth
+- Created browser Supabase client (src/lib/supabase.ts) using createBrowserClient
+- Created server Supabase client (src/lib/supabase-server.ts) with JWT verification helpers
+- Created auth callback route (src/app/auth/callback/route.ts)
+- Rewrote AuthModal.tsx with real Supabase Auth OTP flow + mobile-responsive UI
+- Separated OTP input into 6 individual digit boxes for better UX
+- Added countdown timer for OTP resend (60 seconds)
+- Rewrote auth API route (src/app/api/auth/route.ts) with GET/PATCH/POST for profile management
+- Created auth-context.tsx for session management with localStorage persistence
+- Updated permissions.ts with re-exports from auth-context
+- Updated page.tsx to use checkAuthSession() on mount with loading state
+- Updated api.ts to automatically include Authorization Bearer tokens
+- Updated ALL 7 API routes (posts, comments, tracker, consultations, events, safety) to verify auth tokens via requireAuth()
+- Created supabase/otp-setup.sql migration with auto-create trigger and RLS policy fixes
+- Created SUPABASE_OTP_SETUP.md with comprehensive Twilio setup guide
+- Fixed TypeScript error (UserRole import)
+- 0 lint errors, 0 TypeScript errors
+
+Stage Summary:
+- OTP system is now real — uses Supabase Auth Phone with actual SMS delivery
+- Session persistence: Supabase cookies + localStorage backup
+- All API routes verify JWT tokens server-side
+- RLS policies work correctly (users.id = auth.users.id)
+- SQL trigger auto-creates user profile on first signup
+- Mobile UI: 6-digit OTP input boxes, responsive modal, countdown timer
