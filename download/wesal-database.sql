@@ -49,6 +49,7 @@ CREATE TABLE users (
   id UUID PRIMARY KEY,
   anon_id TEXT UNIQUE NOT NULL,
   email TEXT UNIQUE,
+  phone TEXT,
   phone_hash TEXT,
   nickname TEXT,
   avatar_color TEXT DEFAULT 'bg-teal-100 text-teal-700',
@@ -261,6 +262,9 @@ CREATE TABLE booking_reviews (
 -- ============================================================
 -- الخطوة 3: Indexes
 -- ============================================================
+CREATE INDEX idx_users_phone ON users(phone);
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_banned ON users(is_banned);
 CREATE INDEX idx_posts_user_id ON posts(user_id);
 CREATE INDEX idx_posts_status ON posts(status);
 CREATE INDEX idx_posts_created_at ON posts(created_at DESC);
@@ -498,16 +502,20 @@ BEGIN
     anon_id_val TEXT;
     avatar_color_val TEXT;
     nickname_val TEXT;
+    phone_val TEXT;
   BEGIN
     anon_id_val := 'مسافر #' || (floor(random() * 9000 + 1000))::int;
     avatar_color_val := (ARRAY['bg-teal-100 text-teal-700', 'bg-purple-100 text-purple-700', 'bg-amber-100 text-amber-700', 'bg-rose-100 text-rose-700', 'bg-blue-100 text-blue-700'])[floor(random() * 5 + 1)::int];
     nickname_val := COALESCE(NEW.raw_user_meta_data ->> 'username', anon_id_val);
+    phone_val := NEW.raw_user_meta_data ->> 'phone';
 
     INSERT INTO public.users (
-      id, anon_id, email, nickname, avatar_color,
+      id, anon_id, email, phone, phone_hash, nickname, avatar_color,
       user_type, reputation_score, tier, streak_days, is_active
     ) VALUES (
-      NEW.id, anon_id_val, NEW.email, nickname_val, avatar_color_val,
+      NEW.id, anon_id_val, NEW.email, phone_val,
+      CASE WHEN phone_val IS NOT NULL THEN encode(digest(phone_val, 'sha256'), 'hex') END,
+      nickname_val, avatar_color_val,
       'patient', 0, 'new', 0, true
     )
     ON CONFLICT DO NOTHING;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Shield, Heart, Check, Loader2, AlertCircle, ArrowRight, User, X, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Shield, Heart, Check, Loader2, AlertCircle, ArrowRight, User, X, Mail, Lock, Eye, EyeOff, Phone, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -30,6 +30,7 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
   // ── Form state ──
   const [activeTab, setActiveTab] = useState<ActiveTab>('register');
   const [username, setUsername] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -47,6 +48,7 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
 
   // ── Error state ──
   const [usernameError, setUsernameError] = useState('');
+  const [phoneError, setPhoneError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
@@ -69,9 +71,24 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
   // ── Helpers ──
   const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
   const isValidPassword = (p: string) => p.length >= 8;
+  const isValidPhone = (p: string) => /^01[0-2,5]{1}[0-9]{8}$/.test(p.replace(/\s/g, ''));
+
+  const formatPhoneDisplay = (p: string) => {
+    const clean = p.replace(/\s/g, '');
+    if (clean.length <= 4) return clean;
+    if (clean.length <= 8) return clean.slice(0, 4) + ' ' + clean.slice(4);
+    return clean.slice(0, 4) + ' ' + clean.slice(4, 8) + ' ' + clean.slice(8, 11);
+  };
+
+  const handlePhoneChange = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 11);
+    setPhone(digits);
+    setPhoneError('');
+  };
 
   const resetState = useCallback(() => {
     setUsername('');
+    setPhone('');
     setEmail('');
     setPassword('');
     setConfirmPassword('');
@@ -81,6 +98,7 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
     setLoading(false);
     setVerifying(false);
     setUsernameError('');
+    setPhoneError('');
     setEmailError('');
     setPasswordError('');
     setConfirmPasswordError('');
@@ -107,6 +125,7 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
   // ════════════════════════════════════════════════════════════
   const handleRegister = async () => {
     setUsernameError('');
+    setPhoneError('');
     setEmailError('');
     setPasswordError('');
     setConfirmPasswordError('');
@@ -121,6 +140,10 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
     let hasError = false;
     if (!username.trim() || username.trim().length < 3) {
       setUsernameError('الاسم المستعار لازم 3 حروف على الأقل');
+      hasError = true;
+    }
+    if (!isValidPhone(phone)) {
+      setPhoneError('رقم الموبايل مش صحيح — لازم يبدأ بـ 01');
       hasError = true;
     }
     if (!isValidEmail(email)) {
@@ -143,12 +166,28 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
 
     setLoading(true);
     try {
+      // أول حاجة: نتأكد إن الموبايل مش محظور
+      const checkRes = await fetch('/api/auth/check-block', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phone.replace(/\s/g, ''), email: email.trim() }),
+      });
+      if (checkRes.ok) {
+        const checkData = await checkRes.json();
+        if (checkData.blocked) {
+          setGeneralError('حسابك محظور — لو حاسس إن ده غلط، تواصل مع فريق الدعم');
+          setLoading(false);
+          return;
+        }
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
         options: {
           data: {
             username: username.trim(),
+            phone: phone.replace(/\s/g, ''),
           },
         },
       });
@@ -167,12 +206,23 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
       // لو Supabase اشتغل بنجاح
       if (data.user && !data.session) {
         // Email confirmation مطلوب — نتقل لخطوة الـ OTP
+        // نحفظ الموبايل عشان نستخدمه لما نحدث الـ profile بعد التأكيد
         setStep('otp');
         setCountdown(60);
         setOtp('');
         setSuccessMessage('تم إرسال كود التأكيد على بريدك الإلكتروني');
       } else if (data.session) {
-        // حساب مفعل تلقائياً (auto-confirm)
+        // حساب مفعل تلقائياً (auto-confirm) — نحدث الـ phone في الـ profile
+        try {
+          await fetch('/api/auth/profile', {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${data.session.access_token}`,
+            },
+            body: JSON.stringify({ nickname: username.trim(), phone: phone.replace(/\s/g, '') }),
+          });
+        } catch { /* ignore */ }
         onSuccess();
       }
     } catch {
@@ -212,6 +262,25 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
         email: email.trim(),
         password,
       });
+
+      // بعد تسجيل الدخول — نتأكد إن المستخدم مش محظور
+      if (data.user && !error) {
+        const blockRes = await fetch('/api/auth/check-block', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: data.user.id }),
+        });
+        if (blockRes.ok) {
+          const blockData = await blockRes.json();
+          if (blockData.blocked) {
+            // نطلعه بره علشان محظور
+            await supabase.auth.signOut();
+            setGeneralError('حسابك محظور — لو حاسس إن ده غلط، تواصل مع فريق الدعم');
+            setLoading(false);
+            return;
+          }
+        }
+      }
 
       if (error) {
         if (error.message.includes('Invalid login') || error.message.includes('invalid credentials')) {
@@ -270,7 +339,7 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
         return;
       }
 
-      // نجاح — تحديث الـ nickname في الـ profile
+      // نجاح — تحديث الـ nickname و phone في الـ profile
       if (data.session && username.trim()) {
         try {
           await fetch('/api/auth/profile', {
@@ -279,7 +348,7 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${data.session.access_token}`,
             },
-            body: JSON.stringify({ nickname: username.trim() }),
+            body: JSON.stringify({ nickname: username.trim(), phone: phone.replace(/\s/g, '') }),
           });
         } catch { /* ignore */ }
       }
@@ -530,6 +599,31 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
                   )}
                 </div>
 
+                {/* Phone (required) */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-foreground">
+                    رقم الموبايل <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Phone size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                    <Input
+                      placeholder="0101 234 5678"
+                      value={formatPhoneDisplay(phone)}
+                      onChange={(e) => handlePhoneChange(e.target.value)}
+                      type="tel"
+                      inputMode="numeric"
+                      autoComplete="tel"
+                      className="pr-11 bg-background border-border text-foreground text-base h-12 rounded-xl"
+                      dir="ltr"
+                    />
+                  </div>
+                  {phoneError && (
+                    <p className="text-xs text-red-500 flex items-center gap-1 animate-fade-in">
+                      <AlertCircle size={13} className="flex-shrink-0" />{phoneError}
+                    </p>
+                  )}
+                </div>
+
                 {/* Email */}
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-foreground">البريد الإلكتروني</label>
@@ -621,7 +715,7 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
                 {/* Register Button */}
                 <Button
                   onClick={handleRegister}
-                  disabled={loading || !username.trim() || !email.trim() || !password || !confirmPassword || !agreedToTerms}
+                  disabled={loading || !username.trim() || !phone.trim() || !email.trim() || !password || !confirmPassword || !agreedToTerms}
                   className="w-full bg-[#508991] hover:bg-[#508991]/90 text-white disabled:opacity-40 h-12 rounded-xl text-sm font-medium"
                 >
                   {loading ? (

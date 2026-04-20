@@ -59,7 +59,16 @@ export async function GET(request: NextRequest) {
         tier: newProfile.tier,
         streakDays: newProfile.streak_days || 0,
         reputationScore: newProfile.reputation_score || 0,
+        isBanned: newProfile.is_banned || false,
       });
+    }
+
+    // التحقق من الحظر
+    if (profile.is_banned) {
+      return NextResponse.json({
+        error: 'حسابك محظور — لو حاسس إن ده غلط، تواصل مع فريق الدعم',
+        isBanned: true,
+      }, { status: 403 });
     }
 
     return NextResponse.json({
@@ -72,6 +81,7 @@ export async function GET(request: NextRequest) {
       tier: profile.tier,
       streakDays: profile.streak_days || 0,
       reputationScore: profile.reputation_score || 0,
+      isBanned: profile.is_banned || false,
     });
   } catch (error) {
     return NextResponse.json({ error: 'خطأ في السيرفر' }, { status: 500 });
@@ -86,11 +96,17 @@ export async function PATCH(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'غير مصرح' }, { status: 401 });
 
     const body = await request.json();
-    const { nickname, avatar_color } = body;
+    const { nickname, avatar_color, phone } = body;
 
     const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
     if (nickname) updateData.nickname = nickname;
     if (avatar_color) updateData.avatar_color = avatar_color;
+    if (phone) {
+      updateData.phone = phone;
+      // نحدث الـ hash كمان
+      const crypto = await import('crypto');
+      updateData.phone_hash = crypto.createHash('sha256').update(phone).digest('hex');
+    }
 
     const { data: updated, error } = await supabase!
       .from('users')
@@ -113,42 +129,18 @@ export async function PATCH(request: NextRequest) {
       tier: updated.tier,
       streakDays: updated.streak_days || 0,
       reputationScore: updated.reputation_score || 0,
+      isBanned: updated.is_banned || false,
     });
   } catch (error) {
     return NextResponse.json({ error: 'خطأ في السيرفر' }, { status: 500 });
   }
 }
 
-// ─── POST /api/auth — إرسال OTP (حتى لو المستخدم مبعتش من الـ Client) ───
+// ─── POST /api/auth — محجوز للتأكد من إن الإيميل/الموبايل مش محظورين ───
+// نظام الـ OTP دلوقتي بيتعامل معاه من الـ Client مباشرة عبر Supabase Auth
 export async function POST(request: NextRequest) {
-  try {
-    if (!supabase) {
-      return NextResponse.json({ success: false, error: 'Supabase not configured' }, { status: 503 });
-    }
-
-    const { phone, nickname } = await request.json();
-
-    if (!phone || phone.length < 10) {
-      return NextResponse.json({ success: false, error: 'رقم الموبايل مطلوب' }, { status: 400 });
-    }
-
-    // نستخدم Supabase Auth Client — ده اللي بيبعت الـ SMS فعلاً
-    const { data, error } = await supabase.auth.signInWithOtp({
-      phone: '+20' + phone.replace(/\s/g, ''),
-      options: {
-        data: nickname ? { nickname } : {},
-      },
-    });
-
-    if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 400 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: 'تم إرسال كود التأكيد على الموبايل',
-    });
-  } catch (error) {
-    return NextResponse.json({ success: false, error: 'خطأ في السيرفر' }, { status: 500 });
-  }
+  return NextResponse.json({
+    success: true,
+    message: 'التسجيل والدخول بيتم من الـ Client مباشرة عبر Supabase Auth',
+  });
 }
