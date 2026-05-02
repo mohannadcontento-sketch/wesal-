@@ -1,32 +1,186 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String   @id @default(cuid())
+  email            String   @unique
+  phone            String?
+  passwordHash     String
+  role             String   @default("user")
+  disabled         Boolean  @default(false)
+  emailVerified    Boolean  @default(false)
+  otpCode          String?
+  otpExpiresAt     DateTime?
+  createdAt        DateTime @default(now())
+  profile          Profile?
+  posts            Post[]
+  comments         Comment[]
+  postReactions    Reaction[]
+  bookmarks        Bookmark[]
+  notifications    Notification[]
+  sentMessages     ChatMessage[]  @relation("SentMessages")
+  patientAppointments Appointment[] @relation("PatientAppointments")
+  doctorAppointments  Appointment[] @relation("DoctorAppointments")
+  reputationEarned ReputationLog[] @relation("ReputationEarned")
+  reputationGiven  ReputationLog[] @relation("ReputationGiven")
+  verificationRequests VerificationRequest[]
+}
+
+model Profile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  username        String?  @unique
+  realName        String
+  bio             String?
+  avatarUrl       String?
+  specialty       String?
+  location        String?
+  rating          Float    @default(0)
+  reputationScore Int      @default(0)
+  reputationTier  String   @default("beginner")
+  isVerified      Boolean  @default(false)
+  verifiedAt      DateTime?
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Post {
+  id             String   @id @default(cuid())
+  authorId       String
+  authorDisplay  String
+  authorBadge    String   @default("🔰")
+  authorRole     String   @default("user")
+  content        String
+  moods          String   @default("")
+  section        String   @default("shares")
+  commentCount   Int      @default(0)
+  reactionCount  Int      @default(0)
+  createdAt      DateTime @default(now())
+  author         User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments       Comment[]
+  reactions      Reaction[]  @relation("PostReactions")
+  bookmarks      Bookmark[]
+}
+
+model Comment {
+  id            String   @id @default(cuid())
+  postId        String
+  authorId      String
+  authorDisplay String
+  authorBadge   String   @default("🔰")
+  parentId      String?
+  content       String
+  createdAt     DateTime @default(now())
+  post          Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author        User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reactions     Reaction[]  @relation("CommentReactions")
+  parent        Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies       Comment[] @relation("CommentReplies")
+}
+
+model Reaction {
+  id         String   @id @default(cuid())
+  userId     String
+  targetId   String
+  targetType String   @default("post")
+  type       String   @default("like")
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  post       Post?    @relation("PostReactions", fields: [targetId], references: [id], onDelete: Cascade, map: "ReactionPostFkey")
+  comment    Comment? @relation("CommentReactions", fields: [targetId], references: [id], onDelete: Cascade, map: "ReactionCommentFkey")
+
+  @@unique([userId, targetId, targetType, type])
+}
+
+model ReputationLog {
+  id           String   @id @default(cuid())
+  userId       String
+  fromUserId   String
+  commentId    String?
+  reactionType String
+  points       Int
+  createdAt    DateTime @default(now())
+  user         User     @relation("ReputationEarned", fields: [userId], references: [id], onDelete: Cascade)
+  fromUser     User     @relation("ReputationGiven", fields: [fromUserId], references: [id], onDelete: Cascade)
+}
+
+model VerificationRequest {
+  id          String   @id @default(cuid())
+  userId      String
+  status      String   @default("pending")
+  reviewedBy  String?
+  reviewNotes String?
+  createdAt   DateTime @default(now())
+  reviewedAt  DateTime?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Appointment {
+  id              String   @id @default(cuid())
+  patientId       String
+  doctorId        String
+  appointmentDate DateTime
+  reason          String
+  status          String   @default("pending")
+  chatRoomId      String?  @unique
+  createdAt       DateTime @default(now())
+  patient         User     @relation("PatientAppointments", fields: [patientId], references: [id])
+  doctor          User     @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  chatRoom        ChatRoom? @relation(fields: [chatRoomId], references: [id])
+}
+
+model ChatRoom {
+  id            String   @id @default(cuid())
+  appointmentId String?  @unique
+  patientId     String
+  doctorId      String
+  status        String   @default("open")
+  createdAt     DateTime @default(now())
+  messages      ChatMessage[]
+  appointment   Appointment?
+}
+
+model ChatMessage {
+  id            String   @id @default(cuid())
+  roomId        String
+  senderId      String
+  messageType   String   @default("text")
+  content       String?
+  voiceUrl      String?
+  voiceDuration Int?
+  read          Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  chatRoom      ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  sender        User     @relation("SentMessages", fields: [senderId], references: [id])
+}
+
+model Bookmark {
   id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
+  userId    String
+  postId    String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  body      String?
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
