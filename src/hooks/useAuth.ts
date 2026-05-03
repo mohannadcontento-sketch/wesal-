@@ -1,27 +1,43 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useAuthStore } from '@/stores/auth-store';
 
 export function useAuth() {
   const { user, loading, setUser, setLoading, logout } = useAuthStore();
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  useEffect(() => {
-    async function fetchSession() {
-      try {
-        const res = await fetch('/api/auth/session');
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data.user);
-        } else {
-          setUser(null);
-        }
-      } catch {
+  const fetchSession = useCallback(async (signal: AbortSignal) => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/auth/session', { signal });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+      } else {
         setUser(null);
       }
+    } catch (err) {
+      // Don't update state if the request was aborted
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      setUser(null);
     }
-    fetchSession();
-  }, [setUser]);
+  }, [setUser, setLoading]);
+
+  useEffect(() => {
+    // Cancel any in-flight request before starting a new one
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    fetchSession(controller.signal);
+
+    return () => {
+      controller.abort();
+      abortControllerRef.current = null;
+    };
+  }, [fetchSession]);
 
   const login = async (email: string, password: string) => {
     try {
@@ -107,7 +123,10 @@ export function useAuth() {
     } catch {
       // Ignore errors
     }
+    // Clear zustand state
     logout();
+    // Force full page reload to clear any cached state
+    window.location.href = '/';
   };
 
   return { user, loading, login, register, verifyOtp, resendOtp, logout: logoutUser };

@@ -8,6 +8,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PostFeed } from '@/components/posts/PostFeed';
 import { PostForm } from '@/components/posts/PostForm';
+import { ScrollReveal } from '@/components/animations/ScrollReveal';
+import { PageTransition } from '@/components/animations/PageTransition';
+import { StaggeredList } from '@/components/animations/StaggeredList';
+import { ParticleField } from '@/components/3d/ParticleField';
 
 /* ═══════════════════════════════════════════════════════════════════
    Intersection Observer hook — adds "animate-fade-in-up" when visible
@@ -269,6 +273,7 @@ function LandingPage() {
   ];
 
   return (
+    <PageTransition>
     <div className="min-h-screen flex flex-col bg-wesal-cream text-wesal-navy overflow-x-hidden">
 
       {/* ── NAVBAR ── */}
@@ -312,6 +317,8 @@ function LandingPage() {
       <main className="flex-1 pt-14">
         {/* ══════════ HERO ══════════ */}
         <section className="gradient-hero relative min-h-[92vh] flex items-center overflow-hidden">
+          {/* 3D Particle Background */}
+          <ParticleField className="absolute inset-0 z-[1]" />
           {/* Animated background elements */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
             <div className="hidden lg:block absolute -top-20 -left-20 w-[500px] h-[500px] rounded-full bg-white/[0.03] animate-float-slow" />
@@ -470,7 +477,7 @@ function LandingPage() {
         <section className="relative z-20 max-w-[1200px] mx-auto px-4 sm:px-6 -mt-8 md:-mt-12">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {stats.map((stat, i) => (
-              <FadeInSection key={stat.label} delay={`${i * 100}ms`} className="h-full">
+              <ScrollReveal key={stat.label} direction="up" delay={i * 0.1} className="h-full">
                 <div className="glass-card rounded-2xl p-5 sm:p-7 text-center h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-500 group">
                   <div className="w-11 h-11 rounded-xl bg-wesal-ice/80 flex items-center justify-center mx-auto mb-3 group-hover:bg-wesal-dark group-hover:text-white transition-all duration-300">
                     <span className="material-symbols-outlined text-wesal-dark group-hover:text-white transition-colors duration-300">{stat.icon}</span>
@@ -478,24 +485,24 @@ function LandingPage() {
                   <div className="text-2xl sm:text-3xl font-extrabold text-wesal-dark mb-0.5">{stat.value}</div>
                   <div className="text-xs sm:text-sm font-semibold text-wesal-medium">{stat.label}</div>
                 </div>
-              </FadeInSection>
+              </ScrollReveal>
             ))}
           </div>
         </section>
 
         {/* ══════════ FEATURES ══════════ */}
         <section className="py-20 md:py-28 max-w-[1200px] mx-auto px-4 sm:px-6">
-          <FadeInSection className="text-center mb-14 md:mb-20">
+          <ScrollReveal direction="up" className="text-center mb-14 md:mb-20">
             <div className="inline-flex items-center gap-2 bg-wesal-ice rounded-full px-4 py-1.5 mb-5">
               <span className="material-symbols-outlined text-wesal-dark text-sm">auto_awesome</span>
               <span className="text-wesal-dark text-xs font-semibold">المميزات</span>
             </div>
             <h2 className="text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-wesal-dark mb-4">ليه تختار <span className="text-wesal-medium">وصال</span>؟</h2>
             <p className="text-base text-wesal-medium max-w-2xl mx-auto leading-relaxed">صمّمنا المنصة لتكون ملاذك الآمن الذي يجمع بين التكنولوجيا المتطورة والخبرة البشرية العميقة.</p>
-          </FadeInSection>
+          </ScrollReveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
             {features.map((f, i) => (
-              <FadeInSection key={f.title} delay={`${i * 80}ms`} className={f.span === 2 ? 'md:col-span-2' : ''}>
+              <ScrollReveal key={f.title} direction="up" delay={i * 0.08} className={f.span === 2 ? 'md:col-span-2' : ''}>
                 <div className={`h-full rounded-2xl p-7 sm:p-10 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl group relative overflow-hidden ${f.dark ? 'gradient-primary text-white shadow-lg shadow-wesal-dark/20' : f.accent ? 'bg-wesal-ice/50 border border-wesal-ice hover:border-wesal-sky/40' : 'bg-white border border-wesal-ice hover:border-wesal-sky/30 shadow-sm'}`}>
                   {/* Decorative background for dark cards */}
                   {f.dark && (
@@ -519,7 +526,7 @@ function LandingPage() {
                     <div className="absolute -top-6 -left-6 w-24 h-24 bg-wesal-sky/10 rounded-full blur-2xl pointer-events-none" />
                   )}
                 </div>
-              </FadeInSection>
+              </ScrollReveal>
             ))}
           </div>
         </section>
@@ -537,17 +544,17 @@ function LandingPage() {
             </div>
           </div>
           <div className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6">
-            <FadeInSection className="text-center mb-14 md:mb-20">
+            <ScrollReveal direction="up" className="text-center mb-14 md:mb-20">
               <div className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-1.5 mb-5 shadow-sm">
                 <span className="material-symbols-outlined text-wesal-dark text-sm">route</span>
                 <span className="text-wesal-dark text-xs font-semibold">كيف نعمل</span>
               </div>
               <h2 className="text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-wesal-dark mb-4">خطواتك نحو <span className="text-wesal-medium">السلام النفسي</span></h2>
-            </FadeInSection>
+            </ScrollReveal>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 relative">
               <div className="hidden md:block absolute top-[52px] left-[20%] right-[20%] h-[2px]" style={{ background: 'repeating-linear-gradient(to left, #d6f3f4 0, #d6f3f4 8px, transparent 8px, transparent 16px)' }} aria-hidden="true" />
               {steps.map((item, i) => (
-                <FadeInSection key={item.step} delay={`${i * 150}ms`}>
+                <ScrollReveal key={item.step} direction="up" delay={i * 0.15}>
                   <div className="relative text-center group">
                     <div className="relative inline-flex items-center justify-center mb-6">
                       <div className="w-[104px] h-[104px] rounded-full bg-white shadow-lg shadow-wesal-dark/5 flex items-center justify-center group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-500">
@@ -559,7 +566,7 @@ function LandingPage() {
                     <h3 className="text-xl font-bold text-wesal-dark mb-3">{item.title}</h3>
                     <p className="text-sm text-wesal-medium leading-relaxed max-w-[260px] mx-auto">{item.desc}</p>
                   </div>
-                </FadeInSection>
+                </ScrollReveal>
               ))}
             </div>
           </div>
@@ -567,16 +574,16 @@ function LandingPage() {
 
         {/* ══════════ SECURITY ══════════ */}
         <section className="py-20 md:py-28 max-w-[1200px] mx-auto px-4 sm:px-6">
-          <FadeInSection className="text-center mb-14 md:mb-20">
+          <ScrollReveal direction="up" className="text-center mb-14 md:mb-20">
             <div className="inline-flex items-center gap-2 bg-wesal-ice rounded-full px-4 py-1.5 mb-5">
               <span className="material-symbols-outlined text-wesal-dark text-sm">gpp_good</span>
               <span className="text-wesal-dark text-xs font-semibold">الأمان والخصوصية</span>
             </div>
             <h2 className="text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-wesal-dark mb-4">أمانك هو <span className="text-wesal-medium">أولويتنا</span></h2>
-          </FadeInSection>
+          </ScrollReveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {security.map((item, i) => (
-              <FadeInSection key={item.title} delay={`${i * 100}ms`}>
+              <ScrollReveal key={item.title} direction="up" delay={i * 0.1}>
                 <div className="h-full bg-white rounded-2xl p-8 border border-wesal-ice hover:border-wesal-sky/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 group relative overflow-hidden">
                   <div className="absolute -bottom-4 -left-4 opacity-[0.04] pointer-events-none">
                     <span className="material-symbols-outlined text-[100px] text-wesal-dark">{item.icon}</span>
@@ -589,7 +596,7 @@ function LandingPage() {
                     <p className="text-sm text-wesal-medium leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
-              </FadeInSection>
+              </ScrollReveal>
             ))}
           </div>
         </section>
@@ -601,16 +608,15 @@ function LandingPage() {
             <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-wesal-ice to-transparent" />
           </div>
           <div className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6">
-            <FadeInSection className="text-center mb-14 md:mb-20">
+            <ScrollReveal direction="up" className="text-center mb-14 md:mb-20">
               <div className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-1.5 mb-5 shadow-sm">
                 <span className="material-symbols-outlined text-wesal-dark text-sm">format_quote</span>
                 <span className="text-wesal-dark text-xs font-semibold">شهادات المستخدمين</span>
               </div>
               <h2 className="text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-wesal-dark mb-4">قصص نجاح من <span className="text-wesal-medium">مجتمعنا</span></h2>
-            </FadeInSection>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {testimonials.map((review, i) => (
-                <FadeInSection key={i} delay={`${i * 120}ms`}>
+            </ScrollReveal>
+            <StaggeredList stagger={0.12} direction="up" className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {testimonials.map((review) => (
                   <div className="h-full bg-white rounded-2xl p-7 sm:p-8 shadow-sm border border-wesal-ice hover:shadow-lg hover:-translate-y-1 transition-all duration-500 flex flex-col">
                     <div className="flex gap-0.5 mb-4">
                       {[1, 2, 3, 4, 5].map((s) => (
@@ -626,15 +632,14 @@ function LandingPage() {
                       </div>
                     </div>
                   </div>
-                </FadeInSection>
               ))}
-            </div>
+            </StaggeredList>
           </div>
         </section>
 
         {/* ══════════ FINAL CTA ══════════ */}
         <section className="py-20 md:py-28 max-w-[1200px] mx-auto px-4 sm:px-6">
-          <FadeInSection>
+          <ScrollReveal direction="up">
             <div className="gradient-hero rounded-[2rem] sm:rounded-[2.5rem] p-10 sm:p-16 md:p-20 text-center relative overflow-hidden shadow-2xl">
               <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
                 <div className="absolute top-10 right-10 w-32 h-32 rounded-full bg-white/[0.04] animate-float" />
@@ -656,7 +661,7 @@ function LandingPage() {
                 </div>
               </div>
             </div>
-          </FadeInSection>
+          </ScrollReveal>
         </section>
       </main>
 
@@ -719,6 +724,7 @@ function LandingPage() {
         </div>
       </footer>
     </div>
+    </PageTransition>
   );
 }
 

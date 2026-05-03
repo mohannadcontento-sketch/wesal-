@@ -6,6 +6,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { PageTransition } from '@/components/animations/PageTransition';
+import { ScrollReveal } from '@/components/animations/ScrollReveal';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -21,7 +23,7 @@ export default function RegisterPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (user && !authLoading) {
-      router.push('/community');
+      router.push('/');
     }
   }, [user, authLoading, router]);
 
@@ -84,6 +86,7 @@ export default function RegisterPage() {
   }
 
   return (
+    <PageTransition>
     <div className="min-h-screen flex bg-wesal-cream">
       {/* ── Left Branding Panel (hidden on mobile) ── */}
       <div className="hidden md:flex flex-col justify-between w-5/12 p-12 relative overflow-hidden gradient-hero text-white">
@@ -109,6 +112,7 @@ export default function RegisterPage() {
 
         {/* Trust Badges */}
         <div className="relative z-10 flex flex-col gap-6 mt-12 animate-fade-in-up stagger-2">
+          <ScrollReveal direction="up" delay={0.2}>
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 w-12 h-12 rounded-2xl glass-panel flex items-center justify-center shadow-md">
               <span className="material-symbols-outlined filled text-wesal-ice">shield</span>
@@ -118,6 +122,8 @@ export default function RegisterPage() {
               <p className="text-sm text-white/60">بياناتك مشفرة ومحمية بأعلى معايير الأمان العالمية.</p>
             </div>
           </div>
+          </ScrollReveal>
+          <ScrollReveal direction="up" delay={0.25}>
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 w-12 h-12 rounded-2xl glass-panel flex items-center justify-center shadow-md">
               <span className="material-symbols-outlined filled text-wesal-ice">favorite</span>
@@ -127,6 +133,8 @@ export default function RegisterPage() {
               <p className="text-sm text-white/60">فريق متخصص متاح للإجابة على استفساراتك وتقديم المساعدة.</p>
             </div>
           </div>
+          </ScrollReveal>
+          <ScrollReveal direction="up" delay={0.3}>
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 w-12 h-12 rounded-2xl glass-panel flex items-center justify-center shadow-md">
               <span className="material-symbols-outlined filled text-wesal-ice">verified_user</span>
@@ -136,6 +144,7 @@ export default function RegisterPage() {
               <p className="text-sm text-white/60">أطباء معتمدون وبروتوكولات صارمة لضمان جودة الرعاية.</p>
             </div>
           </div>
+          </ScrollReveal>
         </div>
 
         {/* Copyright */}
@@ -461,5 +470,6 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }

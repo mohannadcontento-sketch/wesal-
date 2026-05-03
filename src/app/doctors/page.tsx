@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import DoctorCard from '@/components/doctors/DoctorCard';
 import type { Profile, User } from '@/types';
+import { ScrollReveal } from '@/components/animations/ScrollReveal';
+import { StaggeredList } from '@/components/animations/StaggeredList';
 
 const filters = [
   { label: 'الكل', value: 'all' },
@@ -56,6 +58,7 @@ export default function DoctorsPage() {
   return (
     <MainLayout>
       {/* Header Section */}
+      <ScrollReveal direction="up">
       <header className="mb-12 flex flex-col gap-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
@@ -98,6 +101,7 @@ export default function DoctorsPage() {
           ))}
         </div>
       </header>
+      </ScrollReveal>
 
       {/* Doctors Grid */}
       {loading ? (
@@ -131,11 +135,13 @@ export default function DoctorsPage() {
           </p>
         </div>
       ) : (
+        <StaggeredList stagger={0.08} direction="up">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filtered.map((doctor) => (
             <DoctorCard key={doctor.id} doctor={doctor} />
           ))}
         </div>
+        </StaggeredList>
       )}
     </MainLayout>
   );

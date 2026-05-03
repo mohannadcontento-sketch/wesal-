@@ -78,7 +78,8 @@ function getTokenFromRequest(req: Request | NextRequest): string | null {
   if (cookieHeader) {
     const match = cookieHeader.split(';').find(c => c.trim().startsWith('wesal-session='));
     if (match) {
-      return match.split('=')[1]?.trim() || null;
+      const eqIndex = match.indexOf('=');
+      return match.substring(eqIndex + 1).trim() || null;
     }
   }
 

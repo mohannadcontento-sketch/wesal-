@@ -54,7 +54,7 @@ function VerifyForm() {
 
       if (result.success) {
         toast.success('تم تأكيد الإيميل! أهلاً بيك');
-        router.push('/community');
+        router.push('/');
       } else {
         setErrorMsg(result.error || 'الرمز غلط أو انتهى');
         toast.error(result.error || 'الرمز غلط أو انتهى');

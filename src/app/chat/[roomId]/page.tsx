@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, use } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { PageTransition } from '@/components/animations/PageTransition';
 
 interface Message {
   id: string;
@@ -165,6 +166,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
   };
 
   return (
+    <PageTransition>
     <div className="flex flex-col h-screen bg-background">
       {/* Chat Header - Glassmorphism */}
       <header className="glass-panel sticky top-0 z-50 flex items-center justify-between px-6 py-3 border-b border-surface-dim shadow-[0_4px_24px_0_rgba(0,43,45,0.05)]">
@@ -350,5 +352,6 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }

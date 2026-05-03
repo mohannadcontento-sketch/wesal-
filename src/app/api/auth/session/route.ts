@@ -6,10 +6,15 @@ import { buildAuthUser } from '@/lib/auth/session';
 export async function GET(req: Request) {
   try {
     // Get session token from cookie
-    const token = req.headers.get('cookie')
-      ?.split(';')
-      .find(c => c.trim().startsWith('wesal-session='))
-      ?.split('=')[1];
+    const cookieHeader = req.headers.get('cookie');
+    let token: string | null = null;
+    if (cookieHeader) {
+      const match = cookieHeader.split(';').find(c => c.trim().startsWith('wesal-session='));
+      if (match) {
+        const eqIndex = match.indexOf('=');
+        token = match.substring(eqIndex + 1).trim() || null;
+      }
+    }
 
     if (!token) {
       return NextResponse.json({ user: null }, { status: 401 });
