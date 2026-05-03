@@ -1,19 +1,17 @@
 /**
  * Supabase Edge Function: send-email
  *
- * This function handles outgoing email delivery for the Wesal platform.
- * Deploy it to your Supabase project via:
+ * Sends outgoing emails for the Wesal platform via Resend API.
  *
- *   supabase functions deploy send-email
+ * Deploy:
+ *   npx supabase functions deploy send-email
  *
- * Required environment variables in Supabase Dashboard → Settings → Edge Functions:
- *   RESEND_API_KEY  — Your Resend.com API key
- *   EMAIL_FROM      — Sender address (e.g. "Wesal <noreply@wesal.app>")
+ * Required env vars in Supabase Dashboard → Settings → Edge Functions:
+ *   RESEND_API_KEY  — Your Resend.com API key (https://resend.com/api-keys)
+ *   EMAIL_FROM      — Sender address (e.g. "Wesal <noreply@wesal-omega.vercel.app>")
  *
- * The function expects a JSON body:
+ * Request body:
  *   { to: string, subject: string, htmlBody: string, textBody: string }
- *
- * Uses Deno's native fetch — no external dependencies needed.
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
@@ -47,7 +45,7 @@ serve(async (req) => {
       )
     }
 
-    const emailFrom = Deno.env.get('EMAIL_FROM') || 'Wesal <noreply@wesal.app>'
+    const emailFrom = Deno.env.get('EMAIL_FROM') || 'Wesal <onboarding@resend.dev>'
 
     const resendResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -74,6 +72,8 @@ serve(async (req) => {
     }
 
     const data = await resendResponse.json()
+    console.log('Email sent successfully:', data.id)
+
     return new Response(
       JSON.stringify({ success: true, id: data.id }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
