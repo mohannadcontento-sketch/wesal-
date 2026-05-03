@@ -1,14 +1,19 @@
 'use client';
 
 import { MainLayout } from '@/components/layout/MainLayout';
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useCallback } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
+import { AvatarPicker } from '@/components/avatars/AvatarPicker';
+import { renderAvatarSvg, isBuiltInAvatar } from '@/lib/avatars';
+import Image from 'next/image';
 
 interface ProfileData {
   username: string;
   realName?: string;
   bio?: string;
   location?: string;
+  avatarUrl?: string;
   specialty?: string;
   rating?: number;
   badge: string;
@@ -67,6 +72,14 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [posts, setPosts] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
+  const { user } = useAuth();
+
+  const isOwnProfile = user?.username === username;
+
+  const handleAvatarConfirm = useCallback((avatarUrl: string) => {
+    setProfile((prev) => prev ? { ...prev, avatarUrl } : prev);
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -140,14 +153,36 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
           <div className="max-w-4xl mx-auto px-6 -mt-20 relative">
             <div className="flex flex-col md:flex-row items-end md:items-center gap-6">
               {/* Avatar */}
-              <div className="relative">
+              <div className="relative group">
                 <div className="w-[120px] h-[120px] rounded-full bg-gradient-to-br from-primary-fixed to-primary-container flex items-center justify-center border-4 border-white shadow-lg overflow-hidden">
-                  {profile.badge ? (
+                  {profile.avatarUrl && isBuiltInAvatar(profile.avatarUrl) ? (
+                    <div className="w-full h-full [&>svg]:w-full [&>svg]:h-full">
+                      {renderAvatarSvg(profile.avatarUrl)}
+                    </div>
+                  ) : profile.avatarUrl ? (
+                    <Image
+                      src={profile.avatarUrl}
+                      alt={profile.realName || username}
+                      width={120}
+                      height={120}
+                      className="object-cover w-full h-full"
+                    />
+                  ) : profile.badge ? (
                     <span className="text-4xl font-bold text-on-primary-fixed">{profile.badge}</span>
                   ) : (
                     <span className="material-symbols-outlined text-5xl text-on-primary-fixed">person</span>
                   )}
                 </div>
+                {/* Edit avatar button (only for own profile) */}
+                {isOwnProfile && (
+                  <button
+                    onClick={() => setAvatarPickerOpen(true)}
+                    className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer"
+                    aria-label="تعديل الصورة الشخصية"
+                  >
+                    <span className="material-symbols-outlined text-white text-2xl">photo_camera</span>
+                  </button>
+                )}
                 <div className="absolute bottom-1 left-1 bg-primary text-on-primary text-[10px] px-2 py-0.5 rounded-full border-2 border-white font-medium">
                   {tierLabel}
                 </div>
@@ -177,11 +212,17 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               </div>
 
               {/* Edit Button */}
-              <div className="flex gap-3 pb-2">
-                <button className="bg-primary text-on-primary px-6 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-primary/20 active:scale-95 transition-transform">
-                  تعديل الملف
-                </button>
-              </div>
+              {isOwnProfile && (
+                <div className="flex gap-3 pb-2">
+                  <button
+                    onClick={() => setAvatarPickerOpen(true)}
+                    className="bg-primary text-on-primary px-4 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-primary/20 active:scale-95 transition-transform flex items-center gap-2"
+                  >
+                    <span className="material-symbols-outlined text-lg">edit</span>
+                    تعديل الصورة
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -332,6 +373,14 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
           </div>
         </div>
       </div>
+
+      {/* Avatar Picker Sheet */}
+      <AvatarPicker
+        open={avatarPickerOpen}
+        onOpenChange={setAvatarPickerOpen}
+        currentAvatar={profile?.avatarUrl || undefined}
+        onConfirm={handleAvatarConfirm}
+      />
     </MainLayout>
   );
 }
