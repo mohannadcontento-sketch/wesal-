@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef, use } from 'react';
-import { motion } from 'framer-motion';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -14,6 +13,9 @@ import {
   Play,
   Send,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Card } from '@/components/ui/card';
 
 interface Message {
   id: string;
@@ -144,24 +146,22 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
   return (
     <MainLayout>
       <div className="flex flex-col h-[calc(100vh-8rem)] max-w-xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col flex-1 rounded-2xl border border-border-light shadow-md overflow-hidden bg-card"
-        >
+        <Card className="flex flex-col flex-1 rounded-2xl border-gray-200 shadow-md overflow-hidden bg-white p-0">
           {/* Chat Header */}
-          <div className="gradient-primary flex items-center gap-3 p-4">
+          <div className="bg-teal-600 flex items-center gap-3 p-4">
             <Link
               href="/doctors"
-              className="btn btn-icon-sm bg-white/15 hover:bg-white/25 text-white backdrop-blur-sm"
+              className="inline-flex items-center justify-center rounded-md bg-white/15 hover:bg-white/25 text-white backdrop-blur-sm p-2 transition-colors"
             >
               <ArrowRight className="h-5 w-5" />
             </Link>
-            <div className="avatar avatar-md bg-white/20 text-white ring-2 ring-white/30">
-              <span className="text-sm">🏥</span>
-            </div>
+            <Avatar className="size-9 bg-white/20 text-white ring-2 ring-white/30">
+              <AvatarFallback className="bg-white/20 text-white text-sm">
+                🏥
+              </AvatarFallback>
+            </Avatar>
             <div className="flex-1 min-w-0">
-              <h2 className="font-semibold text-white text-sm font-heading">شات مع الدكتور</h2>
+              <h2 className="font-semibold text-white text-sm">شات مع الدكتور</h2>
               <div className="flex items-center gap-1.5">
                 <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-[11px] text-white/70">محادثة آمنة ومشفرة</span>
@@ -170,30 +170,28 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
           </div>
 
           {/* Messages Area */}
-          <div className="chat-messages overflow-y-auto p-4 bg-background/50 flex flex-col gap-3">
+          <div className="overflow-y-auto p-4 bg-gray-50 flex flex-col gap-3 flex-1">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full py-16 text-center">
-                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-light">
-                  <Send className="h-6 w-6 text-primary" />
+                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-50">
+                  <Send className="h-6 w-6 text-teal-600" />
                 </div>
-                <p className="text-body-md font-medium text-foreground">ابدأ المحادثة مع الدكتور</p>
-                <p className="text-body-sm text-muted-foreground mt-1">رسائلك خاصة ومشفرة</p>
+                <p className="text-sm font-medium text-gray-900">ابدأ المحادثة مع الدكتور</p>
+                <p className="text-sm text-gray-500 mt-1">رسائلك خاصة ومشفرة</p>
               </div>
             )}
             {messages.map((msg) => {
               const isMe = msg.senderId === user?.userId;
               return (
-                <motion.div
+                <div
                   key={msg.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
                   className={`flex ${isMe ? 'justify-start' : 'justify-end'}`}
                 >
                   <div
                     className={`max-w-[78%] px-4 py-2.5 ${
                       isMe
-                        ? 'gradient-primary text-white rounded-2xl rounded-tl-sm'
-                        : 'bg-muted text-foreground rounded-2xl rounded-tr-sm'
+                        ? 'bg-teal-600 text-white rounded-2xl rounded-tl-sm'
+                        : 'bg-gray-100 text-gray-900 rounded-2xl rounded-tr-sm'
                     }`}
                   >
                     {msg.messageType === 'text' && (
@@ -201,8 +199,8 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
                     )}
                     {msg.messageType === 'voice' && (
                       <div className="flex items-center gap-2.5 min-w-[140px]">
-                        <button className="btn btn-icon-sm bg-white/20 hover:bg-white/30 text-white p-0 w-8 h-8">
-                          <Play className="h-3.5 w-3.5" />
+                        <button className="inline-flex items-center justify-center rounded-md bg-white/20 hover:bg-white/30 text-white p-0 size-8 transition-colors">
+                          <Play className="size-3.5" />
                         </button>
                         {/* Waveform placeholder */}
                         <div className="flex-1 flex items-center gap-0.5">
@@ -224,13 +222,13 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
                     )}
                     <span
                       className={`text-[10px] mt-1.5 block ${
-                        isMe ? 'text-white/50 text-left' : 'text-muted-foreground text-right'
+                        isMe ? 'text-white/50 text-left' : 'text-gray-400 text-right'
                       }`}
                     >
                       {timeAgo(msg.createdAt)}
                     </span>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
             <div ref={messagesEndRef} />
@@ -238,28 +236,26 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
 
           {/* Recording Indicator */}
           {recording && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-destructive-light border-t border-destructive/10">
-              <div className="h-2.5 w-2.5 rounded-full bg-destructive animate-pulse" />
-              <span className="text-sm text-destructive font-medium">جاري التسجيل...</span>
+            <div className="flex items-center gap-2 px-4 py-2 bg-red-50 border-t border-red-100">
+              <div className="h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse" />
+              <span className="text-sm text-red-600 font-medium">جاري التسجيل...</span>
               <div className="flex-1" />
-              <button
+              <Button
                 onClick={stopRecording}
-                className="btn btn-sm bg-destructive text-white hover:bg-destructive/90"
+                size="sm"
+                className="bg-red-600 text-white hover:bg-red-700 gap-1"
               >
                 <MicOff className="h-4 w-4" />
                 <span>إيقاف</span>
-              </button>
+              </Button>
             </div>
           )}
 
           {/* Chat Input */}
-          <div className="flex items-center gap-2 p-3 border-t border-border-light bg-card">
-            <button
-              className="btn btn-icon-sm btn-ghost text-muted-foreground"
-              title="إرفاق ملف"
-            >
-              <Paperclip className="h-5 w-5" />
-            </button>
+          <div className="flex items-center gap-2 p-3 border-t border-gray-200 bg-white">
+            <Button variant="ghost" size="icon-sm" className="text-gray-400 hover:text-gray-600" title="إرفاق ملف">
+              <Paperclip className="size-5" />
+            </Button>
             <input
               ref={inputRef}
               type="text"
@@ -268,32 +264,31 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendText(); } }}
               disabled={recording}
-              className="input flex-1 h-11 rounded-full bg-muted border-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+              className="flex-1 h-11 rounded-full bg-gray-100 border-none px-4 text-sm outline-none focus:ring-2 focus:ring-teal-600/20 disabled:opacity-50 placeholder:text-gray-400"
             />
-            <button
+            <Button
+              variant="ghost"
+              size="icon-sm"
               onClick={recording ? stopRecording : startRecording}
               title={recording ? 'إيقاف التسجيل' : 'رسالة صوتية'}
-              className={`btn btn-icon-sm ${
-                recording
-                  ? 'bg-destructive-light text-destructive hover:bg-destructive/10'
-                  : 'btn-ghost text-muted-foreground'
-              }`}
+              className={recording ? 'text-red-500 hover:text-red-600 hover:bg-red-50' : 'text-gray-400 hover:text-gray-600'}
             >
               {recording ? (
-                <MicOff className="h-5 w-5" />
+                <MicOff className="size-5" />
               ) : (
-                <Mic className="h-5 w-5" />
+                <Mic className="size-5" />
               )}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={sendText}
               disabled={!text.trim() || sending || recording}
-              className="btn btn-primary btn-icon-sm disabled:opacity-40"
+              size="icon-sm"
+              className="bg-teal-600 text-white hover:bg-teal-700 disabled:opacity-40"
             >
-              <Send className="h-5 w-5" />
-            </button>
+              <Send className="size-5" />
+            </Button>
           </div>
-        </motion.div>
+        </Card>
       </div>
     </MainLayout>
   );

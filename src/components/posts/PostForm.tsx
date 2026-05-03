@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { MoodSelector } from './MoodSelector';
 import { toast } from 'sonner';
 import { Send, Loader2 } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 
 interface PostFormProps {
   onPostCreated?: () => void;
@@ -38,11 +41,9 @@ export function PostForm({ onPostCreated }: PostFormProps) {
         setContent('');
         setMoods([]);
         toast.success('تم النشر!');
-        // Trigger refresh of the post feed
         if (onPostCreated) {
           onPostCreated();
         } else {
-          // Fallback: dispatch a custom event that PostFeed can listen to
           window.dispatchEvent(new CustomEvent('post-created'));
         }
       } else {
@@ -63,61 +64,62 @@ export function PostForm({ onPostCreated }: PostFormProps) {
   };
 
   return (
-    <motion.div
-      className="card p-4"
-      initial={false}
-    >
-      <div className="flex gap-3">
-        <div className="avatar avatar-md font-heading shrink-0">
-          {user.badge}
-        </div>
-        <div className="flex-1 space-y-3 min-w-0">
-          {/* Textarea */}
-          <div className="relative">
-            <textarea
-              ref={textareaRef}
-              placeholder="شارك فكرة أو تجربة..."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="w-full min-h-[80px] resize-none rounded-xl border border-border bg-surface-dim px-3.5 py-3 text-body-md text-text-primary placeholder:text-text-tertiary transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/10 focus:bg-card"
-              maxLength={maxChars}
-              disabled={loading}
-            />
-            {charCount > 0 && (
-              <div
-                className={`absolute bottom-2.5 left-3 text-[10px] font-medium transition-colors ${
-                  isNearLimit ? 'text-warm' : 'text-text-tertiary'
-                }`}
-              >
-                {charCount}/{maxChars}
-              </div>
-            )}
-          </div>
+    <Card className="py-0">
+      <CardContent className="p-4">
+        <div className="flex gap-3">
+          <Avatar size="lg">
+            <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-sm">
+              {user.badge}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 space-y-3 min-w-0">
+            {/* Textarea */}
+            <div className="relative">
+              <Textarea
+                ref={textareaRef as React.RefObject<HTMLTextAreaElement>}
+                placeholder="شارك فكرة أو تجربة..."
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="min-h-[80px] resize-none rounded-xl bg-gray-50 text-sm text-gray-900 placeholder:text-gray-400"
+                maxLength={maxChars}
+                disabled={loading}
+              />
+              {charCount > 0 && (
+                <div
+                  className={`absolute bottom-2.5 left-3 text-[10px] font-medium transition-colors ${
+                    isNearLimit ? 'text-amber-500' : 'text-gray-400'
+                  }`}
+                >
+                  {charCount}/{maxChars}
+                </div>
+              )}
+            </div>
 
-          {/* Bottom Bar */}
-          <div className="flex items-center justify-between gap-2">
-            <MoodSelector selected={moods} onChange={setMoods} />
-            <div className="flex items-center gap-2">
-              <span className="text-caption text-text-tertiary hidden sm:block">
-                Ctrl+Enter للنشر
-              </span>
-              <button
-                onClick={handleSubmit}
-                disabled={loading || !content.trim()}
-                className="btn btn-primary btn-sm gap-1.5 disabled:opacity-40"
-              >
-                {loading ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                  <Send className="w-3.5 h-3.5" />
-                )}
-                {loading ? 'جاري النشر...' : 'نشر'}
-              </button>
+            {/* Bottom Bar */}
+            <div className="flex items-center justify-between gap-2">
+              <MoodSelector selected={moods} onChange={setMoods} />
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 hidden sm:block">
+                  Ctrl+Enter للنشر
+                </span>
+                <Button
+                  size="sm"
+                  onClick={handleSubmit}
+                  disabled={loading || !content.trim()}
+                >
+                  {loading ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Send className="w-3.5 h-3.5" />
+                  )}
+                  {loading ? 'جاري النشر...' : 'نشر'}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </motion.div>
+      </CardContent>
+    </Card>
   );
 }

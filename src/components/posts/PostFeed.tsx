@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
 import { PostCard } from './PostCard';
+import { Skeleton } from '@/components/ui/skeleton';
+import EmptyState from '@/components/shared/EmptyState';
 import { MessageSquarePlus } from 'lucide-react';
 
 interface Post {
@@ -55,28 +56,28 @@ export function PostFeed({ section }: { section: string }) {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="card p-5 animate-pulse">
+          <div key={i} className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 space-y-4 animate-pulse">
             {/* Author skeleton */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="skeleton h-10 w-10 rounded-full shrink-0" />
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-10 w-10 rounded-full shrink-0" />
               <div className="flex-1 space-y-2">
-                <div className="skeleton h-3.5 w-28 rounded-md" />
-                <div className="skeleton h-2.5 w-16 rounded-md" />
+                <Skeleton className="h-3.5 w-28" />
+                <Skeleton className="h-2.5 w-16" />
               </div>
             </div>
             {/* Content skeleton */}
-            <div className="space-y-2 mb-4">
-              <div className="skeleton h-3 w-full rounded-md" />
-              <div className="skeleton h-3 w-4/5 rounded-md" />
-              <div className="skeleton h-3 w-3/5 rounded-md" />
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-4/5" />
+              <Skeleton className="h-3 w-3/5" />
             </div>
             {/* Action bar skeleton */}
-            <div className="flex gap-3 pt-3 border-t border-border-light">
-              <div className="skeleton h-7 w-16 rounded-lg" />
-              <div className="skeleton h-7 w-16 rounded-lg" />
-              <div className="skeleton h-7 w-16 rounded-lg" />
+            <div className="flex gap-3 pt-3 border-t border-gray-100">
+              <Skeleton className="h-7 w-16 rounded-lg" />
+              <Skeleton className="h-7 w-16 rounded-lg" />
+              <Skeleton className="h-7 w-16 rounded-lg" />
               <div className="flex-1" />
-              <div className="skeleton h-7 w-10 rounded-lg" />
+              <Skeleton className="h-7 w-10 rounded-lg" />
             </div>
           </div>
         ))}
@@ -86,32 +87,18 @@ export function PostFeed({ section }: { section: string }) {
 
   if (posts.length === 0) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="py-16 text-center"
-      >
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-light">
-          <MessageSquarePlus className="w-7 h-7 text-primary" />
-        </div>
-        <p className="text-body-md font-semibold text-text-primary mb-1">لا توجد مشاركات بعد</p>
-        <p className="text-body-sm text-text-tertiary">كن أول من ينشر تجربتك مع المجتمع!</p>
-      </motion.div>
+      <EmptyState
+        icon={MessageSquarePlus}
+        title="لا توجد مشاركات بعد"
+        description="كن أول من ينشر تجربتك مع المجتمع!"
+      />
     );
   }
 
   return (
     <div className="space-y-4">
-      {posts.map((post, index) => (
-        <motion.div
-          key={post.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: index * 0.05 }}
-        >
-          <PostCard post={post} />
-        </motion.div>
+      {posts.map((post) => (
+        <PostCard key={post.id} post={post} />
       ))}
     </div>
   );

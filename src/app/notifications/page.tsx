@@ -3,7 +3,6 @@
 import { MainLayout } from '@/components/layout/MainLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
   Bell,
   Heart,
@@ -14,9 +13,11 @@ import {
   Check,
   CheckCircle,
   Loader2,
-  X,
 } from 'lucide-react';
 import Link from 'next/link';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface Notification {
   id: string;
@@ -30,15 +31,15 @@ interface Notification {
 
 const typeIconMap: Record<string, { icon: React.ElementType; color: string }> = {
   reaction: { icon: Heart, color: 'text-rose-500 bg-rose-50' },
-  comment: { icon: MessageCircle, color: 'text-primary bg-primary-light' },
-  verification: { icon: BadgeCheck, color: 'text-accent bg-accent-light' },
-  system: { icon: Megaphone, color: 'text-warm bg-warm-light' },
-  appointment: { icon: Calendar, color: 'text-primary bg-primary-light' },
+  comment: { icon: MessageCircle, color: 'text-teal-600 bg-teal-50' },
+  verification: { icon: BadgeCheck, color: 'text-amber-500 bg-amber-50' },
+  system: { icon: Megaphone, color: 'text-amber-500 bg-amber-50' },
+  appointment: { icon: Calendar, color: 'text-teal-600 bg-teal-50' },
   bookmark: { icon: CheckCircle, color: 'text-emerald-500 bg-emerald-50' },
 };
 
 function getTypeIcon(type: string) {
-  return typeIconMap[type] || { icon: Bell, color: 'text-primary bg-primary-light' };
+  return typeIconMap[type] || { icon: Bell, color: 'text-teal-600 bg-teal-50' };
 }
 
 export default function NotificationsPage() {
@@ -92,134 +93,137 @@ export default function NotificationsPage() {
         {/* Page Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-primary-light text-primary">
+            <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
               <Bell className="h-5 w-5" />
               {unreadCount > 0 && (
-                <div className="absolute -top-1 -left-1 flex h-5 w-5 items-center justify-center rounded-full gradient-primary text-[10px] font-bold text-white">
+                <div className="absolute -top-1 -left-1 flex h-5 w-5 items-center justify-center rounded-full bg-teal-600 text-[10px] font-bold text-white">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </div>
               )}
             </div>
             <div>
-              <h1 className="text-h4 text-foreground font-heading">التنبيهات</h1>
-              <p className="text-body-sm text-muted-foreground">
+              <h1 className="font-bold text-gray-900 text-sm">التنبيهات</h1>
+              <p className="text-sm text-gray-500">
                 {unreadCount > 0 ? `${unreadCount} غير مقروء` : 'كلها مقروءة'}
               </p>
             </div>
           </div>
           {unreadCount > 0 && (
-            <button
-              className="btn btn-ghost btn-sm text-primary gap-1"
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-teal-600 hover:text-teal-700 gap-1"
               onClick={handleMarkAllRead}
             >
               <Check className="h-4 w-4" />
               <span>قرأت الكل</span>
-            </button>
+            </Button>
           )}
         </div>
 
         {/* Auth check */}
         {!user ? (
           <div className="py-16 text-center">
-            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-light">
-              <Bell className="h-7 w-7 text-primary/40" />
+            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-50">
+              <Bell className="h-7 w-7 text-teal-600/40" />
             </div>
-            <p className="text-body-md text-muted-foreground">سجل دخول الأول</p>
+            <p className="text-sm text-gray-500">سجل دخول الأول</p>
           </div>
         ) : loading ? (
           /* Loading skeleton */
           <div className="space-y-3">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="rounded-2xl border border-border-light bg-card p-4 animate-pulse">
-                <div className="flex items-start gap-3">
-                  <div className="h-9 w-9 rounded-lg bg-muted shrink-0" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-3.5 w-3/4 rounded bg-muted" />
-                    <div className="h-3 w-1/2 rounded bg-muted" />
+              <Card key={i} className="rounded-2xl border-gray-200 bg-white p-4 animate-pulse">
+                <CardContent className="p-0">
+                  <div className="flex items-start gap-3">
+                    <div className="h-9 w-9 rounded-lg bg-gray-200 shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-3.5 w-3/4 rounded bg-gray-200" />
+                      <div className="h-3 w-1/2 rounded bg-gray-200" />
+                    </div>
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         ) : notifications.length === 0 ? (
           /* Empty State */
           <div className="py-16 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-light">
-              <Bell className="h-8 w-8 text-primary/30" />
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50">
+              <Bell className="h-8 w-8 text-teal-600/30" />
             </div>
-            <p className="text-body-md font-medium text-foreground">مفيش تنبيهات</p>
-            <p className="mt-1.5 text-body-sm text-muted-foreground">
+            <p className="text-sm font-medium text-gray-900">مفيش تنبيهات</p>
+            <p className="mt-1.5 text-sm text-gray-500">
               هتظهر هنا أول ما تجي
             </p>
           </div>
         ) : (
           /* Notifications List */
           <div className="space-y-2.5">
-            {notifications.map((n, i) => {
+            {notifications.map((n) => {
               const { icon: Icon, color } = getTypeIcon(n.type);
               return (
-                <motion.div
-                  key={n.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                >
+                <div key={n.id}>
                   {n.link ? (
                     <Link href={n.link} onClick={() => handleMarkRead(n.id)}>
-                      <div
-                        className={`flex items-start gap-3 rounded-2xl border p-4 transition-all cursor-pointer hover:shadow-sm ${
+                      <Card
+                        className={`rounded-2xl p-4 transition-all cursor-pointer hover:shadow-sm ${
                           n.read
-                            ? 'bg-card border-border-light opacity-70'
-                            : 'bg-primary-50 border-primary/10'
+                            ? 'bg-white border-gray-200 opacity-70'
+                            : 'bg-teal-50 border-teal-100'
                         }`}
                       >
+                        <CardContent className="p-0 flex items-start gap-3">
+                          <div className={`flex h-9 w-9 items-center justify-center rounded-lg shrink-0 ${color}`}>
+                            <Icon className="h-4 w-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className={`text-sm font-medium truncate ${n.read ? 'text-gray-900/60' : 'text-gray-900'}`}>
+                                {n.title}
+                              </p>
+                              <span className="text-xs text-gray-500 shrink-0">{timeAgo(n.createdAt)}</span>
+                            </div>
+                            {n.body && (
+                              <p className="text-sm text-gray-500 mt-0.5 leading-relaxed line-clamp-2">{n.body}</p>
+                            )}
+                          </div>
+                          {!n.read && (
+                            <div className="h-2.5 w-2.5 rounded-full bg-teal-600 shrink-0 mt-1.5" />
+                          )}
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ) : (
+                    <Card
+                      className={`rounded-2xl p-4 transition-all cursor-pointer ${
+                        n.read
+                          ? 'bg-white border-gray-200 opacity-70'
+                          : 'bg-teal-50 border-teal-100'
+                      }`}
+                    >
+                      <CardContent className="p-0 flex items-start gap-3">
                         <div className={`flex h-9 w-9 items-center justify-center rounded-lg shrink-0 ${color}`}>
                           <Icon className="h-4 w-4" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
-                            <p className={`text-body-md font-medium truncate ${n.read ? 'text-foreground/60' : 'text-foreground'}`}>
+                            <p className={`text-sm font-medium truncate ${n.read ? 'text-gray-900/60' : 'text-gray-900'}`}>
                               {n.title}
                             </p>
-                            <span className="text-caption text-muted-foreground shrink-0">{timeAgo(n.createdAt)}</span>
+                            <span className="text-xs text-gray-500 shrink-0">{timeAgo(n.createdAt)}</span>
                           </div>
                           {n.body && (
-                            <p className="text-body-sm text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{n.body}</p>
+                            <p className="text-sm text-gray-500 mt-0.5 leading-relaxed line-clamp-2">{n.body}</p>
                           )}
                         </div>
                         {!n.read && (
-                          <div className="h-2.5 w-2.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                          <div className="h-2.5 w-2.5 rounded-full bg-teal-600 shrink-0 mt-1.5" />
                         )}
-                      </div>
-                    </Link>
-                  ) : (
-                    <div
-                      className={`flex items-start gap-3 rounded-2xl border p-4 transition-all cursor-pointer ${
-                        n.read
-                          ? 'bg-card border-border-light opacity-70'
-                          : 'bg-primary-50 border-primary/10'
-                      }`}
-                    >
-                      <div className={`flex h-9 w-9 items-center justify-center rounded-lg shrink-0 ${color}`}>
-                        <Icon className="h-4 w-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <p className={`text-body-md font-medium truncate ${n.read ? 'text-foreground/60' : 'text-foreground'}`}>
-                            {n.title}
-                          </p>
-                          <span className="text-caption text-muted-foreground shrink-0">{timeAgo(n.createdAt)}</span>
-                        </div>
-                        {n.body && (
-                          <p className="text-body-sm text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{n.body}</p>
-                        )}
-                      </div>
-                      {!n.read && (
-                        <div className="h-2.5 w-2.5 rounded-full bg-primary shrink-0 mt-1.5" />
-                      )}
-                    </div>
+                      </CardContent>
+                    </Card>
                   )}
-                </motion.div>
+                </div>
               );
             })}
           </div>

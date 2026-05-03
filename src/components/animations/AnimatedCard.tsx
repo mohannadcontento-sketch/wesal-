@@ -25,7 +25,8 @@ export default function AnimatedCard({
         hover
           ? {
               y: -2,
-              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.04)',
+              boxShadow:
+                '0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.04)',
             }
           : undefined
       }

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -10,6 +9,10 @@ import {
   Mail, Lock, Eye, EyeOff, User, Stethoscope, Phone, Shield,
   Loader2, ArrowLeft, UserCircle, GraduationCap,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -81,132 +84,78 @@ export default function RegisterPage() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center gradient-hero">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-teal-600 to-teal-700">
         <Loader2 className="w-8 h-8 animate-spin text-white/60" />
       </div>
     );
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center gradient-hero overflow-hidden px-4 py-8">
-      {/* Decorative gradient circles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-primary-200/20 rounded-full blur-3xl animate-pulse-soft" />
-        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-accent/15 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '1.5s' }} />
-        <div className="absolute top-1/4 right-1/4 w-56 h-56 bg-primary-100/25 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '0.8s' }} />
-        <div className="absolute bottom-1/3 left-1/3 w-48 h-48 bg-accent-light/30 rounded-full blur-2xl animate-pulse-soft" style={{ animationDelay: '2s' }} />
-      </div>
-
-      {/* Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="relative w-full max-w-md z-10"
-      >
-        {/* Logo */}
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-teal-600 to-teal-700 px-4 py-8">
+      <div className="w-full max-w-md">
+        {/* Header */}
         <div className="text-center mb-6">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.4 }}
-            className="inline-flex items-center gap-3 mb-3"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 border border-white/20 backdrop-blur-sm">
-              <svg width="26" height="26" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 8C14 8 10 12 10 16C10 20 14 22 20 28C26 22 30 20 30 16C30 12 26 8 20 8Z" fill="#73b3ce" opacity="0.9"/>
-                <path d="M12 18C12 14 16 12 20 16C24 12 28 14 28 18C28 22 24 24 20 28C16 24 12 22 12 18Z" fill="#d6f3f4" opacity="0.7"/>
-              </svg>
-            </div>
-          </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-3xl font-extrabold text-white font-heading"
-          >
+          <h1 className="text-3xl font-bold text-white">
             انضم لوصال
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="text-white/60 text-body-md mt-1"
-          >
+          </h1>
+          <p className="text-white/60 mt-1">
             اعمل حساب جديد في ثواني
-          </motion.p>
+          </p>
         </div>
 
-        {/* Form Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
-          className="rounded-2xl bg-card border border-border-light shadow-md p-6 sm:p-8"
-        >
-          {/* Error message */}
-          {errorMsg && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-5 p-3.5 rounded-xl bg-destructive-light border border-destructive/15 text-destructive text-sm text-center font-medium"
-            >
-              {errorMsg}
-            </motion.div>
-          )}
+        {/* Card */}
+        <Card className="rounded-2xl shadow-lg border-0 p-6 sm:p-8">
+          <CardContent className="p-0">
+            {/* Error message */}
+            {errorMsg && (
+              <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm text-center font-medium">
+                {errorMsg}
+              </div>
+            )}
 
-          {/* Tab switch */}
-          <div className="flex gap-1 p-1 rounded-xl bg-surface-container mb-6">
-            <button
-              type="button"
-              onClick={() => { setActiveTab('user'); setErrorMsg(''); }}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200
-                ${activeTab === 'user'
-                  ? 'gradient-primary text-white shadow-sm'
-                  : 'text-text-secondary hover:text-foreground hover:bg-muted'
-                }
-              `}
-            >
-              <User className="w-4 h-4" />
-              مستخدم
-            </button>
-            <button
-              type="button"
-              onClick={() => { setActiveTab('doctor'); setErrorMsg(''); }}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200
-                ${activeTab === 'doctor'
-                  ? 'gradient-primary text-white shadow-sm'
-                  : 'text-text-secondary hover:text-foreground hover:bg-muted'
-                }
-              `}
-            >
-              <Stethoscope className="w-4 h-4" />
-              طبيب
-            </button>
-          </div>
-
-          {/* Form content with animation */}
-          <AnimatePresence mode="wait">
-            {activeTab === 'user' ? (
-              <motion.form
-                key="user-form"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.25 }}
-                onSubmit={handleUserRegister}
-                className="space-y-4"
+            {/* Tab switch */}
+            <div className="flex gap-1 p-1 rounded-xl bg-gray-100 mb-6">
+              <button
+                type="button"
+                onClick={() => { setActiveTab('user'); setErrorMsg(''); }}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200
+                  ${activeTab === 'user'
+                    ? 'bg-teal-600 text-white shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  }
+                `}
               >
+                <User className="w-4 h-4" />
+                مستخدم
+              </button>
+              <button
+                type="button"
+                onClick={() => { setActiveTab('doctor'); setErrorMsg(''); }}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200
+                  ${activeTab === 'doctor'
+                    ? 'bg-teal-600 text-white shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  }
+                `}
+              >
+                <Stethoscope className="w-4 h-4" />
+                طبيب
+              </button>
+            </div>
+
+            {/* User form */}
+            {activeTab === 'user' ? (
+              <form onSubmit={handleUserRegister} className="space-y-4">
                 {/* Username */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground">اسم المستخدم</label>
+                  <Label className="text-sm font-semibold text-gray-900">اسم المستخدم</Label>
                   <div className="relative">
-                    <User className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-tertiary pointer-events-none" />
-                    <input
+                    <User className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
+                    <Input
                       placeholder="cool_user23"
                       value={userForm.username}
                       onChange={(e) => { setUserForm({ ...userForm, username: e.target.value }); setErrorMsg(''); }}
-                      className="input pr-11"
+                      className="h-12 rounded-lg border-gray-200 pr-11"
                       required
                       disabled={loading}
                     />
@@ -215,15 +164,15 @@ export default function RegisterPage() {
 
                 {/* Email */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground">الإيميل</label>
+                  <Label className="text-sm font-semibold text-gray-900">الإيميل</Label>
                   <div className="relative">
-                    <Mail className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-tertiary pointer-events-none" />
-                    <input
+                    <Mail className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
+                    <Input
                       type="email"
                       placeholder="example@email.com"
                       value={userForm.email}
                       onChange={(e) => { setUserForm({ ...userForm, email: e.target.value }); setErrorMsg(''); }}
-                      className="input pr-11"
+                      className="h-12 rounded-lg border-gray-200 pr-11"
                       required
                       disabled={loading}
                     />
@@ -232,15 +181,15 @@ export default function RegisterPage() {
 
                 {/* Phone */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground">رقم الموبايل</label>
+                  <Label className="text-sm font-semibold text-gray-900">رقم الموبايل</Label>
                   <div className="relative">
-                    <Phone className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-tertiary pointer-events-none" />
-                    <input
+                    <Phone className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
+                    <Input
                       type="tel"
                       placeholder="01xxxxxxxxx"
                       value={userForm.phone}
                       onChange={(e) => { setUserForm({ ...userForm, phone: e.target.value }); setErrorMsg(''); }}
-                      className="input pr-11"
+                      className="h-12 rounded-lg border-gray-200 pr-11"
                       required
                       disabled={loading}
                     />
@@ -249,15 +198,15 @@ export default function RegisterPage() {
 
                 {/* Password */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground">كلمة المرور</label>
+                  <Label className="text-sm font-semibold text-gray-900">كلمة المرور</Label>
                   <div className="relative">
-                    <Lock className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-tertiary pointer-events-none" />
-                    <input
+                    <Lock className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
+                    <Input
                       type={showPassword ? 'text' : 'password'}
                       placeholder="6 أحرف على الأقل"
                       value={userForm.password}
                       onChange={(e) => { setUserForm({ ...userForm, password: e.target.value }); setErrorMsg(''); }}
-                      className="input pr-11 pl-11"
+                      className="h-12 rounded-lg border-gray-200 pr-11 pl-11"
                       required
                       minLength={6}
                       disabled={loading}
@@ -265,7 +214,7 @@ export default function RegisterPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary transition-colors"
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                       aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
                     >
                       {showPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
@@ -274,17 +223,17 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Privacy note */}
-                <div className="flex items-start gap-3 rounded-xl bg-primary-50 p-4 border border-primary/10">
-                  <Shield className="w-4.5 h-4.5 text-primary mt-0.5 shrink-0" />
-                  <p className="text-xs text-text-secondary leading-relaxed">
+                <div className="flex items-start gap-3 rounded-xl bg-teal-50 p-4 border border-teal-100">
+                  <Shield className="w-4 h-4 text-teal-600 mt-0.5 shrink-0" />
+                  <p className="text-xs text-gray-600 leading-relaxed">
                     اسمك الحقيقي مش هيظهر لأي حد. اختار اسم مستعار وشارك براحتك.
                   </p>
                 </div>
 
                 {/* Submit */}
-                <button
+                <Button
                   type="submit"
-                  className="btn btn-primary btn-lg w-full"
+                  className="w-full h-11 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-semibold text-base"
                   disabled={loading}
                 >
                   {loading ? (
@@ -295,28 +244,20 @@ export default function RegisterPage() {
                   ) : (
                     'إنشاء حساب'
                   )}
-                </button>
-              </motion.form>
+                </Button>
+              </form>
             ) : (
-              <motion.form
-                key="doctor-form"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.25 }}
-                onSubmit={handleDoctorRegister}
-                className="space-y-4"
-              >
+              <form onSubmit={handleDoctorRegister} className="space-y-4">
                 {/* Real Name */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground">الاسم الحقيقي</label>
+                  <Label className="text-sm font-semibold text-gray-900">الاسم الحقيقي</Label>
                   <div className="relative">
-                    <UserCircle className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-tertiary pointer-events-none" />
-                    <input
+                    <UserCircle className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
+                    <Input
                       placeholder="د. أحمد محمود"
                       value={doctorForm.realName}
                       onChange={(e) => { setDoctorForm({ ...doctorForm, realName: e.target.value }); setErrorMsg(''); }}
-                      className="input pr-11"
+                      className="h-12 rounded-lg border-gray-200 pr-11"
                       required
                       disabled={loading}
                     />
@@ -325,14 +266,14 @@ export default function RegisterPage() {
 
                 {/* Specialty */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground">التخصص</label>
+                  <Label className="text-sm font-semibold text-gray-900">التخصص</Label>
                   <div className="relative">
-                    <GraduationCap className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-tertiary pointer-events-none" />
-                    <input
+                    <GraduationCap className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
+                    <Input
                       placeholder="طب نفسي"
                       value={doctorForm.specialty}
                       onChange={(e) => { setDoctorForm({ ...doctorForm, specialty: e.target.value }); setErrorMsg(''); }}
-                      className="input pr-11"
+                      className="h-12 rounded-lg border-gray-200 pr-11"
                       required
                       disabled={loading}
                     />
@@ -341,15 +282,15 @@ export default function RegisterPage() {
 
                 {/* Email */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground">الإيميل</label>
+                  <Label className="text-sm font-semibold text-gray-900">الإيميل</Label>
                   <div className="relative">
-                    <Mail className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-tertiary pointer-events-none" />
-                    <input
+                    <Mail className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
+                    <Input
                       type="email"
                       placeholder="doctor@hospital.com"
                       value={doctorForm.email}
                       onChange={(e) => { setDoctorForm({ ...doctorForm, email: e.target.value }); setErrorMsg(''); }}
-                      className="input pr-11"
+                      className="h-12 rounded-lg border-gray-200 pr-11"
                       required
                       disabled={loading}
                     />
@@ -358,15 +299,15 @@ export default function RegisterPage() {
 
                 {/* Phone */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground">رقم الموبايل</label>
+                  <Label className="text-sm font-semibold text-gray-900">رقم الموبايل</Label>
                   <div className="relative">
-                    <Phone className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-tertiary pointer-events-none" />
-                    <input
+                    <Phone className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
+                    <Input
                       type="tel"
                       placeholder="01xxxxxxxxx"
                       value={doctorForm.phone}
                       onChange={(e) => { setDoctorForm({ ...doctorForm, phone: e.target.value }); setErrorMsg(''); }}
-                      className="input pr-11"
+                      className="h-12 rounded-lg border-gray-200 pr-11"
                       required
                       disabled={loading}
                     />
@@ -375,15 +316,15 @@ export default function RegisterPage() {
 
                 {/* Password */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground">كلمة المرور</label>
+                  <Label className="text-sm font-semibold text-gray-900">كلمة المرور</Label>
                   <div className="relative">
-                    <Lock className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-text-tertiary pointer-events-none" />
-                    <input
+                    <Lock className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
+                    <Input
                       type={showPassword ? 'text' : 'password'}
                       placeholder="6 أحرف على الأقل"
                       value={doctorForm.password}
                       onChange={(e) => { setDoctorForm({ ...doctorForm, password: e.target.value }); setErrorMsg(''); }}
-                      className="input pr-11 pl-11"
+                      className="h-12 rounded-lg border-gray-200 pr-11 pl-11"
                       required
                       minLength={6}
                       disabled={loading}
@@ -391,7 +332,7 @@ export default function RegisterPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary transition-colors"
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                       aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
                     >
                       {showPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
@@ -400,17 +341,17 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Doctor note */}
-                <div className="flex items-start gap-3 rounded-xl bg-primary-50 p-4 border border-primary/10">
-                  <Stethoscope className="w-4.5 h-4.5 text-primary mt-0.5 shrink-0" />
-                  <p className="text-xs text-text-secondary leading-relaxed">
+                <div className="flex items-start gap-3 rounded-xl bg-teal-50 p-4 border border-teal-100">
+                  <Stethoscope className="w-4 h-4 text-teal-600 mt-0.5 shrink-0" />
+                  <p className="text-xs text-gray-600 leading-relaxed">
                     هنتحقق من مؤهلاتك الطبية قبل ما حسابك يظهر كطبيب موثوق.
                   </p>
                 </div>
 
                 {/* Submit */}
-                <button
+                <Button
                   type="submit"
-                  className="btn btn-primary btn-lg w-full"
+                  className="w-full h-11 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-semibold text-base"
                   disabled={loading}
                 >
                   {loading ? (
@@ -421,34 +362,29 @@ export default function RegisterPage() {
                   ) : (
                     'إنشاء حساب دكتور'
                   )}
-                </button>
-              </motion.form>
+                </Button>
+              </form>
             )}
-          </AnimatePresence>
 
-          {/* Login link */}
-          <div className="mt-6 text-center text-sm text-text-secondary">
-            عندك حساب؟{' '}
-            <Link href="/login" className="text-primary hover:text-primary-hover font-semibold transition-colors inline-flex items-center gap-1">
-              سجل دخول
-              <ArrowLeft className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        </motion.div>
+            {/* Login link */}
+            <div className="mt-6 text-center text-sm text-gray-500">
+              عندك حساب؟{' '}
+              <Link href="/login" className="text-teal-600 hover:text-teal-700 font-semibold transition-colors inline-flex items-center gap-1">
+                سجل دخول
+                <ArrowLeft className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Back link */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="mt-5 text-center"
-        >
+        <div className="mt-5 text-center">
           <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-white/50 hover:text-white/80 transition-colors">
             <ArrowLeft className="w-4 h-4" />
             رجوع للصفحة الرئيسية
           </Link>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 }

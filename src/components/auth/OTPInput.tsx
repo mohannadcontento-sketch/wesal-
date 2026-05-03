@@ -79,40 +79,33 @@ export default function OTPInput({ length = 6, onComplete, disabled = false }: O
   return (
     <div className="flex gap-2.5 sm:gap-3 justify-center" dir="ltr">
       {values.map((value, index) => (
-        <div key={index} className="relative">
-          <input
-            ref={(el) => {
-              inputRefs.current[index] = el;
-            }}
-            type="text"
-            inputMode="numeric"
-            maxLength={1}
-            value={value}
-            onChange={(e) => handleChange(index, e.target.value)}
-            onKeyDown={(e) => handleKeyDown(index, e)}
-            onPaste={index === 0 ? handlePaste : undefined}
-            onFocus={() => setFocusedIndex(index)}
-            disabled={disabled}
-            className={`input w-11 h-13 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-bold tracking-wider transition-all duration-200
-              ${value
-                ? 'border-primary bg-primary-50 text-primary'
-                : focusedIndex === index
-                  ? 'border-primary shadow-glow'
-                  : 'bg-card border-border'
-              }
-              ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-            `}
-            style={{
-              animationDelay: `${index * 50}ms`,
-            }}
-          />
-          {/* Bottom indicator line */}
-          <div
-            className={`absolute -bottom-1 left-1/2 -translate-x-1/2 h-0.5 rounded-full transition-all duration-200
-              ${value ? 'w-6 bg-primary' : focusedIndex === index ? 'w-4 bg-primary/60' : 'w-0'}
-            `}
-          />
-        </div>
+        <input
+          key={index}
+          ref={(el) => {
+            inputRefs.current[index] = el;
+          }}
+          type="text"
+          inputMode="numeric"
+          maxLength={1}
+          value={value}
+          onChange={(e) => handleChange(index, e.target.value)}
+          onKeyDown={(e) => handleKeyDown(index, e)}
+          onPaste={index === 0 ? handlePaste : undefined}
+          onFocus={() => setFocusedIndex(index)}
+          disabled={disabled}
+          className={`w-11 h-13 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-bold tracking-wider rounded-lg border-2 transition-all duration-200 outline-none
+            ${value
+              ? 'border-teal-500 bg-teal-50 text-teal-700'
+              : focusedIndex === index
+                ? 'border-teal-400 ring-2 ring-teal-100'
+                : 'border-gray-200 bg-white text-gray-900'
+            }
+            ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
+          `}
+          style={{
+            animationDelay: `${index * 50}ms`,
+          }}
+        />
       ))}
     </div>
   );

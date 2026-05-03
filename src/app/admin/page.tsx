@@ -3,11 +3,20 @@
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import AnimatedCard from '@/components/animations/AnimatedCard';
 import EmptyState from '@/components/shared/EmptyState';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Shield,
   Users,
@@ -125,7 +134,7 @@ export default function AdminPage() {
       label: 'إجمالي المستخدمين',
       value: stats.totalUsers,
       icon: Users,
-      color: 'bg-primary-light text-primary',
+      color: 'bg-teal-50 text-teal-600',
       trend: '+12%',
       trendUp: true,
     },
@@ -133,7 +142,7 @@ export default function AdminPage() {
       label: 'الأطباء',
       value: stats.doctors,
       icon: Stethoscope,
-      color: 'bg-accent-light text-accent',
+      color: 'bg-purple-50 text-purple-600',
       trend: '+5%',
       trendUp: true,
     },
@@ -141,7 +150,7 @@ export default function AdminPage() {
       label: 'المنشورات',
       value: stats.posts,
       icon: FileText,
-      color: 'bg-success-light text-success',
+      color: 'bg-green-50 text-green-600',
       trend: '+8%',
       trendUp: true,
     },
@@ -149,8 +158,11 @@ export default function AdminPage() {
       label: 'طلبات التوثيق',
       value: stats.pendingVerifications,
       icon: Clock,
-      color: 'bg-[#FEF3C7] text-warm',
-      trend: stats.pendingVerifications > 0 ? `${stats.pendingVerifications} جديد` : 'لا يوجد',
+      color: 'bg-amber-50 text-amber-600',
+      trend:
+        stats.pendingVerifications > 0
+          ? `${stats.pendingVerifications} جديد`
+          : 'لا يوجد',
       trendUp: null,
     },
   ];
@@ -182,14 +194,12 @@ export default function AdminPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl gradient-primary text-white shadow-glow">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-600 text-white shadow-sm">
             <BarChart3 className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-h3 text-text-primary font-heading">
-              لوحة التحكم
-            </h1>
-            <p className="text-body-sm text-text-secondary">
+            <h1 className="text-xl font-bold text-foreground">لوحة التحكم</h1>
+            <p className="text-sm text-muted-foreground">
               نظرة عامة على منصة وصال
             </p>
           </div>
@@ -202,19 +212,17 @@ export default function AdminPage() {
           const Icon = stat.icon;
           return (
             <AnimatedCard key={stat.label} delay={index * 0.08}>
-              <div className="card p-4 sm:p-5">
+              <Card className="p-4 sm:p-5">
                 <div className="flex items-start justify-between mb-3">
                   <div
                     className={`flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl ${stat.color}`}
                   >
-                    <Icon className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
+                    <Icon className="w-5 h-5 sm:w-[22px] sm:h-[22px]" />
                   </div>
                   {stat.trendUp !== null && (
                     <div
                       className={`flex items-center gap-0.5 text-xs font-medium ${
-                        stat.trendUp
-                          ? 'text-success'
-                          : 'text-destructive'
+                        stat.trendUp ? 'text-green-600' : 'text-red-600'
                       }`}
                     >
                       <TrendingUp
@@ -226,17 +234,17 @@ export default function AdminPage() {
                     </div>
                   )}
                 </div>
-                <p className="text-h2 text-text-primary font-heading">
+                <p className="text-3xl font-bold text-foreground">
                   {isLoadingStats ? (
-                    <span className="skeleton inline-block w-12 h-8 rounded-md" />
+                    <Skeleton className="inline-block w-12 h-8 rounded-md" />
                   ) : (
                     stat.value
                   )}
                 </p>
-                <p className="text-caption text-text-tertiary mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {stat.label}
                 </p>
-              </div>
+              </Card>
             </AnimatedCard>
           );
         })}
@@ -247,71 +255,76 @@ export default function AdminPage() {
         {/* Recent Verification Requests */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-h4 text-text-primary font-heading flex items-center gap-2">
-              <Activity className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <Activity className="w-5 h-5 text-teal-600" />
               طلبات التوثيق الأخيرة
             </h2>
             <Link href="/admin/verification">
-              <button className="btn btn-ghost btn-sm gap-1.5 text-text-secondary">
+              <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
                 عرض الكل
                 <ArrowLeft className="w-4 h-4" />
-              </button>
+              </Button>
             </Link>
           </div>
 
           {requests.length === 0 ? (
             <AnimatedCard>
-              <div className="card p-6">
+              <Card className="p-6">
                 <EmptyState
                   icon={CheckCircle}
                   title="لا توجد طلبات معلقة"
                   description="جميع طلبات التوثيق تمت مراجعتها"
                 />
-              </div>
+              </Card>
             </AnimatedCard>
           ) : (
             <div className="space-y-3">
               {requests.slice(0, 5).map((req, index) => (
                 <AnimatedCard key={req.id} delay={index * 0.06}>
-                  <div className="card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-light text-primary shrink-0">
-                        <Users className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-text-primary">
-                          {req.user.profile.realName}
-                        </p>
-                        <p className="text-caption text-text-tertiary">
-                          @{req.user.profile.username || '—'} · {req.user.profile.reputationScore} نقطة
-                        </p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="badge badge-primary">
-                            {req.user.profile.reputationTier}
-                          </span>
-                          <span className="text-[11px] text-text-tertiary">
-                            {formatDate(req.createdAt)}
-                          </span>
+                  <Card className="p-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-50 text-teal-600 shrink-0">
+                          <Users className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">
+                            {req.user.profile.realName}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            @{req.user.profile.username || '—'} · {req.user.profile.reputationScore} نقطة
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="outline" className="text-xs">
+                              {req.user.profile.reputationTier}
+                            </Badge>
+                            <span className="text-[11px] text-muted-foreground">
+                              {formatDate(req.createdAt)}
+                            </span>
+                          </div>
                         </div>
                       </div>
+                      <div className="flex items-center gap-2 sm:flex-shrink-0">
+                        <Button
+                          size="sm"
+                          onClick={() => handleAction(req.id, 'approved')}
+                          className="bg-teal-600 hover:bg-teal-700 text-white gap-1.5"
+                        >
+                          <CheckCircle className="w-3.5 h-3.5" />
+                          توثيق
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleAction(req.id, 'rejected')}
+                          className="text-red-600 hover:bg-red-50 gap-1.5"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                          رفض
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 sm:flex-shrink-0">
-                      <button
-                        onClick={() => handleAction(req.id, 'approved')}
-                        className="btn btn-sm btn-primary gap-1.5"
-                      >
-                        <CheckCircle className="w-3.5 h-3.5" />
-                        توثيق
-                      </button>
-                      <button
-                        onClick={() => handleAction(req.id, 'rejected')}
-                        className="btn btn-sm btn-ghost text-destructive hover:bg-destructive-light gap-1.5"
-                      >
-                        <XCircle className="w-3.5 h-3.5" />
-                        رفض
-                      </button>
-                    </div>
-                  </div>
+                  </Card>
                 </AnimatedCard>
               ))}
             </div>
@@ -322,87 +335,87 @@ export default function AdminPage() {
         <div className="space-y-4">
           {/* Quick Actions */}
           <AnimatedCard delay={0.2}>
-            <div className="card p-5">
-              <h3 className="text-h4 text-text-primary font-heading mb-4">
-                إجراءات سريعة
-              </h3>
-              <div className="space-y-2">
-                {quickActions.map((action) => {
-                  const Icon = action.icon;
-                  return (
-                    <Link key={action.href} href={action.href}>
-                      <button
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                          action.variant === 'primary'
-                            ? 'btn btn-primary justify-start'
-                            : 'hover:bg-muted text-text-secondary'
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                        {action.label}
-                        <ArrowLeft className="w-4 h-4 mr-auto" />
-                      </button>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
+            <Card className="p-5">
+              <CardHeader className="p-0 pb-4">
+                <CardTitle className="text-lg font-semibold">
+                  إجراءات سريعة
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="space-y-2">
+                  {quickActions.map((action) => {
+                    const Icon = action.icon;
+                    return (
+                      <Link key={action.href} href={action.href}>
+                        <Button
+                          variant={action.variant === 'primary' ? 'default' : 'ghost'}
+                          className="w-full justify-start gap-3 bg-teal-600 hover:bg-teal-700 text-white"
+                        >
+                          <Icon className="w-4 h-4" />
+                          {action.label}
+                          <ArrowLeft className="w-4 h-4 mr-auto" />
+                        </Button>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
           </AnimatedCard>
 
           {/* Platform Summary */}
           <AnimatedCard delay={0.3}>
-            <div className="card p-5">
-              <h3 className="text-h4 text-text-primary font-heading mb-4">
-                ملخص المنصة
-              </h3>
-              <div className="space-y-3">
+            <Card className="p-5">
+              <CardHeader className="p-0 pb-4">
+                <CardTitle className="text-lg font-semibold">
+                  ملخص المنصة
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-text-secondary">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="w-2 h-2 rounded-full bg-teal-600" />
                     المستخدمون النشطون
                   </div>
-                  <span className="text-sm font-semibold text-text-primary">
+                  <span className="text-sm font-semibold text-foreground">
                     {stats.totalUsers}
                   </span>
                 </div>
-                <div className="divider" />
+                <Separator />
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-text-secondary">
-                    <div className="w-2 h-2 rounded-full bg-accent" />
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="w-2 h-2 rounded-full bg-purple-600" />
                     الأطباء الموثقون
                   </div>
-                  <span className="text-sm font-semibold text-text-primary">
+                  <span className="text-sm font-semibold text-foreground">
                     {stats.doctors}
                   </span>
                 </div>
-                <div className="divider" />
+                <Separator />
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-text-secondary">
-                    <div className="w-2 h-2 rounded-full bg-success" />
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="w-2 h-2 rounded-full bg-green-600" />
                     إجمالي المنشورات
                   </div>
-                  <span className="text-sm font-semibold text-text-primary">
+                  <span className="text-sm font-semibold text-foreground">
                     {stats.posts}
                   </span>
                 </div>
-                <div className="divider" />
+                <Separator />
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-text-secondary">
-                    <div className="w-2 h-2 rounded-full bg-warm" />
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="w-2 h-2 rounded-full bg-amber-600" />
                     طلبات معلقة
                   </div>
-                  <span
-                    className={`badge ${
-                      stats.pendingVerifications > 0
-                        ? 'badge-destructive'
-                        : 'badge-success'
-                    }`}
+                  <Badge
+                    variant={stats.pendingVerifications > 0 ? 'destructive' : 'secondary'}
+                    className="text-xs"
                   >
                     {stats.pendingVerifications}
-                  </span>
+                  </Badge>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </AnimatedCard>
         </div>
       </div>

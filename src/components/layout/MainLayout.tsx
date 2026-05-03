@@ -5,9 +5,9 @@ import { MobileBottomNav } from './MobileBottomNav';
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
-      <main className="w-full max-w-5xl mx-auto flex-1 px-4 sm:px-6">
+      <main className="w-full max-w-3xl mx-auto px-4 flex-1">
         {children}
       </main>
       <MobileBottomNav />
