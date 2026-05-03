@@ -53,85 +53,94 @@ export default function LoginPage() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-surface">
-        <span className="material-symbols-outlined animate-spin text-[32px] text-primary">progress_activity</span>
+      <div className="flex min-h-screen items-center justify-center bg-wesal-cream">
+        <span className="material-symbols-outlined animate-spin text-[32px] text-wesal-dark">progress_activity</span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex bg-surface">
-      {/* Right Side: Branding Panel (hidden on mobile) */}
-      <div className="hidden md:flex flex-col justify-between w-5/12 p-12 relative overflow-hidden gradient-primary text-on-primary">
-        {/* Abstract background elements */}
-        <div className="absolute -top-20 -right-20 w-64 h-64 bg-tertiary-fixed rounded-full mix-blend-screen blur-[80px] opacity-20" />
-        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-inverse-primary rounded-full mix-blend-screen blur-[100px] opacity-30" />
+    <div className="min-h-screen flex bg-wesal-cream">
+      {/* ── Left Branding Panel (hidden on mobile) ── */}
+      <div className="hidden md:flex flex-col justify-between w-5/12 p-12 relative overflow-hidden gradient-hero text-white">
+        {/* Floating glass elements */}
+        <div className="absolute top-16 left-8 w-28 h-28 rounded-2xl glass-panel animate-float opacity-60 rotate-6" />
+        <div className="absolute top-48 right-12 w-20 h-20 rounded-full glass-panel animate-float-slow opacity-40 -rotate-12" />
+        <div className="absolute bottom-40 left-20 w-24 h-24 rounded-3xl glass-panel animate-float opacity-30 rotate-3" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-20 right-8 w-16 h-16 rounded-xl glass-panel animate-float-slow opacity-50 -rotate-6" style={{ animationDelay: '2s' }} />
+
+        {/* Decorative circles */}
+        <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/5 rounded-full blur-[80px]" />
+        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-wesal-sky/10 rounded-full blur-[100px]" />
 
         {/* Logo & Description */}
-        <div className="relative z-10">
+        <div className="relative z-10 animate-fade-in-up">
+          <div className="w-14 h-14 rounded-2xl glass-panel flex items-center justify-center mb-6 shadow-lg">
+            <span className="material-symbols-outlined filled text-[28px] text-wesal-ice">favorite</span>
+          </div>
           <h1 className="text-[40px] font-bold leading-tight tracking-tight mb-6">وصال</h1>
-          <p className="text-lg leading-relaxed text-surface-variant max-w-sm">
+          <p className="text-lg leading-relaxed text-white/75 max-w-sm">
             منصة متكاملة للصحة النفسية، تجمع بين الاحترافية السريرية والبيئة الداعمة لرحلة تعافيك.
           </p>
         </div>
 
         {/* Trust Badges */}
-        <div className="relative z-10 flex flex-col gap-6 mt-12">
+        <div className="relative z-10 flex flex-col gap-6 mt-12 animate-fade-in-up stagger-2">
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center backdrop-blur-md border border-white/20">
-              <span className="material-symbols-outlined filled text-tertiary-fixed">lock</span>
+            <div className="flex-shrink-0 w-12 h-12 rounded-2xl glass-panel flex items-center justify-center shadow-md">
+              <span className="material-symbols-outlined filled text-wesal-ice">lock</span>
             </div>
             <div>
               <h3 className="text-sm font-bold mb-1">حماية بياناتك</h3>
-              <p className="text-sm text-surface-variant opacity-90">بياناتك مشفرة ومحمية بأعلى معايير الأمان العالمية.</p>
+              <p className="text-sm text-white/60">بياناتك مشفرة ومحمية بأعلى معايير الأمان العالمية.</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center backdrop-blur-md border border-white/20">
-              <span className="material-symbols-outlined filled text-tertiary-fixed">verified_user</span>
+            <div className="flex-shrink-0 w-12 h-12 rounded-2xl glass-panel flex items-center justify-center shadow-md">
+              <span className="material-symbols-outlined filled text-wesal-ice">verified_user</span>
             </div>
             <div>
               <h3 className="text-sm font-bold mb-1">تواصل آمن</h3>
-              <p className="text-sm text-surface-variant opacity-90">جميع المحادثات والاستشارات مشفرة بالكامل.</p>
+              <p className="text-sm text-white/60">جميع المحادثات والاستشارات مشفرة بالكامل.</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center backdrop-blur-md border border-white/20">
-              <span className="material-symbols-outlined filled text-tertiary-fixed">support_agent</span>
+            <div className="flex-shrink-0 w-12 h-12 rounded-2xl glass-panel flex items-center justify-center shadow-md">
+              <span className="material-symbols-outlined filled text-wesal-ice">support_agent</span>
             </div>
             <div>
               <h3 className="text-sm font-bold mb-1">دعم متواصل</h3>
-              <p className="text-sm text-surface-variant opacity-90">فريق متخصص متاح على مدار الساعة لمساعدتك.</p>
+              <p className="text-sm text-white/60">فريق متخصص متاح على مدار الساعة لمساعدتك.</p>
             </div>
           </div>
         </div>
 
         {/* Copyright */}
-        <div className="relative z-10 mt-auto pt-6 text-sm text-surface-variant opacity-70">
+        <div className="relative z-10 mt-auto pt-6 text-sm text-white/40 animate-fade-in-up stagger-4">
           © ٢٠٢٤ وصال للصحة النفسية
         </div>
       </div>
 
-      {/* Left Side: Login Form */}
-      <div className="w-full md:w-7/12 flex flex-col justify-center p-6 md:p-12 lg:p-16 bg-surface-container-lowest">
-        <div className="w-full max-w-md mx-auto">
+      {/* ── Right Side: Login Form ── */}
+      <div className="w-full md:w-7/12 flex flex-col justify-center p-6 md:p-12 lg:p-16 bg-wesal-cream">
+        <div className="w-full max-w-md mx-auto animate-fade-in-up stagger-1">
           {/* Mobile Logo */}
           <div className="md:hidden mb-8 text-center">
-            <div className="w-16 h-16 bg-primary-container rounded-xl flex items-center justify-center shadow-sm mx-auto mb-4">
-              <span className="material-symbols-outlined filled text-on-primary text-[32px]">favorite</span>
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-wesal-dark to-wesal-medium flex items-center justify-center shadow-lg mx-auto mb-4">
+              <span className="material-symbols-outlined filled text-[32px] text-white">favorite</span>
             </div>
-            <h1 className="text-[32px] font-bold text-primary-container">Wesal</h1>
+            <h1 className="text-[32px] font-bold text-wesal-navy">وصال</h1>
           </div>
 
           {/* Desktop Header */}
           <div className="hidden md:block mb-8">
-            <h2 className="text-[32px] font-bold text-primary mb-2">مرحباً بيك مجدداً</h2>
-            <p className="text-base text-on-surface-variant">سجل دخول لحسابك وواصل رحلتك نحو صحة نفسية أفضل.</p>
+            <h2 className="text-[32px] font-bold text-wesal-navy mb-2">مرحباً بيك مجدداً</h2>
+            <p className="text-base text-wesal-medium">سجل دخول لحسابك وواصل رحلتك نحو صحة نفسية أفضل.</p>
           </div>
 
           {/* Error message */}
           {errorMsg && (
-            <div className="mb-5 p-3.5 rounded-xl bg-error-container border border-error/20 text-error text-sm text-center font-medium">
+            <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm text-center font-medium animate-scale-in">
               {errorMsg}
             </div>
           )}
@@ -140,16 +149,16 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             {/* Email */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-on-surface-variant">البريد الإلكتروني</label>
+              <label className="text-xs font-medium text-wesal-medium">البريد الإلكتروني</label>
               <div className="relative">
-                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">mail</span>
+                <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">mail</span>
                 <input
                   type="email"
                   placeholder="example@email.com"
                   dir="ltr"
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); setErrorMsg(''); }}
-                  className="w-full pl-3 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
+                  className="w-full pl-3 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
                   required
                   autoComplete="email"
                   disabled={loading}
@@ -160,22 +169,22 @@ export default function LoginPage() {
             {/* Password */}
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-medium text-on-surface-variant">كلمة المرور</label>
+                <label className="text-xs font-medium text-wesal-medium">كلمة المرور</label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs text-primary-container hover:text-primary transition-colors"
+                  className="text-xs text-wesal-dark hover:text-wesal-medium transition-colors font-medium"
                 >
                   نسيت كلمة المرور؟
                 </Link>
               </div>
               <div className="relative">
-                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">lock</span>
+                <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">lock</span>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="أدخل كلمة المرور"
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setErrorMsg(''); }}
-                  className="w-full pl-10 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
+                  className="w-full pl-10 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
                   required
                   autoComplete="current-password"
                   disabled={loading}
@@ -183,7 +192,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-wesal-sky hover:text-wesal-medium transition-colors"
                   aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
                 >
                   <span className="material-symbols-outlined text-[20px]">
@@ -197,7 +206,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || !email || !password}
-              className="mt-2 w-full py-3.5 px-6 rounded-lg bg-gradient-to-l from-primary to-primary-container text-on-primary text-sm font-bold shadow-md hover:shadow-lg hover:opacity-90 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-2 w-full py-3.5 px-6 rounded-xl bg-gradient-to-l from-wesal-dark to-wesal-medium text-white text-sm font-bold shadow-lg hover:shadow-xl hover:brightness-110 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
@@ -212,11 +221,11 @@ export default function LoginPage() {
 
           {/* Register link */}
           <div className="mt-6 text-center">
-            <p className="text-base text-on-surface-variant">
+            <p className="text-base text-wesal-medium">
               مش عندك حساب؟{' '}
               <Link
                 href="/register"
-                className="text-primary font-bold hover:text-primary-container transition-colors underline decoration-primary/30 underline-offset-4"
+                className="text-wesal-dark font-bold hover:text-wesal-medium transition-colors underline decoration-wesal-medium/30 underline-offset-4"
               >
                 سجل دلوقتي
               </Link>
@@ -227,7 +236,7 @@ export default function LoginPage() {
           <div className="mt-4">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-primary-container transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs text-wesal-medium hover:text-wesal-dark transition-colors"
             >
               <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
               العودة للرئيسية

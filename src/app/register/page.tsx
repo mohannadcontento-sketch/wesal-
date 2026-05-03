@@ -76,94 +76,106 @@ export default function RegisterPage() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-surface">
-        <span className="material-symbols-outlined animate-spin text-[32px] text-primary">progress_activity</span>
+      <div className="flex min-h-screen items-center justify-center bg-wesal-cream">
+        <span className="material-symbols-outlined animate-spin text-[32px] text-wesal-dark">progress_activity</span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surface p-6">
-      <div className="w-full max-w-6xl bg-surface-container-lowest rounded-xl shadow-[0_8px_32px_0_rgba(0,67,70,0.1)] overflow-hidden flex flex-col md:flex-row min-h-[700px] md:min-h-[800px]">
-        {/* Right Side: Branding & Features */}
-        <div className="hidden md:flex flex-col justify-between w-5/12 p-12 relative overflow-hidden gradient-primary text-on-primary">
-          {/* Abstract background elements */}
-          <div className="absolute -top-20 -right-20 w-64 h-64 bg-tertiary-fixed rounded-full mix-blend-screen blur-[80px] opacity-20" />
-          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-inverse-primary rounded-full mix-blend-screen blur-[100px] opacity-30" />
+    <div className="min-h-screen flex bg-wesal-cream">
+      {/* ── Left Branding Panel (hidden on mobile) ── */}
+      <div className="hidden md:flex flex-col justify-between w-5/12 p-12 relative overflow-hidden gradient-hero text-white">
+        {/* Floating glass elements */}
+        <div className="absolute top-12 left-6 w-24 h-24 rounded-2xl glass-panel animate-float opacity-50 -rotate-3" />
+        <div className="absolute top-56 right-10 w-16 h-16 rounded-full glass-panel animate-float-slow opacity-40 rotate-6" />
+        <div className="absolute bottom-48 left-16 w-20 h-20 rounded-3xl glass-panel animate-float opacity-30 rotate-12" style={{ animationDelay: '1.5s' }} />
+        <div className="absolute bottom-28 right-6 w-14 h-14 rounded-xl glass-panel animate-float-slow opacity-45 -rotate-9" style={{ animationDelay: '2.5s' }} />
 
-          <div className="relative z-10">
-            <h1 className="text-[40px] font-bold leading-tight tracking-tight mb-6">وصال</h1>
-            <p className="text-lg leading-relaxed text-surface-variant max-w-sm">
-              منصة متكاملة للصحة النفسية، تجمع بين الاحترافية السريرية والبيئة الداعمة لرحلة تعافيك.
-            </p>
+        {/* Decorative blurs */}
+        <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/5 rounded-full blur-[80px]" />
+        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-wesal-sky/10 rounded-full blur-[100px]" />
+
+        {/* Logo & Description */}
+        <div className="relative z-10 animate-fade-in-up">
+          <div className="w-14 h-14 rounded-2xl glass-panel flex items-center justify-center mb-6 shadow-lg">
+            <span className="material-symbols-outlined filled text-[28px] text-wesal-ice">favorite</span>
           </div>
+          <h1 className="text-[40px] font-bold leading-tight tracking-tight mb-6">وصال</h1>
+          <p className="text-lg leading-relaxed text-white/75 max-w-sm">
+            منصة متكاملة للصحة النفسية، تجمع بين الاحترافية السريرية والبيئة الداعمة لرحلة تعافيك.
+          </p>
+        </div>
 
-          <div className="relative z-10 flex flex-col gap-6 mt-12">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center backdrop-blur-md border border-white/20">
-                <span className="material-symbols-outlined filled text-tertiary-fixed">shield</span>
-              </div>
-              <div>
-                <h3 className="text-sm font-bold mb-1">خصوصية تامة</h3>
-                <p className="text-sm text-surface-variant opacity-90">بياناتك مشفرة ومحمية بأعلى معايير الأمان العالمية.</p>
-              </div>
+        {/* Trust Badges */}
+        <div className="relative z-10 flex flex-col gap-6 mt-12 animate-fade-in-up stagger-2">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-12 h-12 rounded-2xl glass-panel flex items-center justify-center shadow-md">
+              <span className="material-symbols-outlined filled text-wesal-ice">shield</span>
             </div>
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center backdrop-blur-md border border-white/20">
-                <span className="material-symbols-outlined filled text-tertiary-fixed">favorite</span>
-              </div>
-              <div>
-                <h3 className="text-sm font-bold mb-1">دعم مستمر</h3>
-                <p className="text-sm text-surface-variant opacity-90">فريق متخصص متاح للإجابة على استفساراتك وتقديم المساعدة.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center backdrop-blur-md border border-white/20">
-                <span className="material-symbols-outlined filled text-tertiary-fixed">verified_user</span>
-              </div>
-              <div>
-                <h3 className="text-sm font-bold mb-1">موثوقية وأمان</h3>
-                <p className="text-sm text-surface-variant opacity-90">أطباء معتمدون وبروتوكولات صارمة لضمان جودة الرعاية.</p>
-              </div>
+            <div>
+              <h3 className="text-sm font-bold mb-1">خصوصية تامة</h3>
+              <p className="text-sm text-white/60">بياناتك مشفرة ومحمية بأعلى معايير الأمان العالمية.</p>
             </div>
           </div>
-
-          <div className="relative z-10 mt-auto pt-6 text-sm text-surface-variant opacity-70">
-            © ٢٠٢٤ وصال للصحة النفسية
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-12 h-12 rounded-2xl glass-panel flex items-center justify-center shadow-md">
+              <span className="material-symbols-outlined filled text-wesal-ice">favorite</span>
+            </div>
+            <div>
+              <h3 className="text-sm font-bold mb-1">دعم مستمر</h3>
+              <p className="text-sm text-white/60">فريق متخصص متاح للإجابة على استفساراتك وتقديم المساعدة.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-12 h-12 rounded-2xl glass-panel flex items-center justify-center shadow-md">
+              <span className="material-symbols-outlined filled text-wesal-ice">verified_user</span>
+            </div>
+            <div>
+              <h3 className="text-sm font-bold mb-1">موثوقية وأمان</h3>
+              <p className="text-sm text-white/60">أطباء معتمدون وبروتوكولات صارمة لضمان جودة الرعاية.</p>
+            </div>
           </div>
         </div>
 
-        {/* Left Side: Sign Up Form */}
-        <div className="w-full md:w-7/12 p-6 md:p-12 lg:p-16 flex flex-col justify-center bg-surface-container-lowest">
+        {/* Copyright */}
+        <div className="relative z-10 mt-auto pt-6 text-sm text-white/40 animate-fade-in-up stagger-4">
+          © ٢٠٢٤ وصال للصحة النفسية
+        </div>
+      </div>
+
+      {/* ── Right Side: Register Form ── */}
+      <div className="w-full md:w-7/12 flex flex-col justify-center p-6 md:p-12 lg:p-16 bg-wesal-cream overflow-y-auto">
+        <div className="w-full max-w-md mx-auto animate-fade-in-up stagger-1">
           {/* Mobile Logo */}
           <div className="md:hidden mb-6 text-center">
-            <div className="w-14 h-14 bg-primary-container rounded-xl flex items-center justify-center shadow-sm mx-auto mb-3">
-              <span className="material-symbols-outlined filled text-on-primary text-[28px]">favorite</span>
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-wesal-dark to-wesal-medium flex items-center justify-center shadow-lg mx-auto mb-3">
+              <span className="material-symbols-outlined filled text-[28px] text-white">favorite</span>
             </div>
-            <h1 className="text-2xl font-bold text-primary-container">Wesal</h1>
+            <h1 className="text-2xl font-bold text-wesal-navy">وصال</h1>
           </div>
 
           <div className="mb-6 text-center md:text-right">
-            <h2 className="text-[32px] font-bold text-primary mb-1 leading-tight tracking-tight">إنشاء حساب جديد</h2>
-            <p className="text-base text-on-surface-variant">انضم إلى مجتمع وصال وابدأ رحلتك نحو صحة نفسية أفضل.</p>
+            <h2 className="text-[32px] font-bold text-wesal-navy mb-1 leading-tight tracking-tight">إنشاء حساب جديد</h2>
+            <p className="text-base text-wesal-medium">انضم إلى مجتمع وصال وابدأ رحلتك نحو صحة نفسية أفضل.</p>
           </div>
 
           {/* Error message */}
           {errorMsg && (
-            <div className="mb-5 p-3.5 rounded-xl bg-error-container border border-error/20 text-error text-sm text-center font-medium">
+            <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm text-center font-medium animate-scale-in">
               {errorMsg}
             </div>
           )}
 
           {/* Role Toggle */}
-          <div className="flex p-1 bg-surface-container rounded-lg mb-6">
+          <div className="flex p-1 bg-wesal-ice/60 rounded-xl mb-6 border border-wesal-ice">
             <button
               type="button"
               onClick={() => { setActiveTab('user'); setErrorMsg(''); }}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-md text-sm font-bold transition-all duration-200
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold transition-all duration-300
                 ${activeTab === 'user'
-                  ? 'bg-surface-container-lowest shadow-sm text-primary'
-                  : 'text-on-surface-variant opacity-70 hover:opacity-100'
+                  ? 'bg-white shadow-md text-wesal-dark'
+                  : 'text-wesal-medium hover:text-wesal-dark'
                 }
               `}
             >
@@ -173,10 +185,10 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => { setActiveTab('doctor'); setErrorMsg(''); }}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-md text-sm font-bold transition-all duration-200
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold transition-all duration-300
                 ${activeTab === 'doctor'
-                  ? 'bg-surface-container-lowest shadow-sm text-primary'
-                  : 'text-on-surface-variant opacity-70 hover:opacity-100'
+                  ? 'bg-white shadow-md text-wesal-dark'
+                  : 'text-wesal-medium hover:text-wesal-dark'
                 }
               `}
             >
@@ -185,20 +197,20 @@ export default function RegisterPage() {
             </button>
           </div>
 
-          {/* User Form */}
+          {/* ── User Form ── */}
           {activeTab === 'user' ? (
             <form onSubmit={handleUserRegister} className="flex flex-col gap-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Username */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-medium text-on-surface-variant">اسم المستخدم</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-wesal-medium">اسم المستخدم</label>
                   <div className="relative">
-                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">account_circle</span>
+                    <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">account_circle</span>
                     <input
                       placeholder="أدخل اسم المستخدم"
                       value={userForm.username}
                       onChange={(e) => { setUserForm({ ...userForm, username: e.target.value }); setErrorMsg(''); }}
-                      className="w-full pl-3 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
+                      className="w-full pl-3 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
                       required
                       disabled={loading}
                     />
@@ -206,17 +218,17 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Email */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-medium text-on-surface-variant">البريد الإلكتروني</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-wesal-medium">البريد الإلكتروني</label>
                   <div className="relative">
-                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">mail</span>
+                    <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">mail</span>
                     <input
                       type="email"
                       placeholder="example@email.com"
                       dir="ltr"
                       value={userForm.email}
                       onChange={(e) => { setUserForm({ ...userForm, email: e.target.value }); setErrorMsg(''); }}
-                      className="w-full pl-3 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
+                      className="w-full pl-3 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
                       required
                       disabled={loading}
                     />
@@ -226,17 +238,17 @@ export default function RegisterPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Phone */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-medium text-on-surface-variant">رقم الجوال</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-wesal-medium">رقم الجوال</label>
                   <div className="relative">
-                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">phone_iphone</span>
+                    <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">phone_iphone</span>
                     <input
                       type="tel"
                       placeholder="05X XXX XXXX"
                       dir="ltr"
                       value={userForm.phone}
                       onChange={(e) => { setUserForm({ ...userForm, phone: e.target.value }); setErrorMsg(''); }}
-                      className="w-full pl-3 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
+                      className="w-full pl-3 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
                       required
                       disabled={loading}
                     />
@@ -244,16 +256,16 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Password */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-medium text-on-surface-variant">كلمة المرور</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-wesal-medium">كلمة المرور</label>
                   <div className="relative">
-                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">lock</span>
+                    <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">lock</span>
                     <input
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
                       value={userForm.password}
                       onChange={(e) => { setUserForm({ ...userForm, password: e.target.value }); setErrorMsg(''); }}
-                      className="w-full pl-10 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
+                      className="w-full pl-10 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
                       required
                       minLength={6}
                       disabled={loading}
@@ -261,7 +273,7 @@ export default function RegisterPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors"
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-wesal-sky hover:text-wesal-medium transition-colors"
                       aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
                     >
                       <span className="material-symbols-outlined text-[20px]">
@@ -273,13 +285,13 @@ export default function RegisterPage() {
               </div>
 
               {/* Privacy note */}
-              <div className="flex items-start gap-2 mt-2 bg-tertiary-fixed/20 p-3 rounded-lg border border-tertiary-fixed/30">
-                <span className="material-symbols-outlined text-primary-container text-sm mt-0.5 flex-shrink-0">info</span>
-                <p className="text-xs text-on-surface-variant leading-relaxed">
+              <div className="flex items-start gap-2 mt-2 bg-wesal-ice/50 p-3.5 rounded-xl border border-wesal-ice">
+                <span className="material-symbols-outlined text-wesal-dark text-sm mt-0.5 flex-shrink-0">info</span>
+                <p className="text-xs text-wesal-navy/70 leading-relaxed">
                   بإنشاء حساب، أنت توافق على{' '}
-                  <Link href="#" className="text-primary font-bold underline decoration-primary/30 underline-offset-4">الشروط والأحكام</Link>
+                  <Link href="#" className="text-wesal-dark font-bold underline decoration-wesal-medium/30 underline-offset-4">الشروط والأحكام</Link>
                   {' '}و{' '}
-                  <Link href="#" className="text-primary font-bold underline decoration-primary/30 underline-offset-4">سياسة الخصوصية</Link>
+                  <Link href="#" className="text-wesal-dark font-bold underline decoration-wesal-medium/30 underline-offset-4">سياسة الخصوصية</Link>
                   {' '}الخاصة بمنصة وصال. نحن نلتزم بحماية بياناتك الشخصية.
                 </p>
               </div>
@@ -288,7 +300,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-4 w-full py-3 px-6 rounded-lg bg-gradient-to-l from-primary to-primary-container text-on-primary text-sm font-bold shadow-md hover:shadow-lg hover:opacity-90 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="mt-4 w-full py-3.5 px-6 rounded-xl bg-gradient-to-l from-wesal-dark to-wesal-medium text-white text-sm font-bold shadow-lg hover:shadow-xl hover:brightness-110 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
@@ -304,19 +316,19 @@ export default function RegisterPage() {
               </button>
             </form>
           ) : (
-            /* Doctor Form */
+            /* ── Doctor Form ── */
             <form onSubmit={handleDoctorRegister} className="flex flex-col gap-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Real Name */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-medium text-on-surface-variant">الاسم الحقيقي</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-wesal-medium">الاسم الحقيقي</label>
                   <div className="relative">
-                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">badge</span>
+                    <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">badge</span>
                     <input
                       placeholder="د. أحمد محمود"
                       value={doctorForm.realName}
                       onChange={(e) => { setDoctorForm({ ...doctorForm, realName: e.target.value }); setErrorMsg(''); }}
-                      className="w-full pl-3 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
+                      className="w-full pl-3 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
                       required
                       disabled={loading}
                     />
@@ -324,15 +336,15 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Specialty */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-medium text-on-surface-variant">التخصص</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-wesal-medium">التخصص</label>
                   <div className="relative">
-                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">school</span>
+                    <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">school</span>
                     <input
                       placeholder="طب نفسي"
                       value={doctorForm.specialty}
                       onChange={(e) => { setDoctorForm({ ...doctorForm, specialty: e.target.value }); setErrorMsg(''); }}
-                      className="w-full pl-3 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
+                      className="w-full pl-3 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
                       required
                       disabled={loading}
                     />
@@ -342,17 +354,17 @@ export default function RegisterPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Email */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-medium text-on-surface-variant">البريد الإلكتروني</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-wesal-medium">البريد الإلكتروني</label>
                   <div className="relative">
-                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">mail</span>
+                    <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">mail</span>
                     <input
                       type="email"
                       placeholder="doctor@hospital.com"
                       dir="ltr"
                       value={doctorForm.email}
                       onChange={(e) => { setDoctorForm({ ...doctorForm, email: e.target.value }); setErrorMsg(''); }}
-                      className="w-full pl-3 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
+                      className="w-full pl-3 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
                       required
                       disabled={loading}
                     />
@@ -360,17 +372,17 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Phone */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-medium text-on-surface-variant">رقم الجوال</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-wesal-medium">رقم الجوال</label>
                   <div className="relative">
-                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">phone_iphone</span>
+                    <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">phone_iphone</span>
                     <input
                       type="tel"
                       placeholder="05X XXX XXXX"
                       dir="ltr"
                       value={doctorForm.phone}
                       onChange={(e) => { setDoctorForm({ ...doctorForm, phone: e.target.value }); setErrorMsg(''); }}
-                      className="w-full pl-3 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
+                      className="w-full pl-3 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
                       required
                       disabled={loading}
                     />
@@ -379,16 +391,16 @@ export default function RegisterPage() {
               </div>
 
               {/* Password (full width) */}
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-medium text-on-surface-variant">كلمة المرور</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-wesal-medium">كلمة المرور</label>
                 <div className="relative">
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">lock</span>
+                  <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">lock</span>
                   <input
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     value={doctorForm.password}
                     onChange={(e) => { setDoctorForm({ ...doctorForm, password: e.target.value }); setErrorMsg(''); }}
-                    className="w-full pl-10 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
+                    className="w-full pl-10 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
                     required
                     minLength={6}
                     disabled={loading}
@@ -396,7 +408,7 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors"
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-wesal-sky hover:text-wesal-medium transition-colors"
                     aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
                   >
                     <span className="material-symbols-outlined text-[20px]">
@@ -407,9 +419,9 @@ export default function RegisterPage() {
               </div>
 
               {/* Doctor note */}
-              <div className="flex items-start gap-2 mt-2 bg-tertiary-fixed/20 p-3 rounded-lg border border-tertiary-fixed/30">
-                <span className="material-symbols-outlined text-primary-container text-sm mt-0.5 flex-shrink-0">info</span>
-                <p className="text-xs text-on-surface-variant leading-relaxed">
+              <div className="flex items-start gap-2 mt-2 bg-wesal-ice/50 p-3.5 rounded-xl border border-wesal-ice">
+                <span className="material-symbols-outlined text-wesal-dark text-sm mt-0.5 flex-shrink-0">info</span>
+                <p className="text-xs text-wesal-navy/70 leading-relaxed">
                   هنتحقق من مؤهلاتك الطبية قبل ما حسابك يظهر كطبيب موثوق على المنصة.
                 </p>
               </div>
@@ -418,7 +430,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-4 w-full py-3 px-6 rounded-lg bg-gradient-to-l from-primary to-primary-container text-on-primary text-sm font-bold shadow-md hover:shadow-lg hover:opacity-90 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="mt-4 w-full py-3.5 px-6 rounded-xl bg-gradient-to-l from-wesal-dark to-wesal-medium text-white text-sm font-bold shadow-lg hover:shadow-xl hover:brightness-110 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
@@ -437,11 +449,11 @@ export default function RegisterPage() {
 
           {/* Login link */}
           <div className="mt-6 text-center">
-            <p className="text-base text-on-surface-variant">
+            <p className="text-base text-wesal-medium">
               لديك حساب؟{' '}
               <Link
                 href="/login"
-                className="text-primary font-bold hover:text-primary-container underline decoration-primary/30 underline-offset-4 transition-colors"
+                className="text-wesal-dark font-bold hover:text-wesal-medium underline decoration-wesal-medium/30 underline-offset-4 transition-colors"
               >
                 سجل دخول
               </Link>

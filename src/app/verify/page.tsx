@@ -101,28 +101,29 @@ function VerifyForm() {
   };
 
   return (
-    <div className="bg-surface relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Ambient Background Gradients */}
+    <div className="bg-wesal-cream relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* ── Ambient Background Gradients ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-primary-fixed/20 blur-[120px]" />
-        <div className="absolute bottom-[-20%] left-[-10%] w-[60vw] h-[60vw] rounded-full bg-tertiary-fixed/30 blur-[150px]" />
+        <div className="absolute top-[-15%] right-[-10%] w-[55vw] h-[55vw] rounded-full bg-wesal-dark/10 blur-[120px] animate-float-slow" />
+        <div className="absolute bottom-[-20%] left-[-15%] w-[60vw] h-[60vw] rounded-full bg-wesal-sky/15 blur-[150px] animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-[40%] left-[50%] w-[30vw] h-[30vw] rounded-full bg-wesal-ice/40 blur-[100px]" />
       </div>
 
-      {/* Verification Card */}
-      <main className="relative z-10 w-full max-w-[480px] px-6">
-        <div className="bg-surface-container-lowest/60 backdrop-blur-[24px] border border-white/50 rounded-3xl p-8 md:p-10 shadow-[0_16px_48px_-12px_rgba(0,43,45,0.08)] flex flex-col items-center text-center">
+      {/* ── Verification Card ── */}
+      <main className="relative z-10 w-full max-w-[480px] px-6 animate-fade-in-up">
+        <div className="glass-card rounded-3xl p-8 md:p-10 shadow-[0_16px_48px_-12px_rgba(0,67,70,0.1)] flex flex-col items-center text-center">
           {/* Key Icon Container */}
-          <div className="w-20 h-20 rounded-full bg-secondary-container/40 border border-secondary-fixed/50 flex items-center justify-center mb-6 shadow-inner">
-            <span className="material-symbols-outlined text-[36px] text-primary">key</span>
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-wesal-ice to-white border border-wesal-ice flex items-center justify-center mb-6 shadow-lg animate-pulse-glow">
+            <span className="material-symbols-outlined text-[36px] text-wesal-dark">key</span>
           </div>
 
           {/* Header */}
-          <h1 className="text-[32px] font-bold text-on-surface mb-2 leading-tight tracking-tight">
+          <h1 className="text-[28px] md:text-[32px] font-bold text-wesal-navy mb-2 leading-tight tracking-tight">
             تأكيد البريد الإلكتروني
           </h1>
-          <p className="text-base text-on-surface-variant mb-8 px-2 leading-relaxed">
+          <p className="text-base text-wesal-medium mb-8 px-2 leading-relaxed">
             لقد أرسلنا رمزاً مكوناً من 6 أرقام إلى بريدك الإلكتروني{' '}
-            <span className="font-semibold text-primary-container break-all">
+            <span className="font-semibold text-wesal-dark break-all">
               {email || 'إيميلك'}
             </span>
             . يرجى إدخاله أدناه لتأكيد حسابك.
@@ -130,7 +131,7 @@ function VerifyForm() {
 
           {/* Error message */}
           {errorMsg && (
-            <div className="mb-5 w-full p-3.5 rounded-xl bg-error-container border border-error/20 text-error text-sm text-center font-medium">
+            <div className="mb-5 w-full p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm text-center font-medium animate-scale-in">
               {errorMsg}
             </div>
           )}
@@ -152,7 +153,7 @@ function VerifyForm() {
               <button
                 type="submit"
                 disabled={loading || otpCode.length < 6}
-                className="bg-gradient-to-l from-primary to-primary-container text-on-primary rounded-xl text-sm font-bold py-3.5 px-6 w-full hover:opacity-90 transition-opacity shadow-[0_4px_12px_rgba(0,67,70,0.2)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="bg-gradient-to-l from-wesal-dark to-wesal-medium text-white rounded-xl text-sm font-bold py-3.5 px-6 w-full hover:brightness-110 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -166,9 +167,9 @@ function VerifyForm() {
 
               {/* Secondary Button (Ghost) */}
               {countdown > 0 ? (
-                <p className="text-sm text-on-surface-variant py-3.5 text-center">
+                <p className="text-sm text-wesal-medium py-3.5 text-center">
                   إعادة إرسال الرمز بعد{' '}
-                  <span className="text-primary-container font-semibold tabular-nums">{countdown}</span>
+                  <span className="text-wesal-dark font-semibold tabular-nums">{countdown}</span>
                   {' '}ثانية
                 </p>
               ) : (
@@ -176,12 +177,12 @@ function VerifyForm() {
                   type="button"
                   onClick={handleResend}
                   disabled={resendLoading}
-                  className="border border-tertiary-fixed/80 bg-surface-container-lowest/30 text-on-surface rounded-xl text-sm font-bold py-3.5 px-6 w-full flex items-center justify-center gap-2 hover:bg-tertiary-fixed/10 transition-colors disabled:opacity-50"
+                  className="border border-wesal-ice bg-white/60 text-wesal-navy rounded-xl text-sm font-bold py-3.5 px-6 w-full flex items-center justify-center gap-2 hover:bg-wesal-ice/50 transition-colors disabled:opacity-50"
                 >
                   {resendLoading ? (
                     <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
                   ) : (
-                    <span className="material-symbols-outlined text-[20px]">refresh</span>
+                    <span className="material-symbols-outlined text-[20px] text-wesal-medium">refresh</span>
                   )}
                   إعادة إرسال الرمز
                 </button>
@@ -192,7 +193,7 @@ function VerifyForm() {
           {/* Back to Login Link */}
           <Link
             href="/login"
-            className="mt-8 text-xs text-primary-container hover:text-primary transition-colors flex items-center gap-1.5"
+            className="mt-8 text-xs text-wesal-dark hover:text-wesal-medium transition-colors flex items-center gap-1.5"
           >
             <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
             رجوع لتسجيل الدخول
@@ -207,10 +208,10 @@ export default function VerifyPage() {
   return (
     <Suspense
       fallback={
-        <div className="bg-surface relative min-h-screen flex items-center justify-center">
+        <div className="bg-wesal-cream relative min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <span className="material-symbols-outlined animate-spin text-[32px] text-primary mb-3 block">progress_activity</span>
-            <p className="text-sm text-on-surface-variant">جاري التحميل...</p>
+            <span className="material-symbols-outlined animate-spin text-[32px] text-wesal-dark mb-3 block">progress_activity</span>
+            <p className="text-sm text-wesal-medium">جاري التحميل...</p>
           </div>
         </div>
       }

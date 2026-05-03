@@ -1,26 +1,91 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 
+/* ═══════════════════════════════════════════════════════════════════
+   Intersection Observer hook — adds "animate-fade-in-up" when visible
+   ═══════════════════════════════════════════════════════════════════ */
+function useInView(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+      { threshold },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return { ref, visible };
+}
+
+/* Reusable animated section wrapper */
+function FadeInSection({
+  children,
+  className = '',
+  delay = '',
+  threshold = 0.12,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: string;
+  threshold?: number;
+}) {
+  const { ref, visible } = useInView(threshold);
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ease-out ${className}`}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(32px)',
+        transitionDelay: delay,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Landing Page
+   ═══════════════════════════════════════════════════════════════════ */
 export default function LandingPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) {
-      router.push('/community');
-    }
+    if (!loading && user) router.push('/community');
   }, [user, loading, router]);
 
+  const handleScroll = useCallback(() => {
+    setScrolled(window.scrollY > 40);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  /* ── Loading State ── */
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center gradient-hero">
-        <div className="text-center">
-          <div className="text-6xl font-bold text-white mb-2">وصال</div>
-          <div className="text-white/60 text-base">wesal</div>
+        <div className="text-center animate-fade-in-up">
+          <div className="text-6xl font-extrabold text-white mb-2 tracking-tight">وصال</div>
+          <div className="text-white/50 text-sm tracking-widest">WESAL</div>
+          <div className="mt-6 w-10 h-1 bg-white/30 rounded-full mx-auto overflow-hidden">
+            <div className="h-full bg-white rounded-full animate-shimmer w-full" />
+          </div>
         </div>
       </div>
     );
@@ -28,405 +93,753 @@ export default function LandingPage() {
 
   if (user) return null;
 
-  return (
-    <div className="min-h-screen bg-background text-on-surface overflow-x-hidden">
+  /* ── Data ── */
+  const stats = [
+    { value: '١٠٠٠+', label: 'مستخدم نشط', icon: 'group' },
+    { value: '٥٠+', label: 'طبيب معتمد', icon: 'medical_services' },
+    { value: '١٠٠+', label: 'مقالة داعمة', icon: 'article' },
+    { value: '٩٨٪', label: 'نسبة الرضا', icon: 'sentiment_satisfied' },
+  ];
 
-      {/* ═══════════ 1. NAVBAR ═══════════ */}
-      <header className="bg-surface-bright/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-teal-100/20 shadow-sm">
-        <nav className="flex justify-between items-center px-6 py-4 w-full max-w-screen-2xl mx-auto">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="text-2xl font-bold text-teal-800">وصال</Link>
-            <div className="hidden md:flex gap-6 font-medium text-sm text-teal-900">
-              <a className="text-teal-700 border-b-2 border-teal-700 pb-1" href="#">الرئيسية</a>
-              <a className="text-slate-500 hover:text-teal-600 transition-colors" href="#">المجتمع</a>
-              <a className="text-slate-500 hover:text-teal-600 transition-colors" href="#">الأطباء</a>
+  const features = [
+    {
+      icon: 'shield',
+      title: 'خصوصية لا تقبل المساومة',
+      desc: 'بياناتك مشفرة بالكامل. يمكنك اختيار اسم مستعار والتحكم الكامل فيما تشاركه ومع من تشاركه.',
+      span: 2,
+      dark: false,
+    },
+    {
+      icon: 'verified',
+      title: 'أطباء معتمدون',
+      desc: 'فريقنا يضم نخبة من المتخصصين المرخصين الذين خضعوا لتدقيق صارم لضمان جودة الرعاية.',
+      span: 1,
+      dark: true,
+    },
+    {
+      icon: 'diversity_3',
+      title: 'مجتمع داعم',
+      desc: 'تواصل مع أشخاص يمرون بتجارب مشابهة في مساحات نقاشية آمنة ومراقبة باحترافية.',
+      span: 1,
+      dark: false,
+      accent: true,
+    },
+    {
+      icon: 'forum',
+      title: 'محادثات آمنة ومشفرة',
+      desc: 'جلسات فردية فورية عبر رسائل نصية أو صوتية مشفرة تضمن لك الراحة في أي وقت وأي مكان.',
+      span: 2,
+      dark: false,
+    },
+    {
+      icon: 'self_improvement',
+      title: 'محتوى تعليمي مخصص',
+      desc: 'مقالات وأدوات تفاعلية تساعدك على فهم مشاعرك وتطوير مهاراتك في التعامل مع الضغوط.',
+      span: 1,
+      dark: false,
+      accent: true,
+    },
+  ];
+
+  const steps = [
+    {
+      step: '١',
+      title: 'سجّل حسابك',
+      desc: 'أنشئ حسابك في ثوانٍ. لا نحتاج لهويتك الحقيقية لتبدأ رحلتك.',
+      icon: 'person_add',
+    },
+    {
+      step: '٢',
+      title: 'اكتشف وشارك',
+      desc: 'ابحث عن الطبيب المناسب أو شارك في المجتمعات المفتوحة والداعمة.',
+      icon: 'explore',
+    },
+    {
+      step: '٣',
+      title: 'تواصل وتعافَ',
+      desc: 'ابدأ رحلة العلاج مع متخصص يدعمك في كل خطوة نحو السلام النفسي.',
+      icon: 'volunteer_activism',
+    },
+  ];
+
+  const security = [
+    {
+      icon: 'enhanced_encryption',
+      title: 'تشفير كامل للبيانات',
+      desc: 'نستخدم بروتوكولات تشفير متقدمة لضمان أن لا أحد غيرك وطبيبك يمكنه الوصول لمحادثاتك.',
+    },
+    {
+      icon: 'masks',
+      title: 'هوية مخفية تماماً',
+      desc: 'لك كامل الحرية في اختيار اسم مستعار وعدم مشاركة أي تفاصيل شخصية تكشف هويتك.',
+    },
+    {
+      icon: 'workspace_premium',
+      title: 'خبراء موثوقون',
+      desc: 'كل مقدم خدمة على المنصة يتم التحقق من تراخيصه المهنية وخبراته العملية بدقة.',
+    },
+  ];
+
+  const testimonials = [
+    {
+      text: 'وجدت هنا الأمان والسرية اللي كنت بدور عليها. الطبيب اللي تواصلت معاه كان مستمع رائع وساعدني كتير.',
+      name: 'مستخدم هادئ',
+      time: 'منذ شهرين',
+      initials: 'م',
+      color: 'bg-wesal-dark',
+    },
+    {
+      text: 'مجتمع وصال خلاني أحس إني مش لوحدي. النقاشات الجماعية مفيدة جداً وتحت إشراف متخصصين.',
+      name: 'صديق وصال',
+      time: 'منذ ٥ أشهر',
+      initials: 'ص',
+      color: 'bg-wesal-medium',
+    },
+    {
+      text: 'التجربة سهلة ومريحة جداً. ما تخيلتش إن الحصول على استشارة نفسية ممكن يكون بالسهولة والخصوصية دي.',
+      name: 'باحث عن الهدوء',
+      time: 'منذ سنة',
+      initials: 'ب',
+      color: 'bg-wesal-sky',
+    },
+  ];
+
+  return (
+    <div className="min-h-screen flex flex-col bg-wesal-cream text-wesal-navy overflow-x-hidden">
+
+      {/* ═══════════════════════════════════════════════════════════════
+          1. NAVBAR — transparent at top, glass on scroll
+          ═══════════════════════════════════════════════════════════════ */}
+      <header
+        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+          scrolled
+            ? 'glass-panel shadow-lg shadow-wesal-navy/5'
+            : 'bg-transparent'
+        }`}
+      >
+        <nav className="flex justify-between items-center px-4 sm:px-6 lg:px-10 py-3.5 w-full max-w-[1400px] mx-auto">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-500 ${scrolled ? 'bg-wesal-dark' : 'bg-white/15 backdrop-blur-sm'}`}>
+              <span className="material-symbols-outlined text-white text-xl">spa</span>
             </div>
+            <span className={`text-xl font-bold tracking-tight transition-colors duration-500 ${scrolled ? 'text-wesal-dark' : 'text-white'}`}>
+              وصال
+            </span>
+          </Link>
+
+          {/* Desktop Nav Links */}
+          <div className="hidden md:flex items-center gap-1">
+            {['الرئيسية', 'المجتمع', 'الأطباء', 'المقالات'].map((item, i) => (
+              <a
+                key={item}
+                href="#"
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                  i === 0
+                    ? scrolled
+                      ? 'text-wesal-dark bg-wesal-ice/60'
+                      : 'text-white bg-white/15'
+                    : scrolled
+                      ? 'text-wesal-medium hover:text-wesal-dark hover:bg-wesal-ice/40'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                {item}
+              </a>
+            ))}
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 ml-4">
-              <Link
-                href="/login"
-                className="px-4 py-2 text-sm font-semibold text-primary hover:bg-surface-container transition-colors rounded-lg"
-              >
-                تسجيل الدخول
-              </Link>
-              <Link
-                href="/register"
-                className="px-4 py-2 text-sm font-semibold bg-primary text-on-primary rounded-lg shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
-              >
-                ابدأ الآن
-              </Link>
-            </div>
-            <Link href="/login" className="md:hidden text-slate-500 cursor-pointer hover:text-teal-600 transition-colors">
-              <span className="material-symbols-outlined">notifications</span>
+
+          {/* CTA Buttons */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              href="/login"
+              className={`hidden sm:inline-flex px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-300 ${
+                scrolled
+                  ? 'text-wesal-dark hover:bg-wesal-ice/50'
+                  : 'text-white hover:bg-white/10'
+              }`}
+            >
+              تسجيل الدخول
             </Link>
-            <Link href="/login" className="md:hidden text-slate-500 cursor-pointer hover:text-teal-600 transition-colors">
-              <span className="material-symbols-outlined">account_circle</span>
+            <Link
+              href="/register"
+              className={`px-4 sm:px-5 py-2 text-sm font-semibold rounded-xl transition-all duration-300 shadow-lg ${
+                scrolled
+                  ? 'bg-wesal-dark text-white shadow-wesal-dark/20 hover:bg-wesal-navy'
+                  : 'bg-white text-wesal-dark shadow-black/10 hover:bg-white/90'
+              }`}
+            >
+              ابدأ الآن
             </Link>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`md:hidden p-2 rounded-xl transition-all duration-300 ${
+                scrolled ? 'text-wesal-dark hover:bg-wesal-ice/50' : 'text-white hover:bg-white/10'
+              }`}
+              aria-label="القائمة"
+            >
+              <span className="material-symbols-outlined text-2xl">
+                {mobileMenuOpen ? 'close' : 'menu'}
+              </span>
+            </button>
           </div>
         </nav>
-      </header>
 
-      <main className="pt-[72px]">
-
-        {/* ═══════════ 2. HERO ═══════════ */}
-        <section className="gradient-hero relative min-h-[870px] flex items-center overflow-hidden px-6">
-          <div className="max-w-[1280px] mx-auto grid md:grid-cols-2 gap-10 items-center relative z-10">
-            <div className="text-right">
-              <h1 className="text-[clamp(2rem,5vw,3rem)] font-bold text-white mb-6 leading-tight">
-                مساحتك الآمنة للصحة النفسية
-              </h1>
-              <p className="text-lg text-white/80 mb-10 max-w-xl leading-relaxed">
-                نحن نوفر لك بيئة سرية تماماً للتعبير عن نفسك والتواصل مع خبراء متخصصين. خصوصيتك هي أولويتنا القصوى في رحلة تعافيك النفسي.
-              </p>
-              <div className="flex flex-wrap gap-4 justify-start">
-                <Link
-                  href="/register"
-                  className="px-10 py-4 text-sm font-semibold bg-on-primary-container text-primary-container rounded-full hover:bg-white transition-all shadow-xl shadow-black/10"
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden glass-panel border-t border-wesal-ice/50 animate-fade-in-up">
+            <div className="px-4 py-4 space-y-1">
+              {['الرئيسية', 'المجتمع', 'الأطباء', 'المقالات'].map((item, i) => (
+                <a
+                  key={item}
+                  href="#"
+                  className={`block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                    i === 0
+                      ? 'text-wesal-dark bg-wesal-ice/60'
+                      : 'text-wesal-medium hover:text-wesal-dark hover:bg-wesal-ice/40'
+                  }`}
+                  onClick={() => setMobileMenuOpen(false)}
                 >
-                  ابدأ دلوقتي مجاناً
-                </Link>
+                  {item}
+                </a>
+              ))}
+              <div className="pt-2 border-t border-wesal-ice/50 mt-2">
                 <Link
                   href="/login"
-                  className="px-10 py-4 text-sm font-semibold border-2 border-white/30 text-white rounded-full hover:bg-white/10 transition-all"
+                  className="block px-4 py-3 rounded-xl text-sm font-semibold text-wesal-dark hover:bg-wesal-ice/40 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
                 >
-                  عندي حساب
+                  تسجيل الدخول
                 </Link>
               </div>
-              <div className="mt-16 flex gap-6 items-center opacity-80">
-                <div className="flex items-center gap-1 text-white text-sm">
-                  <span className="material-symbols-outlined text-sm filled">lock</span>
-                  Encrypted
-                </div>
-                <div className="flex items-center gap-1 text-white text-sm">
-                  <span className="material-symbols-outlined text-sm filled">visibility_off</span>
-                  Anonymous
-                </div>
-                <div className="flex items-center gap-1 text-white text-sm">
-                  <span className="material-symbols-outlined text-sm filled">verified_user</span>
-                  Privacy
-                </div>
-              </div>
-            </div>
-            <div className="hidden md:block relative">
-              <div className="absolute inset-0 bg-secondary/20 rounded-full blur-[100px]" />
-              {/* Decorative illustration placeholder */}
-              <div className="relative z-10 w-full flex items-center justify-center" style={{ minHeight: 400 }}>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="glass-card p-6 rounded-2xl text-white">
-                    <span className="material-symbols-outlined text-4xl mb-3">psychology</span>
-                    <div className="text-sm font-medium">دعم نفسي</div>
-                    <div className="text-xs opacity-70 mt-1">متخصصون مرخصون</div>
-                  </div>
-                  <div className="glass-card p-6 rounded-2xl text-white mt-8">
-                    <span className="material-symbols-outlined text-4xl mb-3">favorite</span>
-                    <div className="text-sm font-medium">مجتمع آمن</div>
-                    <div className="text-xs opacity-70 mt-1">تجارب مشتركة</div>
-                  </div>
-                  <div className="glass-card p-6 rounded-2xl text-white">
-                    <span className="material-symbols-outlined text-4xl mb-3">shield</span>
-                    <div className="text-sm font-medium">خصوصية تامة</div>
-                    <div className="text-xs opacity-70 mt-1">تشفير كامل</div>
-                  </div>
-                  <div className="glass-card p-6 rounded-2xl text-white mt-8">
-                    <span className="material-symbols-outlined text-4xl mb-3">chat</span>
-                    <div className="text-sm font-medium">محادثات آمنة</div>
-                    <div className="text-xs opacity-70 mt-1">متاحة 24/7</div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
-        </section>
+        )}
+      </header>
 
-        {/* ═══════════ 3. STATS ═══════════ */}
-        <section className="py-16 max-w-[1280px] mx-auto px-6 -mt-12 relative z-20">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { value: '1,000+', label: 'مستخدم نشط' },
-              { value: '50+', label: 'طبيب معتمد' },
-              { value: '100+', label: 'مقالات داعمة' },
-              { value: '98%', label: 'نسبة الرضا' },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="bg-surface-container-lowest p-10 rounded-xl border border-outline-variant/30 text-center shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="text-[clamp(1.5rem,3vw,3rem)] font-bold text-primary mb-1">
-                  {stat.value}
+      {/* ═══════════════════════════════════════════════════════════════
+          MAIN CONTENT
+          ═══════════════════════════════════════════════════════════════ */}
+      <main className="flex-1 pt-[64px]">
+
+        {/* ═══════════════════════════════════════════════════════════════
+            2. HERO SECTION
+            ═══════════════════════════════════════════════════════════════ */}
+        <section className="gradient-hero relative min-h-[92vh] flex items-center overflow-hidden">
+          {/* ── Decorative Floating Elements (desktop only) ── */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+            {/* Large orb top-right */}
+            <div className="hidden lg:block absolute -top-20 -left-20 w-[500px] h-[500px] rounded-full bg-white/[0.03] animate-float-slow" />
+            {/* Medium orb bottom-left */}
+            <div className="hidden lg:block absolute bottom-10 right-10 w-[300px] h-[300px] rounded-full bg-wesal-sky/10 animate-float" />
+            {/* Small floating shapes */}
+            <div className="hidden md:block absolute top-1/4 left-[15%] w-16 h-16 rounded-2xl bg-white/[0.06] rotate-12 animate-float stagger-2" />
+            <div className="hidden md:block absolute top-[60%] left-[8%] w-12 h-12 rounded-full bg-white/[0.08] animate-float-slow stagger-4" />
+            <div className="hidden lg:block absolute top-[30%] right-[20%] w-20 h-20 rounded-full bg-wesal-ice/10 animate-float stagger-1" />
+            {/* Radial glow center */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-wesal-sky/5 rounded-full blur-[120px]" />
+            {/* Bottom wave */}
+            <svg
+              className="absolute bottom-0 left-0 right-0 w-full"
+              viewBox="0 0 1440 100"
+              preserveAspectRatio="none"
+              fill="none"
+            >
+              <path
+                d="M0 50 C360 100 720 0 1080 50 C1260 75 1380 60 1440 50 L1440 100 L0 100Z"
+                fill="#f8f5f0"
+                fillOpacity="0.05"
+              />
+            </svg>
+          </div>
+
+          {/* ── Hero Content ── */}
+          <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-16 md:py-20">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+              {/* Text Column */}
+              <div className="text-right animate-fade-in-up">
+                {/* Badge */}
+                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full px-4 py-1.5 mb-6">
+                  <span className="material-symbols-outlined filled text-wesal-ice text-sm">verified</span>
+                  <span className="text-white/80 text-xs font-medium">منصة معتمدة طبياً</span>
                 </div>
-                <div className="text-sm font-semibold text-secondary">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </section>
 
-        {/* ═══════════ 4. FEATURES (BENTO GRID) ═══════════ */}
-        <section className="py-16 max-w-[1280px] mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-[clamp(1.5rem,3vw,2rem)] font-semibold text-primary mb-4">
-              ليه تختار وصال؟
-            </h2>
-            <p className="text-base text-secondary max-w-2xl mx-auto leading-relaxed">
-              صممنا المنصة لتكون ملاذك الآمن الذي يجمع بين التكنولوجيا المتطورة والخبرة البشرية العميقة.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Feature 1: Privacy (spans 2 cols) */}
-            <div className="md:col-span-2 bg-white p-10 rounded-xl border border-outline-variant/20 shadow-sm flex flex-col justify-between group hover:border-primary/20 transition-all">
-              <div>
-                <span className="material-symbols-outlined text-4xl text-primary mb-4">security</span>
-                <h3 className="text-2xl font-semibold text-primary mb-2">خصوصية لا تقبل المساومة</h3>
-                <p className="text-base text-secondary leading-relaxed">
-                  بياناتك مشفرة بالكامل. يمكنك اختيار اسم مستعار والتحكم الكامل فيما تشاركه ومع من تشاركه.
+                <h1 className="text-[clamp(2rem,5.5vw,3.25rem)] font-extrabold text-white mb-6 leading-[1.3] tracking-tight">
+                  مساحتك الآمنة
+                  <br />
+                  <span className="text-wesal-ice">للصحة النفسية</span>
+                </h1>
+
+                <p className="text-base sm:text-lg text-white/75 mb-10 max-w-xl leading-relaxed">
+                  نوفّر لك بيئة سرية تماماً للتعبير عن نفسك والتواصل مع خبراء متخصصين. خصوصيتك هي أولويتنا القصوى في رحلة تعافيك.
                 </p>
-              </div>
-              <div className="mt-10 h-48 bg-surface-container rounded-lg overflow-hidden relative">
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="material-symbols-outlined text-8xl text-primary/20">lock</span>
+
+                {/* CTA Buttons */}
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <Link
+                    href="/register"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold bg-white text-wesal-dark rounded-2xl shadow-xl shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300"
+                  >
+                    <span className="material-symbols-outlined text-xl">arrow_back</span>
+                    ابدأ مجاناً الآن
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold border-2 border-white/25 text-white rounded-2xl hover:bg-white/10 hover:border-white/40 transition-all duration-300"
+                  >
+                    عندي حساب
+                  </Link>
+                </div>
+
+                {/* Trust Indicators */}
+                <div className="mt-10 flex flex-wrap gap-5 items-center">
+                  {[
+                    { icon: 'lock', text: 'مشفّر بالكامل' },
+                    { icon: 'visibility_off', text: 'مجهول الهوية' },
+                    { icon: 'verified_user', text: 'خصوصية تامة' },
+                  ].map((item) => (
+                    <div key={item.text} className="flex items-center gap-1.5 text-white/60 text-xs sm:text-sm">
+                      <span className="material-symbols-outlined filled text-wesal-ice text-base">{item.icon}</span>
+                      {item.text}
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
 
-            {/* Feature 2: Certified Doctors */}
-            <div className="bg-primary text-on-primary p-10 rounded-xl flex flex-col justify-center">
-              <span className="material-symbols-outlined text-4xl mb-4">verified</span>
-              <h3 className="text-2xl font-semibold mb-2">أطباء معتمدون</h3>
-              <p className="text-base opacity-80 leading-relaxed">
-                فريقنا يضم نخبة من المتخصصين المرخصين الذين خضعوا لتدقيق صارم لضمان جودة الرعاية المقدمة.
-              </p>
-            </div>
+              {/* Illustration Column (desktop only) */}
+              <div className="hidden lg:flex items-center justify-center relative">
+                <div className="relative w-full max-w-[480px]">
+                  {/* Glow behind cards */}
+                  <div className="absolute inset-0 bg-wesal-sky/10 rounded-full blur-[80px]" />
 
-            {/* Feature 3: Supportive Community */}
-            <div className="bg-secondary-container p-10 rounded-xl border border-outline-variant/20 shadow-sm">
-              <span className="material-symbols-outlined text-4xl text-on-secondary-container mb-4">groups</span>
-              <h3 className="text-2xl font-semibold text-on-secondary-container mb-2">مجتمع داعم</h3>
-              <p className="text-base text-on-secondary-container/80 leading-relaxed">
-                تواصل مع أشخاص يمرون بتجارب مشابهة في مساحات نقاشية آمنة ومراقبة باحترافية.
-              </p>
-            </div>
-
-            {/* Feature 4: Safe Chats (spans 2 cols) */}
-            <div className="md:col-span-2 bg-white p-10 rounded-xl border border-outline-variant/20 shadow-sm flex items-center gap-6 group hover:border-primary/20 transition-all">
-              <div className="w-1/3 min-h-[160px] bg-tertiary-container/10 rounded-lg flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-6xl text-primary">chat_bubble</span>
-              </div>
-              <div className="w-2/3">
-                <h3 className="text-2xl font-semibold text-primary mb-2">محادثات آمنة</h3>
-                <p className="text-base text-secondary leading-relaxed">
-                  جلسات فردية فورية عبر رسائل نصية أو صوتية مشفرة تضمن لك الراحة في أي وقت وأي مكان.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ═══════════ 5. HOW IT WORKS ═══════════ */}
-        <section className="py-16 bg-surface-container-low">
-          <div className="max-w-[1280px] mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-[clamp(1.5rem,3vw,2rem)] font-semibold text-primary mb-4">
-                خطواتك نحو السلام النفسي
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative">
-              {[
-                {
-                  step: '1',
-                  title: 'سجل حسابك',
-                  desc: 'أنشئ حسابك في ثوانٍ. لا نحتاج لهويتك الحقيقية لتبدأ.',
-                },
-                {
-                  step: '2',
-                  title: 'شارك قصتك',
-                  desc: 'ابحث عن الطبيب المناسب أو شارك في المجتمعات المفتوحة.',
-                },
-                {
-                  step: '3',
-                  title: 'تواصل وتعافى',
-                  desc: 'ابدأ رحلة العلاج مع متخصص يدعمك في كل خطوة.',
-                },
-              ].map((item) => (
-                <div key={item.step} className="text-center relative z-10">
-                  <div className="w-16 h-16 bg-primary text-on-primary rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">
-                    {item.step}
-                  </div>
-                  <h3 className="text-xl font-medium text-primary mb-2">{item.title}</h3>
-                  <p className="text-base text-secondary leading-relaxed">{item.desc}</p>
-                </div>
-              ))}
-              {/* Connector Line (Hidden on Mobile) */}
-              <div className="hidden md:block absolute top-8 left-1/4 right-1/4 h-0.5 border-t-2 border-dashed border-primary/20 -z-0" />
-            </div>
-          </div>
-        </section>
-
-        {/* ═══════════ 6. SECURITY CARDS ═══════════ */}
-        <section className="py-16 max-w-[1280px] mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-[clamp(1.5rem,3vw,2rem)] font-semibold text-primary mb-4">
-              أمانك أولويتنا القصوى
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                icon: 'lock_open',
-                title: 'تشفير كامل للبيانات',
-                desc: 'نستخدم بروتوكولات تشفير عسكرية لضمان أن لا أحد غيرك وطبيبك يمكنه الوصول للمحادثات.',
-              },
-              {
-                icon: 'masks',
-                title: 'هوية مخفية تماماً',
-                desc: 'لك كامل الحرية في اختيار اسم مستعار وعدم مشاركة أي تفاصيل شخصية تكشف هويتك.',
-              },
-              {
-                icon: 'badge',
-                title: 'خبراء موثوقون',
-                desc: 'كل مقدم خدمة على المنصة يتم التحقق من تراخيصه المهنية وخبراته العملية بدقة.',
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="p-10 rounded-xl border-2 border-primary/5 hover:border-primary/20 transition-all text-right"
-              >
-                <div className="w-12 h-12 bg-primary-container text-on-primary-container rounded-lg flex items-center justify-center mb-6">
-                  <span className="material-symbols-outlined">{item.icon}</span>
-                </div>
-                <h3 className="text-xl font-medium text-primary mb-2">{item.title}</h3>
-                <p className="text-sm text-secondary leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ═══════════ 7. TESTIMONIALS ═══════════ */}
-        <section className="py-16 bg-primary/5">
-          <div className="max-w-[1280px] mx-auto px-6">
-            <h2 className="text-[clamp(1.5rem,3vw,2rem)] font-semibold text-primary text-center mb-16">
-              قصص نجاح من مجتمعنا
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                {
-                  text: '"وجدت هنا الأمان والسرية اللي كنت بدور عليها. الطبيب اللي تواصلت معاه كان مستمع رائع وساعدني كتير."',
-                  name: 'مستخدم هادئ',
-                  time: 'منذ شهرين',
-                  avatarBg: 'bg-secondary-fixed',
-                },
-                {
-                  text: '"مجتمع وصال خلاني أحس إني مش لوحدي. النقاشات الجماعية مفيدة جداً وتحت إشراف متخصصين."',
-                  name: 'صديق وصال',
-                  time: 'منذ ٥ أشهر',
-                  avatarBg: 'bg-tertiary-fixed',
-                },
-                {
-                  text: '"التجربة سهلة ومريحة جداً. ما تخيلتش إن الحصول على استشارة نفسية ممكن يكون بالسهولة والخصوصية دي."',
-                  name: 'باحث عن الهدوء',
-                  time: 'منذ سنة',
-                  avatarBg: 'bg-primary-fixed',
-                },
-              ].map((review, i) => (
-                <div
-                  key={i}
-                  className="bg-white p-10 rounded-xl shadow-sm border border-outline-variant/10"
-                >
-                  <div className="flex gap-1 text-yellow-500 mb-4">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <span
-                        key={s}
-                        className="material-symbols-outlined filled"
-                        style={{ fontSize: '20px' }}
+                  {/* Main decorative card grid */}
+                  <div className="relative z-10 grid grid-cols-2 gap-4">
+                    {[
+                      { icon: 'psychology', title: 'دعم نفسي', sub: 'متخصصون مرخصون', delay: 'stagger-1', y: 0 },
+                      { icon: 'favorite', title: 'مجتمع آمن', sub: 'تجارب مشتركة', delay: 'stagger-2', y: 8 },
+                      { icon: 'shield', title: 'خصوصية تامة', sub: 'تشفير كامل', delay: 'stagger-3', y: 0 },
+                      { icon: 'chat', title: 'محادثات آمنة', sub: 'متاحة ٢٤/٧', delay: 'stagger-4', y: 8 },
+                    ].map((card) => (
+                      <div
+                        key={card.title}
+                        className={`glass-card rounded-2xl p-6 animate-fade-in-up ${card.delay}`}
+                        style={{ marginTop: `${card.y}px` }}
                       >
-                        star
-                      </span>
+                        <div className="w-12 h-12 rounded-xl bg-wesal-dark/10 flex items-center justify-center mb-4">
+                          <span className="material-symbols-outlined text-wesal-dark text-2xl">{card.icon}</span>
+                        </div>
+                        <div className="text-wesal-navy text-sm font-bold mb-0.5">{card.title}</div>
+                        <div className="text-wesal-medium text-xs">{card.sub}</div>
+                      </div>
                     ))}
                   </div>
-                  <p className="text-base text-primary italic mb-6 leading-relaxed">
-                    {review.text}
-                  </p>
-                  <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-full ${review.avatarBg}`} />
-                    <div>
-                      <div className="text-sm font-semibold text-primary">{review.name}</div>
-                      <div className="text-xs text-secondary">{review.time}</div>
-                    </div>
+
+                  {/* Floating accent elements */}
+                  <div className="absolute -top-4 -right-4 w-16 h-16 rounded-2xl bg-wesal-ice/30 backdrop-blur-sm animate-float stagger-2" />
+                  <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-wesal-sky/15 animate-float-slow stagger-5" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            3. STATS COUNTER (overlapping hero)
+            ═══════════════════════════════════════════════════════════════ */}
+        <section className="relative z-20 max-w-[1200px] mx-auto px-4 sm:px-6 -mt-14 md:-mt-20">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            {stats.map((stat, i) => (
+              <FadeInSection key={stat.label} delay={`${i * 100}ms`} className="h-full">
+                <div className="glass-card rounded-2xl p-5 sm:p-7 text-center h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-500 group">
+                  <div className="w-11 h-11 rounded-xl bg-wesal-ice/80 flex items-center justify-center mx-auto mb-3 group-hover:bg-wesal-dark group-hover:text-white transition-all duration-300">
+                    <span className="material-symbols-outlined text-wesal-dark group-hover:text-white transition-colors duration-300">
+                      {stat.icon}
+                    </span>
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-extrabold text-wesal-dark mb-0.5">
+                    {stat.value}
+                  </div>
+                  <div className="text-xs sm:text-sm font-semibold text-wesal-medium">
+                    {stat.label}
                   </div>
                 </div>
+              </FadeInSection>
+            ))}
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            4. FEATURES BENTO GRID
+            ═══════════════════════════════════════════════════════════════ */}
+        <section className="py-20 md:py-28 max-w-[1200px] mx-auto px-4 sm:px-6">
+          {/* Section Header */}
+          <FadeInSection className="text-center mb-14 md:mb-20">
+            <div className="inline-flex items-center gap-2 bg-wesal-ice rounded-full px-4 py-1.5 mb-5">
+              <span className="material-symbols-outlined text-wesal-dark text-sm">auto_awesome</span>
+              <span className="text-wesal-dark text-xs font-semibold">المميزات</span>
+            </div>
+            <h2 className="text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-wesal-dark mb-4">
+              ليه تختار <span className="text-wesal-medium">وصال</span>؟
+            </h2>
+            <p className="text-base text-wesal-medium max-w-2xl mx-auto leading-relaxed">
+              صمّمنا المنصة لتكون ملاذك الآمن الذي يجمع بين التكنولوجيا المتطورة والخبرة البشرية العميقة.
+            </p>
+          </FadeInSection>
+
+          {/* Bento Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+            {features.map((f, i) => (
+              <FadeInSection
+                key={f.title}
+                delay={`${i * 80}ms`}
+                className={f.span === 2 ? 'md:col-span-2' : ''}
+              >
+                <div
+                  className={`h-full rounded-2xl p-7 sm:p-10 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl group ${
+                    f.dark
+                      ? 'gradient-primary text-white shadow-lg shadow-wesal-dark/20'
+                      : f.accent
+                        ? 'bg-wesal-ice/50 border border-wesal-ice hover:border-wesal-sky/40'
+                        : 'bg-white border border-wesal-ice hover:border-wesal-sky/30 shadow-sm'
+                  }`}
+                >
+                  <div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-all duration-300 ${
+                      f.dark
+                        ? 'bg-white/15 group-hover:bg-white/25'
+                        : f.accent
+                          ? 'bg-wesal-dark/10 group-hover:bg-wesal-dark group-hover:text-white'
+                          : 'bg-wesal-ice group-hover:bg-wesal-dark group-hover:text-white'
+                    }`}
+                  >
+                    <span
+                      className={`material-symbols-outlined text-xl transition-colors duration-300 ${
+                        f.dark ? 'text-white' : 'text-wesal-dark group-hover:text-white'
+                      }`}
+                    >
+                      {f.icon}
+                    </span>
+                  </div>
+                  <h3
+                    className={`text-xl sm:text-2xl font-bold mb-3 ${
+                      f.dark ? 'text-white' : 'text-wesal-navy'
+                    }`}
+                  >
+                    {f.title}
+                  </h3>
+                  <p
+                    className={`text-sm sm:text-base leading-relaxed ${
+                      f.dark ? 'text-white/75' : 'text-wesal-medium'
+                    }`}
+                  >
+                    {f.desc}
+                  </p>
+
+                  {/* Decorative icon for wide cards */}
+                  {f.span === 2 && !f.dark && (
+                    <div className="mt-8 flex items-center justify-end opacity-[0.06]">
+                      <span className="material-symbols-outlined text-[120px] text-wesal-dark">{f.icon}</span>
+                    </div>
+                  )}
+                </div>
+              </FadeInSection>
+            ))}
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            5. HOW IT WORKS
+            ═══════════════════════════════════════════════════════════════ */}
+        <section className="py-20 md:py-28 gradient-warm relative">
+          {/* Subtle background decoration */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+            <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full bg-wesal-ice/50 blur-[80px]" />
+            <div className="absolute bottom-20 left-[15%] w-48 h-48 rounded-full bg-wesal-sky/10 blur-[60px]" />
+          </div>
+
+          <div className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6">
+            {/* Section Header */}
+            <FadeInSection className="text-center mb-14 md:mb-20">
+              <div className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-1.5 mb-5 shadow-sm">
+                <span className="material-symbols-outlined text-wesal-dark text-sm">route</span>
+                <span className="text-wesal-dark text-xs font-semibold">كيف نعمل</span>
+              </div>
+              <h2 className="text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-wesal-dark mb-4">
+                خطواتك نحو <span className="text-wesal-medium">السلام النفسي</span>
+              </h2>
+              <p className="text-base text-wesal-medium max-w-xl mx-auto leading-relaxed">
+                ثلاث خطوات بسيطة تفصلك عن بداية رحلة التعافي والدعم.
+              </p>
+            </FadeInSection>
+
+            {/* Steps */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 relative">
+              {/* Connecting line (desktop only) */}
+              <div
+                className="hidden md:block absolute top-[52px] left-[20%] right-[20%] h-[2px]"
+                style={{
+                  background: 'repeating-linear-gradient(to left, #d6f3f4 0, #d6f3f4 8px, transparent 8px, transparent 16px)',
+                }}
+                aria-hidden="true"
+              />
+
+              {steps.map((item, i) => (
+                <FadeInSection key={item.step} delay={`${i * 150}ms`}>
+                  <div className="relative text-center group">
+                    {/* Step circle */}
+                    <div className="relative inline-flex items-center justify-center mb-6">
+                      <div className="w-[104px] h-[104px] rounded-full bg-white shadow-lg shadow-wesal-dark/5 flex items-center justify-center group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-500">
+                        <span className="material-symbols-outlined text-wesal-dark text-4xl">{item.icon}</span>
+                      </div>
+                      {/* Step number badge */}
+                      <div className="absolute -top-1 -right-1 w-8 h-8 rounded-full bg-wesal-dark text-white flex items-center justify-center text-sm font-bold shadow-md">
+                        {item.step}
+                      </div>
+                      {/* Pulse ring */}
+                      <div className="absolute inset-0 rounded-full border-2 border-wesal-dark/10 animate-pulse-glow" />
+                    </div>
+
+                    <h3 className="text-xl font-bold text-wesal-dark mb-3">{item.title}</h3>
+                    <p className="text-sm text-wesal-medium leading-relaxed max-w-[260px] mx-auto">
+                      {item.desc}
+                    </p>
+                  </div>
+                </FadeInSection>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ═══════════ 8. FINAL CTA ═══════════ */}
-        <section className="py-16 max-w-[1280px] mx-auto px-6 text-center">
-          <div className="gradient-hero p-16 rounded-[2rem] text-white shadow-2xl relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
-            <div className="relative z-10">
-              <h2 className="text-[clamp(2rem,4vw,3rem)] font-bold text-white mb-6">
-                جاهز تبدأ رحلتك؟
+        {/* ═══════════════════════════════════════════════════════════════
+            6. SECURITY / PRIVACY
+            ═══════════════════════════════════════════════════════════════ */}
+        <section className="py-20 md:py-28 max-w-[1200px] mx-auto px-4 sm:px-6">
+          {/* Section Header */}
+          <FadeInSection className="text-center mb-14 md:mb-20">
+            <div className="inline-flex items-center gap-2 bg-wesal-ice rounded-full px-4 py-1.5 mb-5">
+              <span className="material-symbols-outlined text-wesal-dark text-sm">gpp_good</span>
+              <span className="text-wesal-dark text-xs font-semibold">الأمان والخصوصية</span>
+            </div>
+            <h2 className="text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-wesal-dark mb-4">
+              أمانك هو <span className="text-wesal-medium">أولويتنا</span>
+            </h2>
+            <p className="text-base text-wesal-medium max-w-xl mx-auto leading-relaxed">
+              بنينا المنصة من الصفر مع وضع الخصوصية والأمان في قلب كل قرار تقني.
+            </p>
+          </FadeInSection>
+
+          {/* Security Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {security.map((item, i) => (
+              <FadeInSection key={item.title} delay={`${i * 100}ms`}>
+                <div className="h-full bg-white rounded-2xl p-8 border border-wesal-ice hover:border-wesal-sky/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 group">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-wesal-ice to-wesal-cream flex items-center justify-center mb-5 group-hover:from-wesal-dark group-hover:to-wesal-medium transition-all duration-500">
+                    <span className="material-symbols-outlined text-wesal-dark text-2xl group-hover:text-white transition-colors duration-500">
+                      {item.icon}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-bold text-wesal-dark mb-3">{item.title}</h3>
+                  <p className="text-sm text-wesal-medium leading-relaxed">{item.desc}</p>
+                </div>
+              </FadeInSection>
+            ))}
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            7. TESTIMONIALS
+            ═══════════════════════════════════════════════════════════════ */}
+        <section className="py-20 md:py-28 gradient-warm relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-wesal-ice to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-wesal-ice to-transparent" />
+          </div>
+
+          <div className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6">
+            {/* Section Header */}
+            <FadeInSection className="text-center mb-14 md:mb-20">
+              <div className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-1.5 mb-5 shadow-sm">
+                <span className="material-symbols-outlined text-wesal-dark text-sm">format_quote</span>
+                <span className="text-wesal-dark text-xs font-semibold">شهادات المستخدمين</span>
+              </div>
+              <h2 className="text-[clamp(1.6rem,3.5vw,2.4rem)] font-extrabold text-wesal-dark mb-4">
+                قصص نجاح من <span className="text-wesal-medium">مجتمعنا</span>
               </h2>
-              <p className="text-lg text-white/80 mb-10 max-w-xl mx-auto leading-relaxed">
-                نحن هنا لندعمك في كل خطوة. ابدأ أولى خطواتك نحو حياة نفسية أكثر اتزاناً اليوم.
-              </p>
-              <Link
-                href="/register"
-                className="inline-block px-16 py-4 bg-white text-primary text-xl font-medium rounded-full hover:scale-105 active:scale-95 transition-all shadow-lg"
-              >
-                سجل مجاناً الآن
-              </Link>
+            </FadeInSection>
+
+            {/* Testimonial Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {testimonials.map((review, i) => (
+                <FadeInSection key={i} delay={`${i * 120}ms`}>
+                  <div className="h-full bg-white rounded-2xl p-7 sm:p-8 shadow-sm border border-wesal-ice hover:shadow-lg hover:-translate-y-1 transition-all duration-500 flex flex-col">
+                    {/* Stars */}
+                    <div className="flex gap-0.5 mb-4">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <span
+                          key={s}
+                          className="material-symbols-outlined filled text-amber-400"
+                          style={{ fontSize: '20px' }}
+                        >
+                          star
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Quote */}
+                    <p className="text-sm sm:text-base text-wesal-navy leading-relaxed flex-1 mb-6">
+                      &ldquo;{review.text}&rdquo;
+                    </p>
+
+                    {/* Author */}
+                    <div className="flex items-center gap-3 pt-5 border-t border-wesal-ice">
+                      <div className={`w-10 h-10 rounded-full ${review.color} text-white flex items-center justify-center text-sm font-bold`}>
+                        {review.initials}
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-wesal-dark">{review.name}</div>
+                        <div className="text-xs text-wesal-medium">{review.time}</div>
+                      </div>
+                    </div>
+                  </div>
+                </FadeInSection>
+              ))}
             </div>
           </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            8. FINAL CTA
+            ═══════════════════════════════════════════════════════════════ */}
+        <section className="py-20 md:py-28 max-w-[1200px] mx-auto px-4 sm:px-6">
+          <FadeInSection>
+            <div className="gradient-hero rounded-[2rem] sm:rounded-[2.5rem] p-10 sm:p-16 md:p-20 text-center relative overflow-hidden shadow-2xl">
+              {/* Decorative elements */}
+              <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+                <div className="absolute top-10 right-10 w-32 h-32 rounded-full bg-white/[0.04] animate-float" />
+                <div className="absolute bottom-10 left-10 w-48 h-48 rounded-full bg-wesal-sky/10 animate-float-slow stagger-3" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/[0.02] rounded-full blur-[100px]" />
+              </div>
+
+              <div className="relative z-10">
+                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-5 py-2 mb-8">
+                  <span className="material-symbols-outlined text-wesal-ice text-base">rocket_launch</span>
+                  <span className="text-white/80 text-sm font-medium">ابدأ رحلتك اليوم</span>
+                </div>
+
+                <h2 className="text-[clamp(1.8rem,4.5vw,3rem)] font-extrabold text-white mb-6 leading-tight">
+                  جاهز تبدأ رحلتك
+                  <br />
+                  نحو <span className="text-wesal-ice">السلام النفسي</span>؟
+                </h2>
+
+                <p className="text-base sm:text-lg text-white/75 mb-10 max-w-xl mx-auto leading-relaxed">
+                  نحن هنا لندعمك في كل خطوة. ابدأ أولى خطواتك نحو حياة نفسية أكثر اتزاناً وسلاماً.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                  <Link
+                    href="/register"
+                    className="inline-flex items-center justify-center gap-2 px-10 py-4 text-base font-bold bg-white text-wesal-dark rounded-2xl shadow-xl shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300"
+                  >
+                    <span className="material-symbols-outlined text-xl">arrow_back</span>
+                    سجّل مجاناً الآن
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="inline-flex items-center justify-center gap-2 px-10 py-4 text-base font-semibold border-2 border-white/25 text-white rounded-2xl hover:bg-white/10 hover:border-white/40 transition-all duration-300"
+                  >
+                    عندي حساب
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </FadeInSection>
         </section>
       </main>
 
-      {/* ═══════════ 9. FOOTER ═══════════ */}
-      <footer className="bg-surface-container py-16 border-t border-outline-variant/30">
-        <div className="max-w-[1280px] mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10">
-          <div className="md:col-span-1">
-            <div className="text-2xl font-bold text-teal-800 mb-6">وصال</div>
-            <p className="text-sm text-secondary leading-relaxed">
-              منصة رقمية متكاملة تهدف لرفع الوعي بالصحة النفسية وتوفير سبل الدعم الاحترافية بسرية تامة.
-            </p>
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-primary mb-6">روابط سريعة</h4>
-            <ul className="space-y-4 text-sm text-secondary">
-              <li><a className="hover:text-primary transition-colors" href="#">عن المنصة</a></li>
-              <li><a className="hover:text-primary transition-colors" href="#">كيف نعمل</a></li>
-              <li><a className="hover:text-primary transition-colors" href="#">الأطباء</a></li>
-              <li><a className="hover:text-primary transition-colors" href="#">الأسئلة الشائعة</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-primary mb-6">قانوني</h4>
-            <ul className="space-y-4 text-sm text-secondary">
-              <li><a className="hover:text-primary transition-colors" href="#">سياسة الخصوصية</a></li>
-              <li><a className="hover:text-primary transition-colors" href="#">شروط الاستخدام</a></li>
-              <li><a className="hover:text-primary transition-colors" href="#">اتفاقية السرية</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-primary mb-6">تواصل معنا</h4>
-            <div className="flex gap-4 mb-6">
-              <a href="#" className="text-secondary hover:text-primary transition-colors">
-                <span className="material-symbols-outlined">mail</span>
-              </a>
-              <a href="#" className="text-secondary hover:text-primary transition-colors">
-                <span className="material-symbols-outlined">share</span>
-              </a>
-              <a href="#" className="text-secondary hover:text-primary transition-colors">
-                <span className="material-symbols-outlined">language</span>
-              </a>
+      {/* ═══════════════════════════════════════════════════════════════
+          9. FOOTER (sticky at bottom with mt-auto from parent)
+          ═══════════════════════════════════════════════════════════════ */}
+      <footer className="bg-wesal-navy text-white mt-auto">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-14 md:py-20">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8">
+            {/* Brand Column */}
+            <div className="col-span-2 md:col-span-1">
+              <Link href="/" className="flex items-center gap-2.5 mb-5">
+                <div className="w-9 h-9 rounded-xl bg-wesal-dark flex items-center justify-center">
+                  <span className="material-symbols-outlined text-white text-xl">spa</span>
+                </div>
+                <span className="text-xl font-bold">وصال</span>
+              </Link>
+              <p className="text-sm text-white/50 leading-relaxed max-w-[260px]">
+                منصة رقمية متكاملة تهدف لرفع الوعي بالصحة النفسية وتوفير سبل الدعم الاحترافية بسرية تامة.
+              </p>
             </div>
-            <p className="text-sm text-secondary">info@wesal.com</p>
+
+            {/* Quick Links */}
+            <div>
+              <h4 className="text-sm font-bold text-white mb-5">روابط سريعة</h4>
+              <ul className="space-y-3">
+                {['عن المنصة', 'كيف نعمل', 'الأطباء', 'الأسئلة الشائعة'].map((item) => (
+                  <li key={item}>
+                    <a href="#" className="text-sm text-white/50 hover:text-white transition-colors duration-300">
+                      {item}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <h4 className="text-sm font-bold text-white mb-5">قانوني</h4>
+              <ul className="space-y-3">
+                {['سياسة الخصوصية', 'شروط الاستخدام', 'اتفاقية السرية'].map((item) => (
+                  <li key={item}>
+                    <a href="#" className="text-sm text-white/50 hover:text-white transition-colors duration-300">
+                      {item}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="text-sm font-bold text-white mb-5">تواصل معنا</h4>
+              <div className="flex gap-3 mb-5">
+                {[
+                  { icon: 'mail', label: 'البريد الإلكتروني' },
+                  { icon: 'share', label: 'شارك' },
+                  { icon: 'language', label: 'الموقع' },
+                ].map((item) => (
+                  <a
+                    key={item.label}
+                    href="#"
+                    className="w-10 h-10 rounded-xl bg-white/[0.08] hover:bg-white/15 flex items-center justify-center transition-all duration-300"
+                    aria-label={item.label}
+                  >
+                    <span className="material-symbols-outlined text-white/70 text-lg">{item.icon}</span>
+                  </a>
+                ))}
+              </div>
+              <p className="text-sm text-white/50">info@wesal.com</p>
+            </div>
           </div>
         </div>
-        <div className="max-w-[1280px] mx-auto px-6 mt-16 pt-6 border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-secondary">© 2024 وصال (Wesal). جميع الحقوق محفوظة.</p>
-          <div className="flex gap-4 items-center">
-            <span className="material-symbols-outlined text-teal-800 text-sm filled">verified</span>
-            <span className="text-xs text-secondary">معتمد طبياً</span>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-white/10">
+          <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <p className="text-xs text-white/40">
+              © {new Date().getFullYear()} وصال (Wesal). جميع الحقوق محفوظة.
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-wesal-sky text-sm filled">verified</span>
+              <span className="text-xs text-white/40">معتمد طبياً</span>
+            </div>
           </div>
         </div>
       </footer>
