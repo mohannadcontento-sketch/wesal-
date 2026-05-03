@@ -30,7 +30,8 @@ export async function middleware(request: NextRequest) {
   const isApiRoute = pathname.startsWith('/api');
   const isStaticFile = pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon') ||
-    /\.(svg|png|jpg|jpeg|gif|webp|ico)$/.test(pathname);
+    pathname.startsWith('/fonts') ||
+    /\.(svg|png|jpg|jpeg|gif|webp|ico|otf|ttf|woff|woff2|css|js|map)$/.test(pathname);
 
   if (isApiRoute || isStaticFile) {
     return NextResponse.next();
@@ -64,6 +65,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|fonts/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|otf|ttf|woff|woff2|css|js|map)$).*)',
   ],
 };

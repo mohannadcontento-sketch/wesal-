@@ -90,8 +90,8 @@
   --radius-xl: 1.25rem;
 
   /* Fonts */
-  --font-heading: 'Felfel', system-ui, sans-serif;
-  --font-sans: 'Felfel', system-ui, sans-serif;
+  --font-heading: var(--font-felfel), system-ui, sans-serif;
+  --font-sans: var(--font-felfel), system-ui, sans-serif;
 }
 
 html {
@@ -99,7 +99,7 @@ html {
 }
 
 body {
-  font-family: 'Felfel', var(--font-sans);
+  font-family: var(--font-felfel), 'Felfel', system-ui, sans-serif;
   background-color: var(--color-background);
   color: var(--color-on-surface);
   min-height: 100vh;
