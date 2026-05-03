@@ -99,10 +99,9 @@ export default function RegisterPage() {
 
         {/* Logo & Description */}
         <div className="relative z-10 animate-fade-in-up">
-          <div className="relative w-14 h-14 rounded-2xl overflow-hidden mb-6 shadow-lg ring-1 ring-white/20">
-            <Image src="/logo.png" alt="وصال" fill className="object-cover" />
+          <div className="relative h-12 w-auto mb-6">
+            <Image src="/logo.png" alt="وصال" width={196} height={67} className="object-contain" />
           </div>
-          <h1 className="text-[40px] font-bold leading-tight tracking-tight mb-6">وصال</h1>
           <p className="text-lg leading-relaxed text-white/75 max-w-sm">
             منصة متكاملة للصحة النفسية، تجمع بين الاحترافية السريرية والبيئة الداعمة لرحلة تعافيك.
           </p>
@@ -150,10 +149,9 @@ export default function RegisterPage() {
         <div className="w-full max-w-md mx-auto animate-fade-in-up stagger-1">
           {/* Mobile Logo */}
           <div className="md:hidden mb-6 text-center">
-            <div className="relative w-14 h-14 rounded-2xl overflow-hidden shadow-lg mx-auto mb-3">
-              <Image src="/logo.png" alt="وصال" fill className="object-cover" />
+            <div className="relative h-12 w-auto mx-auto mb-3 rounded-lg ring-1 ring-wesal-ice/50">
+              <Image src="/logo.png" alt="وصال" width={196} height={67} className="object-contain" />
             </div>
-            <h1 className="text-2xl font-bold text-wesal-navy">وصال</h1>
           </div>
 
           <div className="mb-6 text-center md:text-right">

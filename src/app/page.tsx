@@ -274,11 +274,10 @@ function LandingPage() {
       {/* ── NAVBAR ── */}
       <header className={`fixed top-0 w-full z-50 transition-all duration-500 h-14 ${scrolled ? 'glass-panel shadow-lg shadow-wesal-navy/5' : 'bg-transparent'}`}>
         <nav className="flex justify-between items-center px-4 sm:px-6 lg:px-10 w-full h-full max-w-[1400px] mx-auto">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className={`relative w-8 h-8 rounded-xl overflow-hidden flex-shrink-0 transition-all duration-500 ${scrolled ? '' : 'ring-1 ring-white/20'}`}>
-              <Image src="/logo.png" alt="وصال" fill className="object-cover" />
+          <Link href="/" className="flex items-center group">
+            <div className={`relative h-7 w-auto flex-shrink-0 transition-all duration-500 ${scrolled ? 'rounded-lg ring-1 ring-wesal-ice/50' : 'rounded-lg ring-1 ring-white/20'}`}>
+              <Image src="/logo.png" alt="وصال" fill className="object-contain" />
             </div>
-            <span className={`text-lg font-bold tracking-tight transition-colors duration-500 ${scrolled ? 'text-wesal-dark' : 'text-white'}`}>وصال</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
@@ -643,8 +642,8 @@ function LandingPage() {
               </div>
               <div className="relative z-10">
                 {/* Logo in CTA */}
-                <div className="relative w-16 h-16 rounded-2xl overflow-hidden mx-auto mb-8 shadow-xl ring-4 ring-white/10">
-                  <Image src="/logo.png" alt="وصال" fill className="object-cover" />
+                <div className="relative h-14 w-auto mx-auto mb-8">
+                  <Image src="/logo.png" alt="وصال" width={196} height={67} className="object-contain" />
                 </div>
                 <h2 className="text-[clamp(1.8rem,4.5vw,3rem)] font-extrabold text-white mb-6 leading-tight">جاهز تبدأ رحلتك<br />نحو <span className="text-wesal-ice">السلام النفسي</span>؟</h2>
                 <p className="text-base sm:text-lg text-white/75 mb-10 max-w-xl mx-auto leading-relaxed">نحن هنا لندعمك في كل خطوة. ابدأ أولى خطواتك نحو حياة نفسية أكثر اتزاناً وسلاماً.</p>
@@ -666,11 +665,10 @@ function LandingPage() {
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-14 md:py-20">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8">
             <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center gap-2.5 mb-5">
-                <div className="relative w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">
-                  <Image src="/logo.png" alt="وصال" fill className="object-cover" />
+              <div className="mb-5">
+                <div className="relative h-8 w-auto flex-shrink-0">
+                  <Image src="/logo.png" alt="وصال" width={196} height={67} className="object-contain" />
                 </div>
-                <span className="text-xl font-bold">وصال</span>
               </div>
               <p className="text-sm text-white/50 leading-relaxed max-w-[260px]">منصة رقمية متكاملة تهدف لرفع الوعي بالصحة النفسية وتوفير سبل الدعم الاحترافية بسرية تامة.</p>
             </div>
@@ -734,11 +732,9 @@ export default function HomePage() {
     return (
       <div className="flex min-h-screen items-center justify-center gradient-hero">
         <div className="text-center animate-fade-in-up">
-          <div className="relative w-20 h-20 rounded-2xl overflow-hidden mx-auto mb-4 shadow-xl ring-4 ring-white/10">
-            <Image src="/logo.png" alt="وصال" fill className="object-cover" />
+          <div className="relative h-16 w-auto mx-auto mb-4">
+            <Image src="/logo.png" alt="وصال" width={196} height={67} className="object-contain" />
           </div>
-          <div className="text-2xl font-extrabold text-white mb-1 tracking-tight">وصال</div>
-          <div className="text-white/40 text-xs tracking-[0.3em] font-medium">WESAL</div>
           <div className="mt-6 w-16 h-1 bg-white/20 rounded-full mx-auto overflow-hidden">
             <div className="h-full bg-wesal-ice rounded-full animate-shimmer w-full" />
           </div>

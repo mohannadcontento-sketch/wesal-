@@ -32,11 +32,10 @@ export function SideNav() {
   return (
     <aside className="hidden md:flex fixed top-14 bottom-0 right-0 w-[272px] flex-col bg-wesal-cream/95 backdrop-blur-xl border-l border-wesal-ice/70 shadow-[0_1px_12px_rgba(0,67,70,0.04)] z-40">
       {/* ── Logo ── */}
-      <div className="p-5 pb-4 flex items-center gap-2.5">
-        <div className="relative w-8 h-8 rounded-xl overflow-hidden flex-shrink-0">
-          <Image src="/logo.png" alt="وصال" fill className="object-cover" />
+      <div className="p-5 pb-4 flex items-center">
+        <div className="relative h-7 w-auto flex-shrink-0 rounded-lg ring-1 ring-wesal-ice/50">
+          <Image src="/logo.png" alt="وصال" fill className="object-contain" />
         </div>
-        <span className="text-lg font-bold text-wesal-dark">وصال</span>
       </div>
 
       {/* ── Navigation Items ── */}

@@ -30,11 +30,10 @@ export function TopNavbar() {
       <nav className="flex justify-between items-center w-full h-full max-w-screen-2xl mx-auto px-4 sm:px-6">
         {/* ── Right side: Logo + Nav links ── */}
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="relative w-8 h-8 rounded-xl overflow-hidden flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow duration-300">
-              <Image src="/logo.png" alt="وصال" fill className="object-cover" />
+          <Link href="/" className="flex items-center group">
+            <div className="relative h-8 w-auto flex-shrink-0 rounded-lg ring-1 ring-wesal-ice/50">
+              <Image src="/logo.png" alt="وصال" fill className="object-contain" />
             </div>
-            <span className="text-lg font-bold text-wesal-dark hidden sm:block">وصال</span>
           </Link>
           <div className="hidden md:flex gap-1 text-sm font-medium">
             {navLinks.map((link) => {
