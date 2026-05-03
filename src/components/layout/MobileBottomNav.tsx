@@ -3,66 +3,56 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { Home, Users, Stethoscope, Bell, User } from 'lucide-react';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (!user) return null;
+  if (loading || !user) return null;
 
   const links = [
-    { href: '/community', label: 'الرئيسية', icon: Home },
-    { href: '/community', label: 'المجتمع', icon: Users },
-    { href: '/doctors', label: 'الأطباء', icon: Stethoscope },
-    { href: '/notifications', label: 'التنبيهات', icon: Bell },
-    { href: `/profile/${user.username || 'me'}`, label: 'الملف', icon: User },
+    { href: '/community', label: 'الرئيسية', icon: 'home' },
+    { href: '/community', label: 'المجتمع', icon: 'group' },
+    { href: '/doctors', label: 'الأطباء', icon: 'medical_services' },
+    { href: '/notifications', label: 'التنبيهات', icon: 'notifications' },
+    {
+      href: `/profile/${user.username || 'me'}`,
+      label: 'الملف الشخصي',
+      icon: 'person',
+      matchPath: '/profile',
+    },
   ];
 
-  return (
-    <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 bg-white border-t border-border shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
-      <div className="flex justify-around items-center px-1 pt-2 pb-2">
-        {links.map((link) => {
-          const Icon = link.icon;
-          const isActive =
-            link.icon === User
-              ? pathname.startsWith('/profile')
-              : link.icon === Home
-                ? pathname === '/community'
-                : pathname === link.href;
+  const isActive = (link: (typeof links)[0]) => {
+    if (link.matchPath) return pathname.startsWith(link.matchPath);
+    return pathname === link.href;
+  };
 
-          return (
-            <Link
-              key={link.href + link.label}
-              href={link.href}
-              className={`flex flex-col items-center justify-center gap-0.5 rounded-2xl transition-all duration-200 min-w-[56px] py-1.5 px-2 ${
-                isActive ? 'text-teal-600' : 'text-muted-foreground hover:text-foreground'
+  return (
+    <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 bg-surface/90 backdrop-blur-lg rounded-t-2xl border-t border-outline-variant/20 shadow-[0_-4px_20px_0_rgba(0,67,70,0.05)] text-[11px] font-medium">
+      {links.map((link) => {
+        const active = isActive(link);
+        return (
+          <Link
+            key={link.href + link.label}
+            href={link.href}
+            className={`flex flex-col items-center justify-center px-3 py-1.5 transition-all duration-200 ${
+              active
+                ? 'text-primary-container bg-[#D6F3F4] dark:bg-primary-container/40 rounded-xl scale-90'
+                : 'text-outline hover:bg-[#D6F3F4]/50 dark:hover:bg-surface-container-high'
+            }`}
+          >
+            <span
+              className={`material-symbols-outlined text-[24px] mb-0.5 ${
+                active ? 'filled' : ''
               }`}
             >
-              <div
-                className={`relative flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200 ${
-                  isActive ? 'bg-teal-50' : ''
-                }`}
-              >
-                <Icon
-                  className="w-[20px] h-[20px]"
-                  strokeWidth={isActive ? 2.2 : 1.8}
-                />
-                {isActive && (
-                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-teal-600" />
-                )}
-              </div>
-              <span
-                className={`text-[10px] font-medium leading-tight ${
-                  isActive ? 'font-bold' : ''
-                }`}
-              >
-                {link.label}
-              </span>
-            </Link>
-          );
-        })}
-      </div>
+              {link.icon}
+            </span>
+            <span>{link.label}</span>
+          </Link>
+        );
+      })}
     </nav>
   );
 }

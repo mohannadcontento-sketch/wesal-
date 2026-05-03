@@ -5,21 +5,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { CommentList } from '@/components/comments/CommentList';
 import { toast } from 'sonner';
 import Link from 'next/link';
-import {
-  Heart,
-  MessageCircle,
-  Bookmark,
-  BookmarkCheck,
-  Share2,
-  MoreHorizontal,
-  ThumbsUp,
-  Frown,
-  BadgeCheck,
-} from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 
 interface PostCardProps {
   post: {
@@ -33,6 +18,9 @@ interface PostCardProps {
     reactionCount: number;
     createdAt: string;
     reactions: Record<string, number>;
+    isSensitive?: boolean;
+    sensitiveReason?: string;
+    imageUrl?: string;
   };
 }
 
@@ -43,6 +31,7 @@ export function PostCard({ post }: PostCardProps) {
   const [commentCount, setCommentCount] = useState(post.commentCount);
   const [bookmarked, setBookmarked] = useState(false);
   const [userReaction, setUserReaction] = useState<string | null>(null);
+  const [showSensitive, setShowSensitive] = useState(!post.isSensitive);
 
   const timeAgo = (date: string) => {
     const diff = Date.now() - new Date(date).getTime();
@@ -128,153 +117,148 @@ export function PostCard({ post }: PostCardProps) {
     }
   };
 
-  const reactionButtons = [
-    { type: 'like', icon: ThumbsUp, label: 'مفيد' },
-    { type: 'heart', icon: Heart, label: 'أشعر بذلك' },
-    { type: 'sad', icon: Frown, label: 'محزن' },
-  ];
-
   const totalReactions = Object.values(reactions).reduce((a, b) => a + b, 0);
+  const isDoctor = post.authorRole === 'doctor';
 
   return (
-    <Card className="py-0 hover:shadow-md transition-shadow duration-200">
-      <CardContent className="p-4 space-y-0">
-        {/* Author Row */}
-        <div className="flex items-start gap-3 mb-3">
-          <Avatar size="lg">
-            <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-sm">
-              {post.authorBadge}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {post.authorRole === 'doctor' ? (
-                <Link href="/doctors" className="text-sm font-semibold text-gray-900 hover:text-teal-600 transition-colors truncate">
+    <article className={`bg-surface-bright rounded-xl border p-4 sm:p-5 transition-shadow duration-200 hover:shadow-[0_4px_20px_0_rgba(23,42,57,0.06)] ${
+      isDoctor ? 'border-primary-container/20 shadow-[0_4px_20px_0_rgba(23,42,57,0.05)]' : 'border-outline-variant/30 shadow-[0_4px_20px_0_rgba(23,42,57,0.02)]'
+    }`}>
+      {/* Author Row */}
+      <div className="flex justify-between items-start mb-3">
+        <div className="flex gap-3 items-center">
+          {/* Avatar */}
+          <div className={`w-10 h-10 rounded-full overflow-hidden shrink-0 flex items-center justify-center ${
+            isDoctor ? 'border-2 border-primary-container' : ''
+          } ${!post.authorBadge ? 'bg-primary-container/10' : ''}`}>
+            {post.authorBadge ? (
+              <span className="text-sm font-semibold text-primary-container">{post.authorBadge}</span>
+            ) : (
+              <span className="material-symbols-outlined text-xl text-primary-container">person</span>
+            )}
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5">
+              {isDoctor ? (
+                <Link href="/doctors" className="text-[15px] font-medium text-on-surface hover:text-primary-container transition-colors font-[var(--font-heading)]">
                   {post.authorDisplay}
                 </Link>
               ) : (
-                <span className="text-sm font-semibold text-gray-900 truncate">{post.authorDisplay}</span>
+                <span className="text-[15px] font-medium text-on-surface font-[var(--font-heading)]">{post.authorDisplay}</span>
               )}
-              {post.authorRole === 'doctor' && (
-                <BadgeCheck className="w-4 h-4 text-purple-500 shrink-0" />
-              )}
-              {post.authorRole === 'doctor' && (
-                <Badge className="text-[10px] px-1.5 py-0">طبيب</Badge>
+              {isDoctor && (
+                <span className="material-symbols-outlined filled text-[16px] text-primary-container">verified</span>
               )}
             </div>
-            <span className="text-xs text-gray-400">{timeAgo(post.createdAt)}</span>
+            <p className="text-xs text-on-surface-variant">
+              {isDoctor && 'أخصائية طب نفسي · '}
+              {timeAgo(post.createdAt)}
+            </p>
           </div>
-          <Button variant="ghost" size="icon-sm" className="text-gray-400 hover:text-gray-900 shrink-0">
-            <MoreHorizontal className="w-4 h-4" />
-          </Button>
         </div>
+        <button className="text-on-surface-variant hover:text-on-surface transition-colors p-1">
+          <span className="material-symbols-outlined text-[20px]">more_vert</span>
+        </button>
+      </div>
 
-        {/* Content */}
-        <div className="mb-4">
-          <p className="whitespace-pre-wrap text-sm text-gray-600 leading-relaxed line-clamp-4">
-            {post.content}
+      {/* Content / Sensitive Warning */}
+      {post.isSensitive && !showSensitive ? (
+        <div className="bg-surface-container-low rounded-lg p-5 border border-outline-variant/30 flex flex-col items-center justify-center text-center">
+          <span className="material-symbols-outlined text-[32px] text-primary-container mb-2">visibility_off</span>
+          <h4 className="text-lg font-semibold text-on-surface mb-2 font-[var(--font-heading)]">محتوى حساس</h4>
+          <p className="text-sm text-on-surface-variant mb-4 max-w-[250px]">
+            {post.sensitiveReason || 'هذا المنشور يحتوي على نقاش قد يكون حساساً للبعض.'}
           </p>
+          <button
+            onClick={() => setShowSensitive(true)}
+            className="bg-surface text-primary-container border border-primary-container text-sm font-semibold px-4 py-2 rounded-full hover:bg-surface-container transition-colors"
+          >
+            عرض المحتوى
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="mb-4">
+            <p className="text-base text-on-surface leading-relaxed whitespace-pre-wrap">
+              {post.content}
+            </p>
+          </div>
+
+          {/* Mood Tags */}
           {post.moods && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2 mb-4">
               {post.moods.split(',').filter(Boolean).map((mood, i) => (
                 <span
                   key={i}
-                  className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-3 py-1 text-xs text-teal-600 font-medium"
+                  className="bg-surface-container-high text-primary-container px-3 py-1 rounded-full text-xs font-medium"
                 >
                   {mood.trim()}
                 </span>
               ))}
             </div>
           )}
-        </div>
+        </>
+      )}
 
-        {/* Action Bar */}
-        <div className="flex items-center gap-1 pt-3 border-t border-gray-100">
-          {reactionButtons.map(({ type, icon: Icon, label }) => {
-            const isActive = userReaction === type;
-            const count = reactions[type] || 0;
-            return (
-              <Button
-                key={type}
-                variant="ghost"
-                size="sm"
-                onClick={() => handleReaction(type)}
-                title={label}
-                className={`gap-1.5 px-3 h-8 text-xs font-medium ${
-                  isActive
-                    ? 'text-teal-600 bg-teal-50 hover:text-teal-600 hover:bg-teal-50'
-                    : 'text-gray-400 hover:text-teal-600 hover:bg-teal-50'
-                }`}
-              >
-                <Icon className={`w-4 h-4 ${isActive ? 'fill-current' : ''}`} />
-                {count > 0 && <span>{count}</span>}
-              </Button>
-            );
-          })}
+      {/* Action Bar */}
+      <div className="flex items-center justify-between border-t border-outline-variant/30 pt-3 mt-3">
+        <div className="flex gap-4">
+          {/* Favorite / Heart */}
+          <button
+            onClick={() => handleReaction('heart')}
+            className={`flex items-center gap-1 text-sm transition-colors ${
+              userReaction === 'heart'
+                ? 'text-primary-container'
+                : 'text-on-surface-variant hover:text-primary-container'
+            }`}
+          >
+            <span className={`material-symbols-outlined text-[20px] ${userReaction === 'heart' ? 'filled' : ''}`}>favorite</span>
+            {totalReactions > 0 && <span className="font-medium">{totalReactions}</span>}
+          </button>
 
-          {/* Total Reactions */}
-          {totalReactions > 0 && (
-            <span className="text-[10px] text-gray-400 mr-1">
-              {totalReactions}
-            </span>
-          )}
-
-          <div className="flex-1" />
-
-          {/* Comment Button */}
-          <Button
-            variant="ghost"
-            size="sm"
+          {/* Comments */}
+          <button
             onClick={() => setShowComments(!showComments)}
-            title="التعليقات"
-            className={`gap-1.5 px-3 h-8 text-xs font-medium ${
+            className={`flex items-center gap-1 text-sm transition-colors ${
               showComments
-                ? 'text-teal-600 bg-teal-50 hover:text-teal-600 hover:bg-teal-50'
-                : 'text-gray-400 hover:text-teal-600 hover:bg-teal-50'
+                ? 'text-primary-container'
+                : 'text-on-surface-variant hover:text-primary-container'
             }`}
           >
-            <MessageCircle className={`w-4 h-4 ${showComments ? 'fill-current' : ''}`} />
-            {commentCount > 0 && <span>{commentCount}</span>}
-          </Button>
-
-          {/* Bookmark Button */}
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={handleBookmark}
-            title={bookmarked ? 'إزالة من المحفوظات' : 'حفظ'}
-            className={`h-8 w-8 ${
-              bookmarked
-                ? 'text-amber-500 bg-amber-50 hover:text-amber-500 hover:bg-amber-50'
-                : 'text-gray-400 hover:text-amber-500 hover:bg-amber-50'
-            }`}
-          >
-            {bookmarked ? (
-              <BookmarkCheck className="w-4 h-4" />
-            ) : (
-              <Bookmark className="w-4 h-4" />
-            )}
-          </Button>
-
-          {/* Share Button */}
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={handleShare}
-            title="مشاركة"
-            className="h-8 w-8 text-gray-400 hover:text-purple-500 hover:bg-purple-50"
-          >
-            <Share2 className="w-4 h-4" />
-          </Button>
+            <span className={`material-symbols-outlined text-[20px] ${showComments ? 'filled' : ''}`}>chat_bubble</span>
+            {commentCount > 0 && <span className="font-medium">{commentCount}</span>}
+          </button>
         </div>
 
-        {/* Comments Section */}
-        {showComments && (
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <CommentList postId={post.id} onCommentAdded={() => setCommentCount((c) => c + 1)} />
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        <div className="flex items-center gap-2">
+          {/* Bookmark */}
+          <button
+            onClick={handleBookmark}
+            className={`transition-colors ${
+              bookmarked
+                ? 'text-primary-container'
+                : 'text-on-surface-variant hover:text-primary-container'
+            }`}
+          >
+            <span className={`material-symbols-outlined text-[20px] ${bookmarked ? 'filled' : ''}`}>bookmark</span>
+          </button>
+
+          {/* Share */}
+          <button
+            onClick={handleShare}
+            className="text-on-surface-variant hover:text-primary-container transition-colors"
+          >
+            <span className="material-symbols-outlined text-[20px]">share</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Comments Section */}
+      {showComments && (
+        <div className="mt-4 pt-4 border-t border-outline-variant/30">
+          <CommentList postId={post.id} onCommentAdded={() => setCommentCount((c) => c + 1)} />
+        </div>
+      )}
+    </article>
   );
 }

@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { CommentItem } from './CommentItem';
 import { CommentForm } from './CommentForm';
 import { useAuth } from '@/hooks/useAuth';
-import { Skeleton } from '@/components/ui/skeleton';
-import { MessageCircle } from 'lucide-react';
 
 interface Comment {
   id: string;
@@ -47,38 +45,38 @@ export function CommentList({ postId, onCommentAdded }: { postId: string; onComm
   };
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {user && (
         <CommentForm postId={postId} onCommentAdded={handleCommentAdded} />
       )}
 
       {loading ? (
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           {[1, 2].map((i) => (
-            <div key={i} className="flex gap-2.5">
-              <Skeleton className="h-8 w-8 rounded-full shrink-0" />
+            <div key={i} className="flex gap-3 animate-pulse">
+              <div className="h-8 w-8 rounded-full bg-surface-container-high shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="flex gap-2">
-                  <Skeleton className="h-3 w-20" />
-                  <Skeleton className="h-2.5 w-12" />
+                  <div className="h-3.5 w-20 bg-surface-container-high rounded" />
+                  <div className="h-3 w-12 bg-surface-container-high rounded" />
                 </div>
-                <Skeleton className="h-3 w-full" />
-                <Skeleton className="h-3 w-3/4" />
+                <div className="h-3.5 w-full bg-surface-container-high rounded" />
+                <div className="h-3.5 w-3/4 bg-surface-container-high rounded" />
               </div>
             </div>
           ))}
         </div>
       ) : comments.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-8 px-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 text-gray-400 mb-2">
-            <MessageCircle className="w-5 h-5" />
+        <div className="flex flex-col items-center justify-center py-6 px-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-container text-on-surface-variant mb-2">
+            <span className="material-symbols-outlined text-xl">chat_bubble</span>
           </div>
-          <p className="text-xs text-gray-400 text-center">
+          <p className="text-xs text-on-surface-variant text-center">
             لا توجد تعليقات بعد. كن أول من يعلق!
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {comments.map((comment) => (
             <CommentItem key={comment.id} comment={comment} postId={postId} />
           ))}

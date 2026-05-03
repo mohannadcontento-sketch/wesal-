@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>وصال - رسائل</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#bbe9ff",
+                        "primary-container": "#004346",
+                        "tertiary-container": "#004154",
+                        "on-secondary-fixed-variant": "#364959",
+                        "surface": "#fcf9f4",
+                        "on-background": "#1c1c19",
+                        "surface-container-low": "#f6f3ee",
+                        "on-surface-variant": "#404849",
+                        "tertiary-fixed-dim": "#8fcfeb",
+                        "outline": "#707979",
+                        "inverse-surface": "#31302d",
+                        "inverse-on-surface": "#f3f0eb",
+                        "surface-dim": "#dcdad5",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#b5c9dc",
+                        "outline-variant": "#bfc8c8",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#002a37",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e5e2dd",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#fcf9f4",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#001f29",
+                        "on-error": "#ffffff",
+                        "surface-container": "#f0ede9",
+                        "surface-container-high": "#ebe8e3",
+                        "primary-fixed": "#b6ecef",
+                        "on-primary-fixed": "#002021",
+                        "background": "#fcf9f4",
+                        "secondary": "#4e6071",
+                        "on-secondary-fixed": "#091d2c",
+                        "inverse-primary": "#9ad0d3",
+                        "on-primary-container": "#7aafb2",
+                        "primary-fixed-dim": "#9ad0d3",
+                        "on-tertiary-fixed-variant": "#004d63",
+                        "surface-container-highest": "#e5e2dd",
+                        "on-tertiary-container": "#6eaec9",
+                        "secondary-container": "#cee2f6",
+                        "surface-tint": "#306669",
+                        "on-primary-fixed-variant": "#134e51",
+                        "secondary-fixed": "#d1e5f9",
+                        "on-secondary-container": "#526576",
+                        "primary": "#002b2d",
+                        "on-surface": "#1c1c19"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "xs": "8px",
+                        "margin": "32px",
+                        "md": "24px",
+                        "gutter": "24px",
+                        "xl": "80px",
+                        "base": "4px",
+                        "lg": "48px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Manrope"],
+                        "label-bold": ["Manrope"],
+                        "body-lg": ["Manrope"],
+                        "label-sm": ["Manrope"],
+                        "h3": ["Manrope"],
+                        "h1": ["Manrope"],
+                        "h2": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "label-bold": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "h3": ["24px", {"lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "600"}],
+                        "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "h2": ["32px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .chat-bubble-sent {
+            background: linear-gradient(135deg, #002b2d, #306669);
+            color: white;
+            border-bottom-left-radius: 4px;
+        }
+        .chat-bubble-received {
+            background: #ffffff;
+            border: 1px solid rgba(0, 43, 45, 0.1);
+            color: #1c1c19;
+            border-bottom-right-radius: 4px;
+        }
+        /* Custom scrollbar for chat area */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dcdad5; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #bfc8c8; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased selection:bg-tertiary-fixed selection:text-on-tertiary-fixed">
+<!-- Chat Header -->
+<header class="glass-panel sticky top-0 z-50 flex items-center justify-between px-gutter py-sm border-b border-surface-dim shadow-[0_4px_24px_0_rgba(0,43,45,0.05)]">
+<div class="flex items-center gap-sm">
+<button aria-label="العودة" class="p-xs rounded-full hover:bg-surface-container transition-colors text-primary">
+<span class="material-symbols-outlined text-[24px]">arrow_forward</span>
+</button>
+<div class="relative">
+<img alt="صورة الطبيب" class="w-12 h-12 rounded-full object-cover border-2 border-surface" data-alt="A professional headshot of a female doctor with a warm, reassuring smile. The lighting is soft and bright, emphasizing a modern healthcare aesthetic. She wears a crisp white coat over a light teal shirt, aligning with the primary brand colors. The background is a gently blurred, bright clinical setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoJIdRQgQBz0OSYxq9BvbwtfIW7XpE9vbSj1BdIPi3gPf9IYdFafeTEatE0D_DkjqTXIQTO9ktts-ujefRYDC3C06P84VOdCAFMb1WGCfHE92GfP1riUU4-xcgTtZVg8cJN27yXiwfez32iCb02TuDIbmX-7vhhsqeUJqGwrK5NBQf4_ROQfnWwfj7hYMyFU0Lc7QvQaCCLPI_vEUuOV_OcPgP-zLa5IsTiwbOmlOu930lNkRMxPfjZDmOPP1PzSyBwuVYZPtBJGo"/>
+<div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-surface rounded-full"></div>
+</div>
+<div class="flex flex-col">
+<h2 class="font-h3 text-h3 text-on-surface">د. سارة أحمد</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-green-500 rounded-full inline-block"></span> متصل الآن
+                </span>
+</div>
+</div>
+<div class="flex items-center gap-xs">
+<button aria-label="مكالمة فيديو" class="p-xs rounded-full hover:bg-surface-container transition-colors text-primary">
+<span class="material-symbols-outlined text-[24px]">videocam</span>
+</button>
+<button aria-label="مكالمة صوتية" class="p-xs rounded-full hover:bg-surface-container transition-colors text-primary">
+<span class="material-symbols-outlined text-[24px]">call</span>
+</button>
+<button aria-label="خيارات إضافية" class="p-xs rounded-full hover:bg-surface-container transition-colors text-primary">
+<span class="material-symbols-outlined text-[24px]">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Main Chat Area -->
+<main class="flex-1 overflow-y-auto p-gutter flex flex-col gap-md pb-32">
+<!-- Date Divider -->
+<div class="flex justify-center my-xs">
+<span class="bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant px-sm py-base rounded-full border border-surface-dim">اليوم</span>
+</div>
+<!-- Received Message -->
+<div class="flex gap-sm max-w-[85%] self-start">
+<img alt="صورة الطبيب" class="w-8 h-8 rounded-full object-cover hidden sm:block mt-auto" data-alt="A professional headshot of a female doctor with a warm, reassuring smile. The lighting is soft and bright, emphasizing a modern healthcare aesthetic. She wears a crisp white coat over a light teal shirt, aligning with the primary brand colors. The background is a gently blurred, bright clinical setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGAvxyuuRcTVebwW1qdAfsfE2wlpQlts5yAYanu1wo4sXJVBxpTVGQJMEVal-5kap62NWy-Fa8kX4GjHdRtlBcFOAiiAvbLGbzainKMudml0985QaSHfvgFhTlI7FNIfs2MRLqQkA69fHG0GJR2xeIv1FbVRiYRaxcpZm3vbtjtY_LR-X3zvuPLGNd_q_SKJWJYhdRjRalVXEMA_GQP8vm9P45b1S_6opzayUySzx8Ne2wz3EB2GQZzAU_dnPGlcT7X6yZcFQyDHk"/>
+<div class="flex flex-col gap-1">
+<div class="chat-bubble-received p-sm rounded-2xl rounded-br-sm shadow-sm">
+<p class="font-body-md text-body-md leading-relaxed">مرحباً! كيف حالك اليوم؟ هل لاحظت أي تحسن بعد الجلسة الأخيرة؟</p>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mr-1">10:00 ص</span>
+</div>
+</div>
+<!-- Sent Message -->
+<div class="flex gap-sm max-w-[85%] self-end">
+<div class="flex flex-col gap-1 items-end">
+<div class="chat-bubble-sent p-sm rounded-2xl rounded-bl-sm shadow-md">
+<p class="font-body-md text-body-md leading-relaxed text-on-primary">أهلاً دكتورة سارة. نعم، أشعر بتحسن طفيف. حاولت تطبيق التمارين التي تحدثنا عنها.</p>
+</div>
+<div class="flex items-center gap-1 ml-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">10:05 ص</span>
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">done_all</span>
+</div>
+</div>
+</div>
+<!-- Received Voice Message -->
+<div class="flex gap-sm max-w-[85%] sm:max-w-[60%] self-start">
+<img alt="صورة الطبيب" class="w-8 h-8 rounded-full object-cover hidden sm:block mt-auto" data-alt="A professional headshot of a female doctor with a warm, reassuring smile. The lighting is soft and bright, emphasizing a modern healthcare aesthetic. She wears a crisp white coat over a light teal shirt, aligning with the primary brand colors. The background is a gently blurred, bright clinical setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWGgo7dtjfDQ8PXWWUARQtYsExuBFmipdO8P5snOR245PgJZo9hseuPrK6-Tv35VR2lfwB7JOKbK97glQXp4RCzTrGBejR5kfrFi8FjfBQ8lIDxud1H_7VykJLLyy0GuCDrvBUWVETykyFVa7G82Sn71MN4moyVDBbNvQpIuFGGWt7wuWZgF-P0xF8lQiZUn1szdpbrjMUYaHv0EF_nGDjPm-mQbpGaTTIh1qhhCsdTx3KiW1rr7AmpsDv7B_RprPyM3vdli4YPJI"/>
+<div class="flex flex-col gap-1 w-full">
+<div class="chat-bubble-received p-sm rounded-2xl rounded-br-sm shadow-sm flex items-center gap-sm">
+<button class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed hover:bg-inverse-primary transition-colors flex-shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<!-- Simulated Waveform -->
+<div class="flex-1 flex items-center gap-[2px] h-8 px-2 overflow-hidden">
+<div class="w-1 bg-primary/40 rounded-full h-[20%]"></div>
+<div class="w-1 bg-primary/60 rounded-full h-[40%]"></div>
+<div class="w-1 bg-primary rounded-full h-[80%]"></div>
+<div class="w-1 bg-primary/80 rounded-full h-[60%]"></div>
+<div class="w-1 bg-primary/40 rounded-full h-[30%]"></div>
+<div class="w-1 bg-surface-dim rounded-full h-[20%]"></div>
+<div class="w-1 bg-surface-dim rounded-full h-[50%]"></div>
+<div class="w-1 bg-surface-dim rounded-full h-[30%]"></div>
+<div class="w-1 bg-surface-dim rounded-full h-[70%]"></div>
+<div class="w-1 bg-surface-dim rounded-full h-[40%]"></div>
+<div class="w-1 bg-surface-dim rounded-full h-[20%]"></div>
+<div class="w-1 bg-surface-dim rounded-full h-[50%]"></div>
+<div class="w-1 bg-surface-dim rounded-full h-[30%]"></div>
+<div class="w-1 bg-surface-dim rounded-full h-[60%]"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex-shrink-0">0:45</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mr-1">10:08 ص</span>
+</div>
+</div>
+<!-- Sent Message -->
+<div class="flex gap-sm max-w-[85%] self-end">
+<div class="flex flex-col gap-1 items-end">
+<div class="chat-bubble-sent p-sm rounded-2xl rounded-bl-sm shadow-md">
+<p class="font-body-md text-body-md leading-relaxed text-on-primary">ممتاز، سأستمع إليها الآن. شكراً لك.</p>
+</div>
+<div class="flex items-center gap-1 ml-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">10:10 ص</span>
+<span class="material-symbols-outlined text-[16px] text-surface-dim">done</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Input Area -->
+<div class="fixed bottom-0 w-full glass-panel p-sm border-t border-surface-dim shadow-[0_-4px_24px_0_rgba(0,43,45,0.05)]">
+<div class="max-w-4xl mx-auto flex items-end gap-sm">
+<button aria-label="إرفاق ملف" class="p-xs text-primary hover:bg-surface-container rounded-full transition-colors mb-1">
+<span class="material-symbols-outlined text-[24px]">attach_file</span>
+</button>
+<div class="flex-1 bg-surface-container-low border border-surface-dim rounded-2xl flex items-end focus-within:border-primary-fixed focus-within:ring-1 focus-within:ring-primary-fixed transition-all shadow-inner overflow-hidden">
+<textarea class="w-full bg-transparent border-none focus:ring-0 resize-none font-body-md text-body-md p-sm text-on-surface placeholder:text-on-surface-variant/50 max-h-32" placeholder="اكتب رسالة..." rows="1"></textarea>
+<button aria-label="إضافة رموز تعبيرية" class="p-sm text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">mood</span>
+</button>
+</div>
+<div class="flex gap-xs mb-1">
+<button aria-label="تسجيل صوتي" class="p-sm rounded-full bg-surface-container-high text-primary hover:bg-surface-dim transition-colors">
+<span class="material-symbols-outlined text-[24px]">mic</span>
+</button>
+<button aria-label="إرسال" class="p-sm rounded-full bg-primary text-on-primary hover:bg-surface-tint shadow-md transition-colors">
+<span class="material-symbols-outlined text-[24px] rotate-180" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

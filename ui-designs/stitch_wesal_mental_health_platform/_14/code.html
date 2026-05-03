@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Wesal - Doctors</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#002021",
+                        "surface": "#f8f9f9",
+                        "on-secondary-container": "#526576",
+                        "surface-tint": "#306669",
+                        "secondary-container": "#cee2f6",
+                        "on-primary-fixed-variant": "#134e51",
+                        "surface-bright": "#f8f9f9",
+                        "on-surface-variant": "#404849",
+                        "tertiary": "#002b31",
+                        "on-tertiary-fixed": "#001f24",
+                        "tertiary-fixed": "#b2ecf6",
+                        "surface-container-low": "#f3f4f3",
+                        "surface-container-highest": "#e1e3e2",
+                        "secondary-fixed": "#d1e5f9",
+                        "secondary": "#4e6071",
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#091d2c",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#9ad0d3",
+                        "surface-container": "#edeeee",
+                        "secondary-fixed-dim": "#b5c9dc",
+                        "on-tertiary-fixed-variant": "#094e57",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#b6ecef",
+                        "inverse-on-surface": "#f0f1f0",
+                        "outline": "#707979",
+                        "outline-variant": "#bfc8c8",
+                        "surface-container-high": "#e7e8e8",
+                        "on-background": "#191c1c",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e1e3e2",
+                        "on-secondary-fixed-variant": "#364959",
+                        "primary": "#002b2d",
+                        "on-surface": "#191c1c",
+                        "surface-dim": "#d9dada",
+                        "background": "#f8f9f9",
+                        "on-primary-container": "#7aafb2",
+                        "primary-container": "#004346",
+                        "tertiary-fixed-dim": "#96d0da",
+                        "inverse-surface": "#2e3131",
+                        "primary-fixed-dim": "#9ad0d3",
+                        "tertiary-container": "#00434b",
+                        "on-tertiary-container": "#77b0b9",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "xxl": "64px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "unit": "4px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "h2": ["Manrope"],
+                        "label-md": ["Inter"],
+                        "h1": ["Manrope"],
+                        "display": ["Manrope"],
+                        "h3": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                        "h2": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "h1": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "display": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "h3": ["20px", {"lineHeight": "1.5", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f8f9f9; } /* Enforce surface background */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(115, 179, 206, 0.2);
+            box-shadow: 0 4px 20px 0 rgba(23, 42, 57, 0.05);
+        }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+        
+        /* Custom scrollbar for horizontal categories */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md antialiased min-h-screen flex flex-col pt-safe pb-[80px]">
+<!-- TopAppBar (Web & Mobile, adjusted for mobile emphasis) -->
+<header class="bg-[#F8F5F0]/80 dark:bg-slate-950/80 backdrop-blur-md text-[#004346] dark:text-[#D6F3F4] font-manrope font-semibold docked full-width top-0 sticky shadow-sm dark:shadow-none border-b border-[#73B3CE]/20 flex flex-row-reverse justify-between items-center w-full px-6 py-4 z-40">
+<div class="flex items-center gap-sm">
+<span class="text-2xl font-bold text-[#004346] dark:text-[#D6F3F4]">Wesal</span>
+</div>
+<div class="hidden md:flex flex-row-reverse items-center gap-lg">
+<a class="text-slate-500 dark:text-slate-400 hover:opacity-80 transition-opacity font-body-md text-body-md" href="#">الرئيسية</a>
+<a class="text-slate-500 dark:text-slate-400 hover:opacity-80 transition-opacity font-body-md text-body-md" href="#">المجتمع</a>
+<a class="text-[#004346] dark:text-[#D6F3F4] hover:opacity-80 transition-opacity font-body-md text-body-md border-b-2 border-[#004346] pb-1" href="#">الأطباء</a>
+<a class="text-slate-500 dark:text-slate-400 hover:opacity-80 transition-opacity font-body-md text-body-md" href="#">التنبيهات</a>
+</div>
+<div class="flex items-center gap-md">
+<button aria-label="Notifications" class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A close-up, softly lit portrait of a calm individual looking slightly off-camera. The lighting is warm and natural, suggesting a peaceful, modern setting. The color palette is muted with earthy tones, aligning with a soothing, wellness-oriented aesthetic. The image is cropped to a perfect circle for a profile avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3Z5LAhEh1LHSwT2K18-4oSXONOBxgSBH1bg9L4nfZjkUp0ocAkxhSskxuVRaRVfOzTOARQXyRzq_SHMBkzHqbJIWc3kZVAIl6A6uwVdXimKT1dQeyLnXQzSTmx_o5o9JZpEgka62QNTmquLS7YEwIgoizBgmRrS8189TAcPy-7MphAP-SMzO-J_dwRGoT-tX9EQGIisqZBJUf9k3uDIT1Wl4eJQE3A16chAeaIMwBxUcYmW8omMSLbWIOKxje1xFft1sowI8KAck"/>
+</div>
+</div>
+</header>
+<main class="flex-1 w-full max-w-container-max mx-auto px-gutter py-lg flex flex-col gap-xl">
+<!-- Header & Search Section -->
+<section class="flex flex-col gap-lg">
+<div>
+<h1 class="font-h1 text-h1 text-primary-container mb-sm">ابحث عن طبيبك</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">نخبة من الأخصائيين النفسيين المعتمدين لرحلة تشافيك.</p>
+</div>
+<!-- Search Bar -->
+<div class="relative w-full max-w-2xl">
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline" style="font-variation-settings: 'FILL' 0;">search</span>
+<input class="w-full bg-[#f0f8ff] border border-outline-variant rounded-xl py-3 pr-12 pl-4 focus:outline-none focus:ring-2 focus:ring-primary-container focus:border-transparent font-body-md text-body-md text-on-surface placeholder:text-outline-variant transition-shadow" placeholder="ابحث بالاسم أو التخصص..." type="text"/>
+<button class="absolute left-2 top-1/2 -translate-y-1/2 bg-surface-container-high p-2 rounded-lg text-primary-container hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">tune</span>
+</button>
+</div>
+<!-- Horizontal Category Filters -->
+<div class="flex overflow-x-auto gap-sm pb-2 no-scrollbar">
+<button class="flex-shrink-0 bg-primary-container text-on-primary rounded-full px-6 py-2 font-label-md text-label-md whitespace-nowrap shadow-sm">الكل</button>
+<button class="flex-shrink-0 bg-secondary-container/50 text-on-secondary-container hover:bg-secondary-container border border-outline-variant/30 rounded-full px-6 py-2 font-label-md text-label-md whitespace-nowrap transition-colors">قلق وتوتر</button>
+<button class="flex-shrink-0 bg-secondary-container/50 text-on-secondary-container hover:bg-secondary-container border border-outline-variant/30 rounded-full px-6 py-2 font-label-md text-label-md whitespace-nowrap transition-colors">اكتئاب</button>
+<button class="flex-shrink-0 bg-secondary-container/50 text-on-secondary-container hover:bg-secondary-container border border-outline-variant/30 rounded-full px-6 py-2 font-label-md text-label-md whitespace-nowrap transition-colors">علاج سلوكي</button>
+<button class="flex-shrink-0 bg-secondary-container/50 text-on-secondary-container hover:bg-secondary-container border border-outline-variant/30 rounded-full px-6 py-2 font-label-md text-label-md whitespace-nowrap transition-colors">إرشاد أسري</button>
+<button class="flex-shrink-0 bg-secondary-container/50 text-on-secondary-container hover:bg-secondary-container border border-outline-variant/30 rounded-full px-6 py-2 font-label-md text-label-md whitespace-nowrap transition-colors">اضطرابات نوم</button>
+</div>
+</section>
+<!-- Doctors Grid List -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+<!-- Doctor Card 1 -->
+<div class="glass-card rounded-xl overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-300">
+<div class="p-md flex items-start gap-md">
+<div class="w-[80px] h-[80px] rounded-lg overflow-hidden flex-shrink-0">
+<img alt="Doctor profile" class="w-full h-full object-cover" data-alt="A professional headshot of a female doctor with a warm, reassuring smile. She is wearing a modern, subtle medical coat over a soft teal blouse. The background is a gently blurred, bright clinical office setting with natural light, conveying a sense of calm and competence. High-quality, soft lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxaLptCIDlLyoQeFEHPn2WU61EmSkbCy7Yg0RGlbK-HlZRo6ma5KmUIoVw4FTvEVuZc_IqfIDZBwXTyztWL6-IPW9w8W26Q2uMwu21Gtr4BP_6ETXzANqq9DRudO2LUOyo8jvLVCoJP1ciUpe3c3sFeMZWb1-B6uM_0SvFVnd8liwU3VbnI3KuOUGBIPh_lgAr2ZFCGtYAfTlNKZvvGhvBoJCwPXJXIhlZIujQIQcC-dK1dMBnKZVBaMZR2kfH3yxA4Srhtpanyoc"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-h3 text-h3 text-on-surface">د. نورة السالم</h3>
+<div class="flex items-center gap-1 text-[#f59e0b]">
+<span class="font-label-sm text-label-sm">4.9</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-primary-container mb-2">استشاري الطب النفسي</p>
+<div class="flex flex-wrap gap-xs">
+<span class="bg-[#e0f2f1] text-[#00695c] px-2 py-1 rounded-full font-label-sm text-[10px]">قلق وتوتر</span>
+<span class="bg-[#e0f2f1] text-[#00695c] px-2 py-1 rounded-full font-label-sm text-[10px]">اكتئاب</span>
+</div>
+</div>
+</div>
+<div class="px-md pb-md flex flex-col gap-sm mt-auto">
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-outline text-[18px]">calendar_month</span>
+<span>أقرب موعد: غداً، 10:00 ص</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-outline text-[18px]">payments</span>
+<span>250 ريال / الجلسة</span>
+</div>
+<button class="w-full mt-2 bg-gradient-to-l from-[#002b2d] to-[#004346] text-on-primary py-3 rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity shadow-[0_4px_12px_rgba(0,67,70,0.2)]">حجز موعد</button>
+</div>
+</div>
+<!-- Doctor Card 2 -->
+<div class="glass-card rounded-xl overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-300">
+<div class="p-md flex items-start gap-md">
+<div class="w-[80px] h-[80px] rounded-lg overflow-hidden flex-shrink-0 relative">
+<img alt="Doctor profile" class="w-full h-full object-cover" data-alt="A professional headshot of a male psychologist looking attentively towards the camera with a gentle expression. He is dressed in smart-casual attire, suitable for a modern counseling environment. The background is soft and slightly warm-toned, suggesting a comfortable, private consultation room. Soft, natural lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCK0zr6of-EZnT7Gn6qAGSqeaTJVsSDqYRqfCDO_muzXSHh5LWPYfOPaSNtefQGNQOzi_Xt6QMhyjNPM6oIcxm5k-RiKNLmR62t9aHgE7MixcxOIncyUYkVuL6gpCDR_brwkCt8vER-vrdrBP3tA4i4yrplF0GG7_jyP9b5Tzx0fqwXKysDYjBKrpgfihuXrhqzMJe2Ao4AsM6BMP_jVqSiN1PislXEib6wMhGlJPGZL8IpY7t7iKu4OSflq_aeWgJxsPsWE13jXEM"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-h3 text-h3 text-on-surface">د. أحمد خالد</h3>
+<div class="flex items-center gap-1 text-[#f59e0b]">
+<span class="font-label-sm text-label-sm">4.8</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-primary-container mb-2">أخصائي علاج سلوكي معرفي</p>
+<div class="flex flex-wrap gap-xs">
+<span class="bg-[#e0f2f1] text-[#00695c] px-2 py-1 rounded-full font-label-sm text-[10px]">علاج سلوكي</span>
+<span class="bg-[#e0f2f1] text-[#00695c] px-2 py-1 rounded-full font-label-sm text-[10px]">إدمان</span>
+</div>
+</div>
+</div>
+<div class="px-md pb-md flex flex-col gap-sm mt-auto">
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-outline text-[18px]">calendar_month</span>
+<span>متاح الآن (استشارة فورية)</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-outline text-[18px]">payments</span>
+<span>200 ريال / الجلسة</span>
+</div>
+<button class="w-full mt-2 bg-gradient-to-l from-[#002b2d] to-[#004346] text-on-primary py-3 rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity shadow-[0_4px_12px_rgba(0,67,70,0.2)]">حجز موعد</button>
+</div>
+</div>
+<!-- Doctor Card 3 -->
+<div class="glass-card rounded-xl overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-300">
+<div class="p-md flex items-start gap-md">
+<div class="w-[80px] h-[80px] rounded-lg overflow-hidden flex-shrink-0">
+<img alt="Doctor profile" class="w-full h-full object-cover" data-alt="A portrait of a confident, middle-aged female therapist with a welcoming smile. She wears a soft, neutral-colored cardigan over a simple top. The background features a softly blurred bookshelf, indicating a learned, professional yet approachable setting. The lighting is inviting and bright, emphasizing a modern wellness vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVVsF3Sb1Q-EpiXoQTm1gdveWkkX505wH-c5URUKZTjCIJT1UfKucx1j4Q1kvWI2fJnWufsc9eTOu7yxgab-_lAli08XZaFYnwBlCzGD5vvThoL6YxGJMfM3BIfc2qJenBPBvM47FVBw9ZjNp7jUo553mcBgc5pM5ZX6d0e_qy4fZXUZRdt1_orNz-_VIl7uysj8vQlE-KiuJVsOpNeBO2pfhv-Qu0T7n0qiZnFiJhqAGmXuCDPhbhWLuVy-Qc6J0bYqmuaIdFbrc"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-h3 text-h3 text-on-surface">أ. سارة الماجد</h3>
+<div class="flex items-center gap-1 text-[#f59e0b]">
+<span class="font-label-sm text-label-sm">5.0</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-primary-container mb-2">مستشارة أسرية وزوجية</p>
+<div class="flex flex-wrap gap-xs">
+<span class="bg-[#e0f2f1] text-[#00695c] px-2 py-1 rounded-full font-label-sm text-[10px]">إرشاد أسري</span>
+<span class="bg-[#e0f2f1] text-[#00695c] px-2 py-1 rounded-full font-label-sm text-[10px]">تطوير ذات</span>
+</div>
+</div>
+</div>
+<div class="px-md pb-md flex flex-col gap-sm mt-auto">
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-outline text-[18px]">calendar_month</span>
+<span>أقرب موعد: الأحد، 04:00 م</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-outline text-[18px]">payments</span>
+<span>180 ريال / الجلسة</span>
+</div>
+<button class="w-full mt-2 bg-white border border-primary-container text-primary-container py-3 rounded-lg font-label-md text-label-md hover:bg-[#f0f8ff] transition-colors">عرض الملف</button>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-[#F8F5F0]/90 dark:bg-slate-900/90 backdrop-blur-lg text-[11px] font-manrope font-medium docked full-width bottom-0 rounded-t-2xl border-t border-[#73B3CE]/20 shadow-[0_-4px_20px_0_rgba(23,42,57,0.05)] fixed left-0 w-full z-50 flex flex-row-reverse justify-around items-center px-4 pb-safe pt-2">
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:bg-[#D6F3F4]/50 dark:hover:bg-slate-800 transition-colors rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]">home</span>
+<span>الرئيسية</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:bg-[#D6F3F4]/50 dark:hover:bg-slate-800 transition-colors rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]">group</span>
+<span>المجتمع</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#004346] dark:text-[#D6F3F4] bg-[#D6F3F4] dark:bg-[#004346]/40 rounded-xl px-3 py-1.5 scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+<span>الأطباء</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:bg-[#D6F3F4]/50 dark:hover:bg-slate-800 transition-colors rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]">notifications</span>
+<span>التنبيهات</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:bg-[#D6F3F4]/50 dark:hover:bg-slate-800 transition-colors rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]">person</span>
+<span>الملف الشخصي</span>
+</a>
+</nav>
+</body></html>

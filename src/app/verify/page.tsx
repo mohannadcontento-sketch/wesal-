@@ -7,9 +7,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import OTPInput from '@/components/auth/OTPInput';
-import { KeyRound, ArrowRight, Loader2, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 
 function VerifyForm() {
   const router = useRouter();
@@ -20,6 +17,7 @@ function VerifyForm() {
   const [resendLoading, setResendLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [countdown, setCountdown] = useState(0);
+  const [otpCode, setOtpCode] = useState('');
 
   // Countdown timer
   useEffect(() => {
@@ -68,6 +66,16 @@ function VerifyForm() {
     }
   }, [email, verifyOtp, router]);
 
+  const handleOTPChange = useCallback((code: string) => {
+    setOtpCode(code);
+  }, []);
+
+  const handleConfirmClick = () => {
+    if (otpCode.length === 6 && !loading) {
+      handleVerify(otpCode);
+    }
+  };
+
   const handleResend = async () => {
     if (!email) {
       toast.error('الإيميل مفقود');
@@ -93,71 +101,74 @@ function VerifyForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-teal-50 to-gray-100 px-4 py-8">
-      <div className="w-full max-w-sm">
-        {/* Back button */}
-        <div className="mb-6">
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-teal-600 transition-colors group"
-          >
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl border border-gray-200 hover:border-teal-300 hover:bg-teal-50 transition-all">
-              <ArrowRight className="w-4 h-4 text-gray-500 group-hover:text-teal-600 transition-colors" />
+    <div className="bg-surface relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Ambient Background Gradients */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-primary-fixed/20 blur-[120px]" />
+        <div className="absolute bottom-[-20%] left-[-10%] w-[60vw] h-[60vw] rounded-full bg-tertiary-fixed/30 blur-[150px]" />
+      </div>
+
+      {/* Verification Card */}
+      <main className="relative z-10 w-full max-w-[480px] px-6">
+        <div className="bg-surface-container-lowest/60 backdrop-blur-[24px] border border-white/50 rounded-3xl p-8 md:p-10 shadow-[0_16px_48px_-12px_rgba(0,43,45,0.08)] flex flex-col items-center text-center">
+          {/* Key Icon Container */}
+          <div className="w-20 h-20 rounded-full bg-secondary-container/40 border border-secondary-fixed/50 flex items-center justify-center mb-6 shadow-inner">
+            <span className="material-symbols-outlined text-[36px] text-primary">key</span>
+          </div>
+
+          {/* Header */}
+          <h1 className="text-[32px] font-bold text-on-surface mb-2 leading-tight tracking-tight">
+            تأكيد البريد الإلكتروني
+          </h1>
+          <p className="text-base text-on-surface-variant mb-8 px-2 leading-relaxed">
+            لقد أرسلنا رمزاً مكوناً من 6 أرقام إلى بريدك الإلكتروني{' '}
+            <span className="font-semibold text-primary-container break-all">
+              {email || 'إيميلك'}
+            </span>
+            . يرجى إدخاله أدناه لتأكيد حسابك.
+          </p>
+
+          {/* Error message */}
+          {errorMsg && (
+            <div className="mb-5 w-full p-3.5 rounded-xl bg-error-container border border-error/20 text-error text-sm text-center font-medium">
+              {errorMsg}
             </div>
-            رجوع
-          </Link>
-        </div>
+          )}
 
-        {/* Card */}
-        <Card className="rounded-2xl shadow-lg border-0 p-6 sm:p-8">
-          <CardContent className="p-0">
-            {/* Icon header */}
-            <div className="text-center mb-6">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-600 text-white">
-                <KeyRound className="w-8 h-8" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900">
-                أكّد إيميلك
-              </h2>
-              <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-                رمز التأكيد اتبعت لـ{' '}
-                <span className="font-semibold text-teal-600 break-all">{email || 'إيميلك'}</span>
-              </p>
+          {/* OTP Input Form */}
+          <form className="w-full flex flex-col gap-5" onSubmit={(e) => { e.preventDefault(); handleConfirmClick(); }}>
+            {/* 6-Digit Inputs (forced LTR for numbers) */}
+            <div className="mb-1">
+              <OTPInput
+                onComplete={handleVerify}
+                onChange={handleOTPChange}
+                disabled={loading}
+              />
             </div>
 
-            {/* Error message */}
-            {errorMsg && (
-              <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm text-center font-medium">
-                {errorMsg}
-              </div>
-            )}
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-3 w-full mt-2">
+              {/* Primary Button (Gradient) */}
+              <button
+                type="submit"
+                disabled={loading || otpCode.length < 6}
+                className="bg-gradient-to-l from-primary to-primary-container text-on-primary rounded-xl text-sm font-bold py-3.5 px-6 w-full hover:opacity-90 transition-opacity shadow-[0_4px_12px_rgba(0,67,70,0.2)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+                    جاري التحقق...
+                  </>
+                ) : (
+                  'تأكيد'
+                )}
+              </button>
 
-            {/* OTP Input */}
-            <div className="mb-6">
-              <OTPInput onComplete={handleVerify} disabled={loading || countdown > 0} />
-            </div>
-
-            {/* Verify button */}
-            <Button
-              className="w-full h-11 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-semibold text-base"
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  جاري التحقق...
-                </>
-              ) : (
-                'تأكيد'
-              )}
-            </Button>
-
-            {/* Resend */}
-            <div className="mt-4 text-center">
+              {/* Secondary Button (Ghost) */}
               {countdown > 0 ? (
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-on-surface-variant py-3.5 text-center">
                   إعادة إرسال الرمز بعد{' '}
-                  <span className="text-teal-600 font-semibold tabular-nums">{countdown}</span>
+                  <span className="text-primary-container font-semibold tabular-nums">{countdown}</span>
                   {' '}ثانية
                 </p>
               ) : (
@@ -165,28 +176,29 @@ function VerifyForm() {
                   type="button"
                   onClick={handleResend}
                   disabled={resendLoading}
-                  className="inline-flex items-center gap-1.5 text-sm text-teal-600 hover:text-teal-700 font-medium transition-colors disabled:opacity-50"
+                  className="border border-tertiary-fixed/80 bg-surface-container-lowest/30 text-on-surface rounded-xl text-sm font-bold py-3.5 px-6 w-full flex items-center justify-center gap-2 hover:bg-tertiary-fixed/10 transition-colors disabled:opacity-50"
                 >
                   {resendLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
                   ) : (
-                    <RefreshCw className="w-4 h-4" />
+                    <span className="material-symbols-outlined text-[20px]">refresh</span>
                   )}
                   إعادة إرسال الرمز
                 </button>
               )}
             </div>
-          </CardContent>
-        </Card>
+          </form>
 
-        {/* Back to home */}
-        <div className="mt-5 text-center">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-teal-600 transition-colors">
-            <ArrowRight className="w-3.5 h-3.5" />
-            رجوع للصفحة الرئيسية
+          {/* Back to Login Link */}
+          <Link
+            href="/login"
+            className="mt-8 text-xs text-primary-container hover:text-primary transition-colors flex items-center gap-1.5"
+          >
+            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+            رجوع لتسجيل الدخول
           </Link>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
@@ -195,10 +207,10 @@ export default function VerifyPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-teal-50 to-gray-100">
+        <div className="bg-surface relative min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <Loader2 className="w-8 h-8 animate-spin text-teal-600 mx-auto mb-3" />
-            <p className="text-sm text-gray-500">جاري التحميل...</p>
+            <span className="material-symbols-outlined animate-spin text-[32px] text-primary mb-3 block">progress_activity</span>
+            <p className="text-sm text-on-surface-variant">جاري التحميل...</p>
           </div>
         </div>
       }

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>وصال - إنشاء حساب</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#bbe9ff",
+                        "primary-container": "#004346",
+                        "tertiary-container": "#004154",
+                        "on-secondary-fixed-variant": "#364959",
+                        "surface": "#fcf9f4",
+                        "on-background": "#1c1c19",
+                        "surface-container-low": "#f6f3ee",
+                        "on-surface-variant": "#404849",
+                        "tertiary-fixed-dim": "#8fcfeb",
+                        "outline": "#707979",
+                        "inverse-surface": "#31302d",
+                        "inverse-on-surface": "#f3f0eb",
+                        "surface-dim": "#dcdad5",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#b5c9dc",
+                        "outline-variant": "#bfc8c8",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#002a37",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e5e2dd",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#fcf9f4",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#001f29",
+                        "on-error": "#ffffff",
+                        "surface-container": "#f0ede9",
+                        "surface-container-high": "#ebe8e3",
+                        "primary-fixed": "#b6ecef",
+                        "on-primary-fixed": "#002021",
+                        "background": "#fcf9f4",
+                        "secondary": "#4e6071",
+                        "on-secondary-fixed": "#091d2c",
+                        "inverse-primary": "#9ad0d3",
+                        "on-primary-container": "#7aafb2",
+                        "primary-fixed-dim": "#9ad0d3",
+                        "on-tertiary-fixed-variant": "#004d63",
+                        "surface-container-highest": "#e5e2dd",
+                        "on-tertiary-container": "#6eaec9",
+                        "secondary-container": "#cee2f6",
+                        "surface-tint": "#306669",
+                        "on-primary-fixed-variant": "#134e51",
+                        "secondary-fixed": "#d1e5f9",
+                        "on-secondary-container": "#526576",
+                        "primary": "#002b2d",
+                        "on-surface": "#1c1c19"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "xs": "8px",
+                        "margin": "32px",
+                        "md": "24px",
+                        "gutter": "24px",
+                        "xl": "80px",
+                        "base": "4px",
+                        "lg": "48px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Manrope"],
+                        "label-bold": ["Manrope"],
+                        "body-lg": ["Manrope"],
+                        "label-sm": ["Manrope"],
+                        "h3": ["Manrope"],
+                        "h1": ["Manrope"],
+                        "h2": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "label-bold": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "h3": ["24px", { "lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "600" }],
+                        "h1": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "h2": ["32px", { "lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen flex items-center justify-center p-gutter font-body-md text-on-surface">
+<div class="w-full max-w-6xl bg-surface-container-lowest rounded-xl shadow-[0_8px_32px_0_rgba(0,67,70,0.1)] overflow-hidden flex flex-col md:flex-row min-h-[800px]">
+<!-- Right Side: Branding & Features -->
+<div class="hidden md:flex flex-col justify-between w-5/12 p-lg relative overflow-hidden bg-gradient-to-br from-primary to-primary-container text-on-primary">
+<!-- Abstract background element -->
+<div class="absolute -top-xl -right-xl w-64 h-64 bg-tertiary-fixed rounded-full mix-blend-screen filter blur-[80px] opacity-20"></div>
+<div class="absolute -bottom-xl -left-xl w-80 h-80 bg-inverse-primary rounded-full mix-blend-screen filter blur-[100px] opacity-30"></div>
+<div class="relative z-10">
+<h1 class="font-h1 text-h1 mb-md">وصال</h1>
+<p class="font-body-lg text-body-lg text-surface-variant max-w-sm">منصة متكاملة للصحة النفسية، تجمع بين الاحترافية السريرية والبيئة الداعمة لرحلة تعافيك.</p>
+</div>
+<div class="relative z-10 flex flex-col gap-md mt-lg">
+<div class="flex items-start gap-sm">
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center backdrop-blur-md border border-white/20">
+<span class="material-symbols-outlined filled text-tertiary-fixed">shield</span>
+</div>
+<div>
+<h3 class="font-label-bold text-label-bold mb-base">خصوصية تامة</h3>
+<p class="font-body-md text-body-md text-surface-variant opacity-90 text-sm">بياناتك مشفرة ومحمية بأعلى معايير الأمان العالمية.</p>
+</div>
+</div>
+<div class="flex items-start gap-sm">
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center backdrop-blur-md border border-white/20">
+<span class="material-symbols-outlined filled text-tertiary-fixed">favorite</span>
+</div>
+<div>
+<h3 class="font-label-bold text-label-bold mb-base">دعم مستمر</h3>
+<p class="font-body-md text-body-md text-surface-variant opacity-90 text-sm">فريق متخصص متاح للإجابة على استفساراتك وتقديم المساعدة.</p>
+</div>
+</div>
+<div class="flex items-start gap-sm">
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center backdrop-blur-md border border-white/20">
+<span class="material-symbols-outlined filled text-tertiary-fixed">verified_user</span>
+</div>
+<div>
+<h3 class="font-label-bold text-label-bold mb-base">موثوقية وأمان</h3>
+<p class="font-body-md text-body-md text-surface-variant opacity-90 text-sm">أطباء معتمدون وبروتوكولات صارمة لضمان جودة الرعاية.</p>
+</div>
+</div>
+</div>
+<div class="relative z-10 mt-auto pt-lg text-sm text-surface-variant opacity-70">
+                © ٢٠٢٤ وصال للصحة النفسية
+            </div>
+</div>
+<!-- Left Side: Sign Up Form -->
+<div class="w-full md:w-7/12 p-gutter md:p-lg lg:p-xl flex flex-col justify-center bg-surface-container-lowest">
+<div class="mb-lg text-center md:text-right">
+<h2 class="font-h2 text-h2 text-primary mb-base">إنشاء حساب جديد</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">انضم إلى مجتمع وصال وابدأ رحلتك نحو صحة نفسية أفضل.</p>
+</div>
+<!-- Role Toggle -->
+<div class="flex p-1 bg-surface-container rounded-lg mb-lg">
+<button class="flex-1 flex items-center justify-center gap-xs py-sm rounded-md bg-surface-container-lowest shadow-sm font-label-bold text-label-bold text-primary transition-all">
+<span class="material-symbols-outlined">person</span>
+                    مستخدم
+                </button>
+<button class="flex-1 flex items-center justify-center gap-xs py-sm rounded-md font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-all opacity-70 hover:opacity-100">
+<span class="material-symbols-outlined">medical_services</span>
+                    طبيب
+                </button>
+</div>
+<!-- User Form -->
+<form class="flex flex-col gap-md">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="flex flex-col gap-base">
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="username">اسم المستخدم</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 text-outline">account_circle</span>
+<input class="w-full pl-sm pr-[40px] py-sm bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container font-body-md text-body-md outline-none transition-all" id="username" placeholder="أدخل اسم المستخدم" type="text"/>
+</div>
+</div>
+<div class="flex flex-col gap-base">
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="email">البريد الإلكتروني</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 text-outline">mail</span>
+<input class="w-full pl-sm pr-[40px] py-sm bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container font-body-md text-body-md outline-none transition-all" dir="ltr" id="email" placeholder="example@email.com" type="email"/>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="flex flex-col gap-base">
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="mobile">رقم الجوال</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 text-outline">phone_iphone</span>
+<input class="w-full pl-sm pr-[40px] py-sm bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container font-body-md text-body-md outline-none transition-all" dir="ltr" id="mobile" placeholder="05X XXX XXXX" type="tel"/>
+</div>
+</div>
+<div class="flex flex-col gap-base">
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="password">كلمة المرور</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 text-outline">lock</span>
+<input class="w-full pl-sm pr-[40px] py-sm bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container font-body-md text-body-md outline-none transition-all" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute left-sm top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined">visibility_off</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex items-start gap-xs mt-sm bg-tertiary-fixed/20 p-sm rounded-lg border border-tertiary-fixed/30">
+<span class="material-symbols-outlined text-primary-container text-sm mt-0.5">info</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant leading-relaxed">
+                        بإنشاء حساب، أنت توافق على <a class="text-primary font-label-bold underline decoration-primary/30 underline-offset-4" href="#">الشروط والأحكام</a> و <a class="text-primary font-label-bold underline decoration-primary/30 underline-offset-4" href="#">سياسة الخصوصية</a> الخاصة بمنصة وصال. نحن نلتزم بحماية بياناتك الشخصية.
+                    </p>
+</div>
+<button class="mt-md w-full py-sm px-md rounded-lg bg-gradient-to-r from-primary to-primary-container text-on-primary font-label-bold text-label-bold shadow-md hover:shadow-lg hover:opacity-90 transition-all flex justify-center items-center gap-xs" type="submit">
+                    إنشاء حساب
+                    <span class="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward</span>
+</button>
+<div class="mt-md text-center">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        لديك حساب؟ 
+                        <a class="font-label-bold text-primary hover:text-primary-container underline decoration-primary/30 underline-offset-4 transition-colors" href="#">سجل دخول</a>
+</p>
+</div>
+</form>
+</div>
+</div>
+</body></html>

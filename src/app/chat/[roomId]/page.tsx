@@ -1,21 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef, use } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Link from 'next/link';
-import {
-  ArrowRight,
-  Mic,
-  MicOff,
-  Paperclip,
-  Play,
-  Send,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Card } from '@/components/ui/card';
 
 interface Message {
   id: string;
@@ -36,7 +24,8 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (roomId) {
@@ -135,161 +124,231 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
     setMediaRecorder(null);
   };
 
-  const timeAgo = (date: string) => {
-    const diff = Date.now() - new Date(date).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'الآن';
-    if (mins < 60) return `منذ ${mins} دقيقة`;
-    return `منذ ${Math.floor(mins / 60)} ساعة`;
+  const formatTime = (date: string) => {
+    const d = new Date(date);
+    const hours = d.getHours();
+    const mins = d.getMinutes().toString().padStart(2, '0');
+    if (hours < 12) return `${hours}:${mins} ص`;
+    return `${hours - 12}:${mins} م`;
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendText();
+    }
+  };
+
+  const handleTextareaInput = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 128) + 'px';
+    }
+  };
+
+  // Generate consistent waveform bars from message id
+  const getWaveformBars = (id: string, isSent: boolean) => {
+    const bars: React.ReactNode[] = [];
+    let seed = 0;
+    for (let i = 0; i < id.length; i++) seed += id.charCodeAt(i);
+    for (let i = 0; i < 15; i++) {
+      const h = ((seed * (i + 1) * 7) % 100) / 100;
+      bars.push(
+        <div
+          key={i}
+          className={`w-1 rounded-full ${isSent ? 'bg-on-primary' : i < 5 ? 'bg-primary/60' : 'bg-surface-dim'}`}
+          style={{ height: `${Math.max(20, h * 100)}%` }}
+        />
+      );
+    }
+    return bars;
   };
 
   return (
-    <MainLayout>
-      <div className="flex flex-col h-[calc(100vh-8rem)] max-w-xl mx-auto">
-        <Card className="flex flex-col flex-1 rounded-2xl border-gray-200 shadow-md overflow-hidden bg-white p-0">
-          {/* Chat Header */}
-          <div className="bg-teal-600 flex items-center gap-3 p-4">
-            <Link
-              href="/doctors"
-              className="inline-flex items-center justify-center rounded-md bg-white/15 hover:bg-white/25 text-white backdrop-blur-sm p-2 transition-colors"
-            >
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-            <Avatar className="size-9 bg-white/20 text-white ring-2 ring-white/30">
-              <AvatarFallback className="bg-white/20 text-white text-sm">
-                🏥
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <h2 className="font-semibold text-white text-sm">شات مع الدكتور</h2>
-              <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[11px] text-white/70">محادثة آمنة ومشفرة</span>
-              </div>
+    <div className="flex flex-col h-screen bg-background">
+      {/* Chat Header - Glassmorphism */}
+      <header className="glass-panel sticky top-0 z-50 flex items-center justify-between px-6 py-3 border-b border-surface-dim shadow-[0_4px_24px_0_rgba(0,43,45,0.05)]">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/doctors"
+            aria-label="العودة"
+            className="p-1 rounded-full hover:bg-surface-container transition-colors text-primary"
+          >
+            <span className="material-symbols-outlined text-2xl">arrow_forward</span>
+          </Link>
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-fixed to-primary-container flex items-center justify-center border-2 border-surface shadow-sm">
+              <span className="material-symbols-outlined text-xl text-on-primary-fixed">medical_services</span>
             </div>
+            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-surface rounded-full" />
           </div>
+          <div className="flex flex-col">
+            <h2 className="text-xl font-semibold text-on-surface">الدكتور</h2>
+            <span className="text-xs text-on-surface-variant flex items-center gap-1">
+              <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block" />
+              متصل الآن
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1">
+          <button aria-label="مكالمة فيديو" className="p-1 rounded-full hover:bg-surface-container transition-colors text-primary">
+            <span className="material-symbols-outlined text-2xl">videocam</span>
+          </button>
+          <button aria-label="مكالمة صوتية" className="p-1 rounded-full hover:bg-surface-container transition-colors text-primary">
+            <span className="material-symbols-outlined text-2xl">call</span>
+          </button>
+          <button aria-label="خيارات إضافية" className="p-1 rounded-full hover:bg-surface-container transition-colors text-primary">
+            <span className="material-symbols-outlined text-2xl">more_vert</span>
+          </button>
+        </div>
+      </header>
 
-          {/* Messages Area */}
-          <div className="overflow-y-auto p-4 bg-gray-50 flex flex-col gap-3 flex-1">
-            {messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full py-16 text-center">
-                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-50">
-                  <Send className="h-6 w-6 text-teal-600" />
+      {/* Main Chat Area */}
+      <main className="flex-1 overflow-y-auto p-6 flex flex-col gap-3 pb-32">
+        {/* Date Divider */}
+        <div className="flex justify-center my-1">
+          <span className="bg-surface-container-low text-xs text-on-surface-variant px-3 py-1 rounded-full border border-surface-dim font-medium">
+            اليوم
+          </span>
+        </div>
+
+        {messages.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full py-16 text-center">
+            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container-high">
+              <span className="material-symbols-outlined text-3xl text-primary-container">chat</span>
+            </div>
+            <p className="text-base font-medium text-on-surface">ابدأ المحادثة مع الدكتور</p>
+            <p className="text-sm text-on-surface-variant mt-1">رسائلك خاصة ومشفرة</p>
+          </div>
+        )}
+
+        {messages.map((msg) => {
+          const isMe = msg.senderId === user?.userId;
+          return (
+            <div
+              key={msg.id}
+              className={`flex gap-3 max-w-[85%] ${isMe ? 'self-end' : 'self-start'}`}
+            >
+              {/* Received message shows avatar */}
+              {!isMe && (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-fixed to-primary-container flex items-center justify-center shrink-0 mt-auto hidden sm:flex">
+                  <span className="material-symbols-outlined text-sm text-on-primary-fixed">medical_services</span>
                 </div>
-                <p className="text-sm font-medium text-gray-900">ابدأ المحادثة مع الدكتور</p>
-                <p className="text-sm text-gray-500 mt-1">رسائلك خاصة ومشفرة</p>
-              </div>
-            )}
-            {messages.map((msg) => {
-              const isMe = msg.senderId === user?.userId;
-              return (
-                <div
-                  key={msg.id}
-                  className={`flex ${isMe ? 'justify-start' : 'justify-end'}`}
-                >
-                  <div
-                    className={`max-w-[78%] px-4 py-2.5 ${
-                      isMe
-                        ? 'bg-teal-600 text-white rounded-2xl rounded-tl-sm'
-                        : 'bg-gray-100 text-gray-900 rounded-2xl rounded-tr-sm'
-                    }`}
-                  >
-                    {msg.messageType === 'text' && (
-                      <p className="text-sm leading-relaxed break-words">{msg.content}</p>
-                    )}
-                    {msg.messageType === 'voice' && (
-                      <div className="flex items-center gap-2.5 min-w-[140px]">
-                        <button className="inline-flex items-center justify-center rounded-md bg-white/20 hover:bg-white/30 text-white p-0 size-8 transition-colors">
-                          <Play className="size-3.5" />
-                        </button>
-                        {/* Waveform placeholder */}
-                        <div className="flex-1 flex items-center gap-0.5">
-                          {Array.from({ length: 20 }).map((_, i) => {
-                            const h = Math.random() * 16 + 4;
-                            return (
-                              <div
-                                key={i}
-                                className="w-0.5 bg-current opacity-50 rounded-full"
-                                style={{ height: `${h}px` }}
-                              />
-                            );
-                          })}
-                        </div>
-                        {msg.voiceDuration && (
-                          <span className="text-[11px] opacity-70 whitespace-nowrap">{msg.voiceDuration}ث</span>
-                        )}
-                      </div>
-                    )}
-                    <span
-                      className={`text-[10px] mt-1.5 block ${
-                        isMe ? 'text-white/50 text-left' : 'text-gray-400 text-right'
-                      }`}
-                    >
-                      {timeAgo(msg.createdAt)}
+              )}
+
+              <div className={`flex flex-col gap-1 ${isMe ? 'items-end' : 'items-start'}`}>
+                {msg.messageType === 'text' && (
+                  <div className={`${isMe ? 'chat-bubble-sent' : 'chat-bubble-received'} p-3 rounded-2xl ${isMe ? 'rounded-bl-sm shadow-md' : 'rounded-br-sm shadow-sm'}`}>
+                    <p className="text-base leading-relaxed">{msg.content}</p>
+                  </div>
+                )}
+
+                {msg.messageType === 'voice' && (
+                  <div className={`${isMe ? 'chat-bubble-sent' : 'chat-bubble-received'} p-3 rounded-2xl ${isMe ? 'rounded-bl-sm shadow-md' : 'rounded-br-sm shadow-sm'} flex items-center gap-3 min-w-[180px]`}>
+                    <button className="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed hover:bg-inverse-primary transition-colors shrink-0">
+                      <span className="material-symbols-outlined filled">play_arrow</span>
+                    </button>
+                    {/* Waveform */}
+                    <div className="flex-1 flex items-center gap-[2px] h-8 px-2 overflow-hidden">
+                      {getWaveformBars(msg.id, isMe)}
+                    </div>
+                    <span className="text-xs text-on-surface-variant shrink-0">
+                      {msg.voiceDuration ? `${msg.voiceDuration}:${(msg.voiceDuration % 60).toString().padStart(2, '0')}` : '0:00'}
                     </span>
                   </div>
+                )}
+
+                {/* Timestamp */}
+                <div className={`flex items-center gap-1 ${isMe ? '' : 'mr-1'}`}>
+                  <span className="text-xs text-on-surface-variant">{formatTime(msg.createdAt)}</span>
+                  {isMe && (
+                    <span className="material-symbols-outlined text-sm text-surface-dim">done_all</span>
+                  )}
                 </div>
-              );
-            })}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Recording Indicator */}
-          {recording && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-red-50 border-t border-red-100">
-              <div className="h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-sm text-red-600 font-medium">جاري التسجيل...</span>
-              <div className="flex-1" />
-              <Button
-                onClick={stopRecording}
-                size="sm"
-                className="bg-red-600 text-white hover:bg-red-700 gap-1"
-              >
-                <MicOff className="h-4 w-4" />
-                <span>إيقاف</span>
-              </Button>
+              </div>
             </div>
-          )}
+          );
+        })}
 
-          {/* Chat Input */}
-          <div className="flex items-center gap-2 p-3 border-t border-gray-200 bg-white">
-            <Button variant="ghost" size="icon-sm" className="text-gray-400 hover:text-gray-600" title="إرفاق ملف">
-              <Paperclip className="size-5" />
-            </Button>
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder={recording ? 'جاري التسجيل...' : 'اكتب رسالتك...'}
+        {/* Typing Indicator */}
+        {sending && (
+          <div className="flex gap-3 max-w-[85%] self-start">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-fixed to-primary-container flex items-center justify-center shrink-0 mt-auto hidden sm:flex">
+              <span className="material-symbols-outlined text-sm text-on-primary-fixed">medical_services</span>
+            </div>
+            <div className="chat-bubble-received p-4 rounded-2xl rounded-br-sm flex items-center gap-1.5 h-12">
+              <div className="w-2 h-2 bg-on-surface-variant rounded-full opacity-40 animate-bounce" style={{ animationDelay: '0ms' }} />
+              <div className="w-2 h-2 bg-on-surface-variant rounded-full opacity-60 animate-bounce" style={{ animationDelay: '150ms' }} />
+              <div className="w-2 h-2 bg-on-surface-variant rounded-full opacity-80 animate-bounce" style={{ animationDelay: '300ms' }} />
+            </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
+      </main>
+
+      {/* Recording Indicator */}
+      {recording && (
+        <div className="flex items-center gap-2 px-6 py-2 bg-error-container/50 border-t border-error/20">
+          <div className="h-2.5 w-2.5 rounded-full bg-error animate-pulse" />
+          <span className="text-sm text-error font-medium">جاري التسجيل...</span>
+          <div className="flex-1" />
+          <button
+            onClick={stopRecording}
+            className="flex items-center gap-1 px-3 py-1.5 bg-error text-on-error rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+          >
+            <span className="material-symbols-outlined text-lg">mic_off</span>
+            <span>إيقاف</span>
+          </button>
+        </div>
+      )}
+
+      {/* Input Area */}
+      <div className="fixed bottom-0 w-full glass-panel p-3 border-t border-surface-dim shadow-[0_-4px_24px_0_rgba(0,43,45,0.05)]">
+        <div className="max-w-4xl mx-auto flex items-end gap-3">
+          {/* Attach Button */}
+          <button aria-label="إرفاق ملف" className="p-1 text-primary hover:bg-surface-container rounded-full transition-colors mb-1">
+            <span className="material-symbols-outlined text-2xl">attach_file</span>
+          </button>
+
+          {/* Text Input */}
+          <div className="flex-1 bg-surface-container-low border border-surface-dim rounded-2xl flex items-end focus-within:border-primary-fixed focus-within:ring-1 focus-within:ring-primary-fixed transition-all shadow-inner overflow-hidden">
+            <textarea
+              ref={textareaRef}
+              className="w-full bg-transparent border-none focus:ring-0 resize-none text-base p-3 text-on-surface placeholder:text-on-surface-variant/50 max-h-32"
+              placeholder="اكتب رسالة..."
+              rows={1}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendText(); } }}
+              onKeyDown={handleKeyDown}
+              onInput={handleTextareaInput}
               disabled={recording}
-              className="flex-1 h-11 rounded-full bg-gray-100 border-none px-4 text-sm outline-none focus:ring-2 focus:ring-teal-600/20 disabled:opacity-50 placeholder:text-gray-400"
             />
-            <Button
-              variant="ghost"
-              size="icon-sm"
+            <button aria-label="إضافة رموز تعبيرية" className="p-3 text-on-surface-variant hover:text-primary transition-colors">
+              <span className="material-symbols-outlined text-2xl">mood</span>
+            </button>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-1 mb-1">
+            <button
+              aria-label="تسجيل صوتي"
               onClick={recording ? stopRecording : startRecording}
-              title={recording ? 'إيقاف التسجيل' : 'رسالة صوتية'}
-              className={recording ? 'text-red-500 hover:text-red-600 hover:bg-red-50' : 'text-gray-400 hover:text-gray-600'}
+              className={`p-2 rounded-full transition-colors ${recording ? 'bg-error text-on-error' : 'bg-surface-container-high text-primary hover:bg-surface-dim'}`}
             >
-              {recording ? (
-                <MicOff className="size-5" />
-              ) : (
-                <Mic className="size-5" />
-              )}
-            </Button>
-            <Button
+              <span className="material-symbols-outlined text-2xl">{recording ? 'mic_off' : 'mic'}</span>
+            </button>
+            <button
+              aria-label="إرسال"
               onClick={sendText}
               disabled={!text.trim() || sending || recording}
-              size="icon-sm"
-              className="bg-teal-600 text-white hover:bg-teal-700 disabled:opacity-40"
+              className="p-2 rounded-full bg-primary text-on-primary hover:bg-surface-tint shadow-md transition-colors disabled:opacity-40"
             >
-              <Send className="size-5" />
-            </Button>
+              <span className="material-symbols-outlined text-2xl rotate-180 filled">send</span>
+            </button>
           </div>
-        </Card>
+        </div>
       </div>
-    </MainLayout>
+    </div>
   );
 }

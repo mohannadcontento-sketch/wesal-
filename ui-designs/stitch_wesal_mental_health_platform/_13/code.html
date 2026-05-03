@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#edeeee",
+                    "inverse-primary": "#9ad0d3",
+                    "on-primary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#d1e5f9",
+                    "secondary": "#4e6071",
+                    "on-secondary-fixed": "#091d2c",
+                    "error": "#ba1a1a",
+                    "surface-container-highest": "#e1e3e2",
+                    "surface-container-low": "#f3f4f3",
+                    "tertiary-fixed": "#b2ecf6",
+                    "on-tertiary-fixed": "#001f24",
+                    "tertiary": "#002b31",
+                    "on-surface-variant": "#404849",
+                    "surface-bright": "#f8f9f9",
+                    "on-primary-fixed-variant": "#134e51",
+                    "on-secondary-container": "#526576",
+                    "surface": "#f8f9f9",
+                    "on-primary-fixed": "#002021",
+                    "secondary-container": "#cee2f6",
+                    "surface-tint": "#306669",
+                    "tertiary-container": "#00434b",
+                    "primary-fixed-dim": "#9ad0d3",
+                    "inverse-surface": "#2e3131",
+                    "tertiary-fixed-dim": "#96d0da",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-container": "#77b0b9",
+                    "on-primary-container": "#7aafb2",
+                    "surface-dim": "#d9dada",
+                    "background": "#f8f9f9",
+                    "primary": "#002b2d",
+                    "on-surface": "#191c1c",
+                    "primary-container": "#004346",
+                    "on-error-container": "#93000a",
+                    "on-tertiary": "#ffffff",
+                    "on-background": "#191c1c",
+                    "on-secondary-fixed-variant": "#364959",
+                    "surface-variant": "#e1e3e2",
+                    "on-error": "#ffffff",
+                    "outline": "#707979",
+                    "inverse-on-surface": "#f0f1f0",
+                    "primary-fixed": "#b6ecef",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#b5c9dc",
+                    "on-tertiary-fixed-variant": "#094e57",
+                    "surface-container-high": "#e7e8e8",
+                    "outline-variant": "#bfc8c8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "unit": "4px",
+                    "container-max": "1280px",
+                    "xl": "40px",
+                    "xxl": "64px",
+                    "sm": "8px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "h2": ["Manrope"],
+                    "body-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display": ["Manrope"],
+                    "h3": ["Manrope"],
+                    "label-md": ["Inter"],
+                    "h1": ["Manrope"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                    "h2": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "h3": ["20px", {"lineHeight": "1.5", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "h1": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-wesal-gradient {
+            background: linear-gradient(135deg, #002b2d 0%, #004346 100%);
+        }
+        .bg-soft-cyan {
+            background-color: #f3f4f3;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md overflow-x-hidden">
+<main class="flex min-h-screen w-full">
+<!-- Left Panel: Login Form -->
+<section class="w-full lg:w-1/2 flex items-center justify-center p-lg md:p-xxl bg-surface">
+<div class="w-full max-w-md space-y-xl">
+<!-- Header -->
+<div class="space-y-sm">
+<h1 class="font-h1 text-h1 text-primary">تسجيل الدخول</h1>
+<p class="font-body-md text-body-md text-secondary">مرحباً بك مجدداً في وصال، مساحتك الآمنة.</p>
+</div>
+<!-- Form -->
+<form class="space-y-lg" onsubmit="return false;">
+<!-- Email Field -->
+<div class="space-y-sm">
+<label class="font-label-md text-label-md text-primary" for="email">البريد الإلكتروني</label>
+<div class="relative group">
+<div class="absolute inset-y-0 right-0 pr-md flex items-center pointer-events-none text-secondary group-focus-within:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</div>
+<input class="w-full h-12 pr-11 pl-md bg-surface-container-low border border-outline-variant rounded-lg font-body-md text-primary focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none" id="email" placeholder="name@example.com" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-sm">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-primary" for="password">كلمة المرور</label>
+<a class="font-label-sm text-label-sm text-on-primary-container hover:underline" href="#">نسيت كلمة المرور؟</a>
+</div>
+<div class="relative group">
+<div class="absolute inset-y-0 right-0 pr-md flex items-center pointer-events-none text-secondary group-focus-within:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+</div>
+<input class="w-full h-12 pr-11 pl-11 bg-surface-container-low border border-outline-variant rounded-lg font-body-md text-primary focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute inset-y-0 left-0 pl-md flex items-center text-secondary hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<!-- Login Button -->
+<button class="w-full h-14 bg-wesal-gradient text-on-primary font-label-md text-body-lg rounded-xl shadow-lg shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-sm">
+<span>دخول</span>
+<span class="material-symbols-outlined" data-icon="login">login</span>
+</button>
+</form>
+<!-- Navigation Links -->
+<div class="flex flex-col items-center gap-md pt-lg">
+<p class="font-body-sm text-body-sm text-secondary">
+                        ليس لديك حساب؟ 
+                        <a class="text-primary font-label-md hover:underline decoration-2 underline-offset-4" href="#">إنشاء حساب جديد</a>
+</p>
+<a class="flex items-center gap-xs font-label-md text-secondary hover:text-primary transition-colors" href="/">
+<span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+                        العودة للرئيسية
+                    </a>
+</div>
+</div>
+</section>
+<!-- Right Panel: Brand & Visuals -->
+<section class="hidden lg:flex w-1/2 bg-wesal-gradient relative overflow-hidden items-center justify-center p-xxl">
+<!-- Decorative Elements -->
+<div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+<div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full border-[1px] border-on-primary"></div>
+<div class="absolute bottom-[-20%] left-[-5%] w-[400px] h-[400px] rounded-full border-[1px] border-on-primary"></div>
+</div>
+<div class="relative z-10 text-center space-y-xl max-w-lg">
+<!-- Logo -->
+<div class="flex flex-col items-center gap-md">
+<div class="w-24 h-24 bg-surface/10 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-on-primary/20">
+<span class="text-5xl font-black text-on-primary">وصال</span>
+</div>
+<div class="space-y-sm">
+<h2 class="font-display text-display text-on-primary">وصال للرعاية النفسية</h2>
+<p class="font-body-lg text-on-primary/80 leading-relaxed">خطوتك الأولى نحو الصفاء الذهني في بيئة احترافية تتسم بالخصوصية والأمان التام.</p>
+</div>
+</div>
+<!-- Trust Badges/Icons -->
+<div class="grid grid-cols-2 gap-lg pt-xl">
+<div class="p-lg bg-surface/5 backdrop-blur-md rounded-2xl border border-on-primary/10 flex flex-col items-center gap-sm">
+<span class="material-symbols-outlined text-on-primary text-4xl" data-icon="shield_with_heart" style="font-variation-settings: 'FILL' 1;">shield_with_heart</span>
+<span class="font-label-md text-on-primary">خصوصية مشفرة</span>
+</div>
+<div class="p-lg bg-surface/5 backdrop-blur-md rounded-2xl border border-on-primary/10 flex flex-col items-center gap-sm">
+<span class="material-symbols-outlined text-on-primary text-4xl" data-icon="visibility" style="font-variation-settings: 'FILL' 1;">visibility</span>
+<span class="font-label-md text-on-primary">رؤية واضحة</span>
+</div>
+</div>
+<!-- Abstract Hero Image -->
+<div class="mt-xxl rounded-3xl overflow-hidden shadow-2xl ring-1 ring-on-primary/20">
+<img alt="Wesal Wellness Center" class="w-full h-64 object-cover" data-alt="A peaceful and minimalist therapy room with soft sunlight streaming through a large window. The interior features a warm palette of deep teals and soft greys, with organic-shaped furniture and a lush green plant in the corner. The atmosphere is serene and clinical yet welcoming, reflecting a professional mental wellness environment designed for comfort and privacy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXw46oHLKOJvvHjVPBl216PdLwfWkOxTSQZSJJt2IE-ElB791tRP7bBRZww3-AmQ5n5NlsQrcxNhA3WRe0ArGPdbWSYZfBr94H8EWoZ31P7gNCwQo9pPQ1f4ShlALD-ogWhEpOKZodrhDK_Ft_E2ffca11WU8-UqKK4--PPOpNqtuDNH6d_CDzAr0I4lD85IQBRFNc9wPMsZoasITNx6y1vE5BdqHofpCUhd72xdzppYzAAjAP1e6wDBKfPRT64icElL_e15Z0apw"/>
+</div>
+</div>
+</section>
+</main>
+</body></html>

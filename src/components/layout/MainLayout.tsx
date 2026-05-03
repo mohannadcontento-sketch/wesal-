@@ -1,15 +1,24 @@
 'use client';
 
-import { Navbar } from './Navbar';
+import { TopNavbar } from './TopNavbar';
+import { SideNav } from './SideNav';
 import { MobileBottomNav } from './MobileBottomNav';
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navbar />
-      <main className="w-full max-w-3xl mx-auto px-4 flex-1">
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* ── Fixed Top Navbar ── */}
+      <TopNavbar />
+
+      {/* ── Desktop Side Navigation (right side in RTL) ── */}
+      <SideNav />
+
+      {/* ── Main Content Area ── */}
+      <main className="w-full max-w-screen-2xl mx-auto flex-1 pt-20 px-4 md:px-8 md:pr-72 pb-24 md:pb-8">
         {children}
       </main>
+
+      {/* ── Mobile Bottom Navigation ── */}
       <MobileBottomNav />
     </div>
   );

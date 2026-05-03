@@ -2,16 +2,8 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import {
-  ThumbsUp,
-  Heart,
-  HandHeart,
-  Reply,
-} from 'lucide-react';
 import { toast } from 'sonner';
 import { CommentForm } from './CommentForm';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 
 interface CommentItemProps {
   comment: {
@@ -80,71 +72,66 @@ export function CommentItem({ comment, postId }: CommentItemProps) {
     }
   };
 
-  const handleReplyAdded = (reply: Record<string, unknown>) => {
+  const handleReplyAdded = (_reply: Record<string, unknown>) => {
     setShowReplyForm(false);
   };
 
   const reactionButtons = [
-    { type: 'like', icon: ThumbsUp, label: 'إعجاب', points: '+1' },
-    { type: 'thanks', icon: Heart, label: 'شكر', points: '+3' },
-    { type: 'helpful', icon: HandHeart, label: 'مفيد', points: '+5' },
+    { type: 'like', icon: 'thumb_up', label: 'إعجاب', points: '+1' },
+    { type: 'thanks', icon: 'favorite', label: 'شكر', points: '+3' },
+    { type: 'helpful', icon: 'volunteer_activism', label: 'مفيد', points: '+5' },
   ];
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       {/* Main Comment */}
-      <div className="flex gap-2.5">
-        <Avatar size="sm">
-          <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-[10px]">
-            {comment.authorBadge}
-          </AvatarFallback>
-        </Avatar>
+      <div className="flex gap-3">
+        {/* Avatar */}
+        <div className="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center shrink-0">
+          <span className="text-[10px] font-semibold text-primary-container">{comment.authorBadge}</span>
+        </div>
         <div className="flex-1 min-w-0">
           {/* Name & Time */}
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold text-gray-900">
+            <span className="text-xs font-semibold text-on-surface">
               {comment.authorDisplay}
             </span>
-            <span className="text-[11px] text-gray-400">
+            <span className="text-[11px] text-on-surface-variant">
               {timeAgo(comment.createdAt)}
             </span>
           </div>
 
           {/* Content */}
-          <p className="text-xs text-gray-600 leading-relaxed mb-2">
+          <p className="text-xs text-on-surface leading-relaxed mb-2">
             {comment.content}
           </p>
 
           {/* Reactions & Reply */}
           <div className="flex items-center gap-0.5 flex-wrap">
-            {reactionButtons.map(({ type, icon: Icon, label, points }) => {
+            {reactionButtons.map(({ type, icon, label, points }) => {
               const count = reactions[type] || 0;
               return (
-                <Button
+                <button
                   key={type}
-                  variant="ghost"
-                  size="xs"
                   onClick={() => handleReaction(type)}
-                  className="gap-1 px-2 py-1 text-[11px] font-medium text-gray-400 hover:text-teal-600 hover:bg-teal-50"
+                  className="gap-1 px-2 py-1 text-[11px] font-medium text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 rounded-lg transition-colors flex items-center"
                 >
-                  <Icon className="w-3 h-3" />
+                  <span className={`material-symbols-outlined text-[14px] ${count > 0 ? 'filled' : ''}`}>{icon}</span>
                   <span>{count > 0 ? count : label}</span>
                   {count === 0 && (
-                    <span className="text-[9px] text-gray-400 opacity-60">{points}</span>
+                    <span className="text-[9px] text-on-surface-variant/60">{points}</span>
                   )}
-                </Button>
+                </button>
               );
             })}
             {user && (
-              <Button
-                variant="ghost"
-                size="xs"
+              <button
                 onClick={() => setShowReplyForm(!showReplyForm)}
-                className="gap-1 px-2 py-1 text-[11px] font-medium text-gray-400 hover:text-purple-500 hover:bg-purple-50"
+                className="gap-1 px-2 py-1 text-[11px] font-medium text-on-surface-variant hover:text-primary-container hover:bg-primary-container/10 rounded-lg transition-colors flex items-center"
               >
-                <Reply className="w-3 h-3" />
+                <span className="material-symbols-outlined text-[14px]">reply</span>
                 رد
-              </Button>
+              </button>
             )}
           </div>
         </div>
@@ -152,7 +139,7 @@ export function CommentItem({ comment, postId }: CommentItemProps) {
 
       {/* Reply Form */}
       {showReplyForm && user && (
-        <div className="mr-9">
+        <div className="mr-11">
           <CommentForm
             postId={postId}
             parentId={comment.id}
@@ -163,22 +150,22 @@ export function CommentItem({ comment, postId }: CommentItemProps) {
 
       {/* Nested Replies */}
       {comment.replies && comment.replies.length > 0 && (
-        <div className="mr-9 space-y-3 border-r-2 border-teal-100 pr-3">
+        <div className="mr-11 flex flex-col gap-3 border-r-2 border-primary-container/20 pr-3">
           {comment.replies.map((reply) => (
             <div key={reply.id} className="flex gap-2">
-              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-[8px] font-semibold text-gray-600">
+              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-container text-[8px] font-semibold text-on-surface">
                 {reply.authorBadge}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className="text-[11px] font-semibold text-gray-900">
+                  <span className="text-[11px] font-semibold text-on-surface">
                     {reply.authorDisplay}
                   </span>
-                  <span className="text-[10px] text-gray-400">
+                  <span className="text-[10px] text-on-surface-variant">
                     {timeAgo(reply.createdAt)}
                   </span>
                 </div>
-                <p className="text-[12px] leading-relaxed text-gray-600">
+                <p className="text-xs leading-relaxed text-on-surface">
                   {reply.content}
                 </p>
               </div>

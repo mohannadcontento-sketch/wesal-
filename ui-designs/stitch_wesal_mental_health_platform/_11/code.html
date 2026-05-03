@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#edeeee",
+                    "inverse-primary": "#9ad0d3",
+                    "on-primary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#d1e5f9",
+                    "secondary": "#4e6071",
+                    "on-secondary-fixed": "#091d2c",
+                    "error": "#ba1a1a",
+                    "surface-container-highest": "#e1e3e2",
+                    "surface-container-low": "#f3f4f3",
+                    "tertiary-fixed": "#b2ecf6",
+                    "on-tertiary-fixed": "#001f24",
+                    "tertiary": "#002b31",
+                    "on-surface-variant": "#404849",
+                    "surface-bright": "#f8f9f9",
+                    "on-primary-fixed-variant": "#134e51",
+                    "on-secondary-container": "#526576",
+                    "surface": "#f8f9f9",
+                    "on-primary-fixed": "#002021",
+                    "secondary-container": "#cee2f6",
+                    "surface-tint": "#306669",
+                    "tertiary-container": "#00434b",
+                    "primary-fixed-dim": "#9ad0d3",
+                    "inverse-surface": "#2e3131",
+                    "tertiary-fixed-dim": "#96d0da",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-container": "#77b0b9",
+                    "on-primary-container": "#7aafb2",
+                    "surface-dim": "#d9dada",
+                    "background": "#f8f9f9",
+                    "primary": "#002b2d",
+                    "on-surface": "#191c1c",
+                    "primary-container": "#004346",
+                    "on-error-container": "#93000a",
+                    "on-tertiary": "#ffffff",
+                    "on-background": "#191c1c",
+                    "on-secondary-fixed-variant": "#364959",
+                    "surface-variant": "#e1e3e2",
+                    "on-error": "#ffffff",
+                    "outline": "#707979",
+                    "inverse-on-surface": "#f0f1f0",
+                    "primary-fixed": "#b6ecef",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#b5c9dc",
+                    "on-tertiary-fixed-variant": "#094e57",
+                    "surface-container-high": "#e7e8e8",
+                    "outline-variant": "#bfc8c8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "unit": "4px",
+                    "container-max": "1280px",
+                    "xl": "40px",
+                    "xxl": "64px",
+                    "sm": "8px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "h2": ["Manrope"],
+                    "body-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display": ["Manrope"],
+                    "h3": ["Manrope"],
+                    "label-md": ["Inter"],
+                    "h1": ["Manrope"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                    "h2": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "h3": ["20px", {"lineHeight": "1.5", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "h1": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .profile-gradient {
+            background: linear-gradient(135deg, #004346 0%, #306669 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(115, 179, 206, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md sticky top-0 z-50 border-b border-teal-100/20 dark:border-teal-900/20 shadow-sm">
+<nav class="flex justify-between items-center px-6 py-4 w-full max-w-screen-2xl mx-auto rtl">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold text-teal-800 dark:text-teal-400 font-h1">وصال</span>
+<div class="hidden md:flex gap-6">
+<a class="text-teal-700 dark:text-teal-300 border-b-2 border-teal-700 pb-1 font-manrope font-medium text-sm" href="#">Home</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-teal-600 transition-colors font-manrope font-medium text-sm" href="#">Community</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-teal-600 transition-colors font-manrope font-medium text-sm" href="#">Doctors</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-teal-900 dark:text-teal-50 hover:bg-teal-50/50 dark:hover:bg-teal-900/30 transition-colors rounded-full active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-teal-900 dark:text-teal-50 hover:bg-teal-50/50 dark:hover:bg-teal-900/30 transition-colors rounded-full active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</nav>
+</header>
+<div class="flex max-w-screen-2xl mx-auto min-h-[calc(100vh-72px)]">
+<!-- SideNavBar -->
+<aside class="hidden md:flex fixed right-0 top-18 h-full w-64 border-l border-teal-50 dark:border-teal-900 bg-white dark:bg-slate-900 shadow-xl shadow-teal-900/5 p-4 z-40 flex-col gap-2">
+<div class="mb-8 px-4">
+<h2 class="text-xl font-black text-teal-900 dark:text-teal-50 font-h2">Wesal</h2>
+<p class="text-xs text-slate-500">Mental Wellness</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 p-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:-translate-x-1 transition-transform cursor-pointer font-manrope text-sm font-semibold rounded-lg">
+<span class="material-symbols-outlined" data-icon="forum">forum</span>
+<span>Community</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:-translate-x-1 transition-transform cursor-pointer font-manrope text-sm font-semibold rounded-lg">
+<span class="material-symbols-outlined" data-icon="medical_services">medical_services</span>
+<span>Doctors</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:-translate-x-1 transition-transform cursor-pointer font-manrope text-sm font-semibold rounded-lg">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+<span>Bookmarks</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:-translate-x-1 transition-transform cursor-pointer font-manrope text-sm font-semibold rounded-lg">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span>Notifications</span>
+</a>
+<a class="flex items-center gap-3 p-3 bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-200 hover:-translate-x-1 transition-transform cursor-pointer font-manrope text-sm font-semibold rounded-lg">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span>Profile</span>
+</a>
+</nav>
+<div class="mt-auto p-4 bg-primary-container rounded-xl">
+<p class="text-on-primary-container font-label-md text-center">Reputation: 120 pts</p>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:pr-64">
+<!-- Hero Profile Header -->
+<section class="relative">
+<div class="h-48 md:h-64 profile-gradient w-full"></div>
+<div class="max-w-4xl mx-auto px-6 -mt-20 relative">
+<div class="flex flex-col md:flex-row items-end md:items-center gap-6">
+<div class="relative">
+<img alt="Profile" class="w-[120px] h-[120px] rounded-full border-4 border-white shadow-lg object-cover" data-alt="A warm, professional portrait of a person with a serene expression, set against a soft, out-of-focus background of a peaceful garden. The lighting is natural and golden, emphasizing a sense of empathy and calmness. The person is dressed in modern, professional attire, reflecting a clinical but approachable persona within a high-end mental wellness application aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBblnApwflzY-j07xN1JAs_oC2C5AtmNzTzOFG1nAK3OOSEr5uNSZKt9Fk70F6AsQWrW0PmFj-D-lKfJUw6UBqXrq7XgExNwDHQLISzr4s7UYzZ18yGVUp4n0_eU0Bs4Xmgslz-DbdgEuaoiG9fS2vPieTNQQtPlSv9pbgwbKC0JuPaWgh5eoz6A_6XgyNaVh68ER8Hqb9t4Bid-9O82h4jXFNg2Blw5fC4_vdsdXQL5KwfgZaOQAPwQhKAHXAlq5cT_oSDFFTIog"/>
+<div class="absolute bottom-1 left-1 bg-primary text-white text-[10px] px-2 py-0.5 rounded-full border-2 border-white">
+                                مستوى ٥
+                            </div>
+</div>
+<div class="flex-1 pb-2">
+<h1 class="text-h1 font-h1 text-white md:text-on-background md:mb-1">أحمد محمد عبد الله</h1>
+<div class="flex items-center gap-2">
+<span class="bg-surface-container-highest/80 backdrop-blur px-3 py-1 rounded-full text-label-sm text-secondary">مستخدم مجهول</span>
+<span class="text-on-surface-variant text-body-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="verified">verified</span>
+                                    عضو منذ ٢٠٢٣
+                                </span>
+</div>
+</div>
+<div class="flex gap-3 pb-2">
+<button class="bg-primary text-on-primary px-6 py-2.5 rounded-xl font-label-md shadow-lg shadow-primary/20 active:scale-95 transition-transform">تعديل الملف</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Profile Body Grid -->
+<div class="max-w-4xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Sidebar Info (4 Columns) -->
+<div class="lg:col-span-4 space-y-gutter">
+<!-- Stats Card -->
+<div class="glass-card p-6 rounded-xl space-y-4">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="font-h3 text-h3">التخصص</span>
+</div>
+<p class="text-body-md text-on-surface-variant">الدعم النفسي المجتمعي، التوعية بمرض القلق</p>
+<hr class="border-outline-variant/30"/>
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+<span class="font-h3 text-h3">الموقع</span>
+</div>
+<p class="text-body-md text-on-surface-variant">الرياض، المملكة العربية السعودية</p>
+<hr class="border-outline-variant/30"/>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-h3 text-h3">التقييم</span>
+</div>
+<span class="text-h3 font-h3 text-secondary">٤.٩</span>
+</div>
+</div>
+<!-- Reputation Card -->
+<div class="bg-primary text-on-primary p-6 rounded-xl relative overflow-hidden">
+<div class="absolute -right-4 -top-4 opacity-10">
+<span class="material-symbols-outlined text-[120px]" data-icon="shield">shield</span>
+</div>
+<div class="relative z-10">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined" data-icon="shield" data-weight="fill" style="font-variation-settings: 'FILL' 1;">shield</span>
+<h3 class="font-h3 text-h3">درع السمعة</h3>
+</div>
+<p class="text-display font-display leading-none mb-2">١٢٠</p>
+<p class="text-body-sm opacity-80 mb-4">نقطة تم جمعها من مساعدة الآخرين</p>
+<div class="w-full bg-white/20 h-2 rounded-full mb-2">
+<div class="bg-inverse-primary h-full rounded-full" style="width: 75%"></div>
+</div>
+<div class="flex justify-between text-[10px] font-label-sm">
+<span>المستوى الحالي</span>
+<span>المستوى التالي (١٥٠)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Feed (8 Columns) -->
+<div class="lg:col-span-8 space-y-gutter">
+<!-- Bio Section -->
+<div class="glass-card p-8 rounded-xl">
+<h3 class="text-h2 font-h2 text-primary mb-4">نبذة شخصية</h3>
+<p class="text-body-lg text-on-surface leading-relaxed">
+                            أسعى دائماً لنشر الوعي حول الصحة النفسية في مجتمعاتنا العربية. أؤمن بأن الخطوة الأولى للعلاج هي الاعتراف والحديث. هنا في "وصال"، أشارك تجربتي في التغلب على القلق وأدعم الزملاء في رحلتهم.
+                        </p>
+</div>
+<!-- Activity Feed -->
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<h3 class="text-h2 font-h2 text-primary">آخر المشاركات</h3>
+<button class="text-secondary font-label-md hover:underline flex items-center gap-1">
+                                عرض الكل
+                                <span class="material-symbols-outlined text-[18px]" data-icon="chevron_left">chevron_left</span>
+</button>
+</div>
+<!-- Post Card 1 -->
+<article class="bg-white border border-outline-variant/30 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="forum">forum</span>
+</div>
+<div>
+<h4 class="font-h3 text-h3 text-on-surface">كيف بدأت رحلتي مع التأمل اليومي</h4>
+<p class="text-body-sm text-on-surface-variant">تم النشر في مجتمع "السكينة" • منذ يومين</p>
+</div>
+</div>
+<p class="text-body-md text-on-surface mb-4 line-clamp-3">
+                                لطالما كان الهدوء مطلباً صعب المنال في ضجيج الحياة الحديثة. بدأت منذ شهر تجربة التأمل لمدة ١٠ دقائق فقط كل صباح، والنتائج كانت مذهلة...
+                            </p>
+<div class="flex items-center gap-6 pt-4 border-t border-outline-variant/20">
+<span class="flex items-center gap-1 text-on-surface-variant font-label-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="favorite">favorite</span>
+                                    ٤٥
+                                </span>
+<span class="flex items-center gap-1 text-on-surface-variant font-label-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="comment">comment</span>
+                                    ١٢
+                                </span>
+<span class="flex items-center gap-1 text-on-surface-variant font-label-sm mr-auto">
+<span class="material-symbols-outlined text-[20px]" data-icon="share">share</span>
+</span>
+</div>
+</article>
+<!-- Post Card 2 -->
+<article class="bg-white border border-outline-variant/30 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container">
+<span class="material-symbols-outlined" data-icon="help_center">help_center</span>
+</div>
+<div>
+<h4 class="font-h3 text-h3 text-on-surface">سؤال حول آليات التعامل مع نوبات الهلع المفاجئة</h4>
+<p class="text-body-sm text-on-surface-variant">تم النشر في "الاستشارات العامة" • منذ ٥ أيام</p>
+</div>
+</div>
+<p class="text-body-md text-on-surface mb-4 line-clamp-3">
+                                هل من نصائح سريعة لممارسة تمارين التنفس عندما يشعر الشخص ببداية نوبة هلع في مكان عام؟ شكراً لكم جميعاً على دعمكم المستمر.
+                            </p>
+<div class="flex items-center gap-6 pt-4 border-t border-outline-variant/20">
+<span class="flex items-center gap-1 text-on-surface-variant font-label-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="favorite">favorite</span>
+                                    ٨٩
+                                </span>
+<span class="flex items-center gap-1 text-on-surface-variant font-label-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="comment">comment</span>
+                                    ٣٤
+                                </span>
+<span class="flex items-center gap-1 text-on-surface-variant font-label-sm mr-auto">
+<span class="material-symbols-outlined text-[20px]" data-icon="share">share</span>
+</span>
+</div>
+</article>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Mobile BottomNavBar -->
+<footer class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-teal-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] z-50">
+<div class="flex justify-around items-center h-16">
+<button class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="text-[10px] font-label-sm">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-symbols-outlined" data-icon="forum">forum</span>
+<span class="text-[10px] font-label-sm">Community</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-teal-700">
+<span class="material-symbols-outlined" data-icon="person" data-weight="fill" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="text-[10px] font-label-sm">Profile</span>
+</button>
+</div>
+</footer>
+</body></html>

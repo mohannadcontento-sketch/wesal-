@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { buildAuthUser, createSessionToken } from '@/lib/auth/session';
 import { randomInt } from 'crypto';
+import { sendOtpEmail } from '@/lib/email';
 
 export async function POST(req: Request) {
   try {
@@ -130,11 +131,19 @@ export async function PUT(req: Request) {
       data: { otpCode, otpExpiresAt },
     });
 
-    // TODO: Send OTP email via email service
-    console.log(`[AUTH] New OTP for ${email}: ${otpCode}`);
+    // Send OTP email via Supabase Edge Function (with fallback)
+    const emailResult = await sendOtpEmail(email, otpCode);
+
+    if (!emailResult.success) {
+      console.error(`[AUTH] Failed to resend OTP to ${email} via ${emailResult.method}: ${emailResult.error}`);
+    }
+
+    console.log(`[AUTH] Resend OTP for ${email}: ${otpCode} (sent via: ${emailResult.method})`);
 
     return NextResponse.json({
       message: 'تم إرسال رمز جديد لإيميلك',
+      ...(emailResult.method === 'console-fallback' && { devOtp: otpCode }),
+      deliveryMethod: emailResult.method,
     });
   } catch (error) {
     console.error('Resend OTP error:', error);

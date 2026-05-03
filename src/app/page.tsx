@@ -3,107 +3,8 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import {
-  Shield,
-  Lock,
-  EyeOff,
-  Heart,
-  MessageCircle,
-  Users,
-  Stethoscope,
-  Star,
-  CheckCircle,
-  ArrowLeft,
-  UserPlus,
-  Headphones,
-  Sparkles,
-  Fingerprint,
-} from 'lucide-react';
 
-/* ─── Fade-in animation helper ─── */
-const fadeUp = {
-  initial: { opacity: 0, y: 24 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: '-50px' },
-  transition: { duration: 0.5 },
-};
-
-/* ─── Data ─── */
-const stats = [
-  { icon: Users, value: '1,000+', label: 'مستخدم نشط' },
-  { icon: Stethoscope, value: '+50', label: 'طبيب معتمد' },
-  { icon: MessageCircle, value: '+100', label: 'مشاركة يومياً' },
-  { icon: Star, value: '98%', label: 'رضا المستخدمين' },
-];
-
-const features = [
-  {
-    icon: Fingerprint,
-    title: 'خصوصية تامة',
-    desc: 'شارك بأمان مع إخفاء هويتك بالكامل. اسمك الحقيقي مش بيظهر لأي حد.',
-  },
-  {
-    icon: Stethoscope,
-    title: 'أطباء موثوقين',
-    desc: 'تواصل مع أطباء نفسيين معتمدين وموثقين. كل الأطباء بيتم التحقق من مؤهلاتهم.',
-  },
-  {
-    icon: Heart,
-    title: 'مجتمع داعم',
-    desc: 'تفاعل مع ناس بتمر بنفس التجارب. أنت مش لوحدي في رحلتك.',
-  },
-  {
-    icon: MessageCircle,
-    title: 'محادثات آمنة',
-    desc: 'شات خاص وآمن مع الدكتور. كل المحادثات مشفرة بالكامل.',
-  },
-];
-
-const steps = [
-  {
-    icon: UserPlus,
-    title: 'سجّل حسابك',
-    desc: 'اعمل حساب باسم مستعار في ثواني. بدون بيانات حقيقية.',
-  },
-  {
-    icon: MessageCircle,
-    title: 'شارك وتفاعل',
-    desc: 'اكتب وعلّق وادعم الناس. شارك تجربتك واقرأ تجارب تانية.',
-  },
-  {
-    icon: Headphones,
-    title: 'تواصل مع دكتور',
-    desc: 'احجز موعد وتكلم مع دكتور معتمد في خصوصية تامة.',
-  },
-];
-
-const testimonials = [
-  {
-    text: 'أخيراً لقيت مكان أقدر أتكلم فيه من غير خوف. وصال غيرت حياتي وخلاني أفهم نفسي أكتر.',
-    name: 'مستخدم مجهول',
-  },
-  {
-    text: 'الدكتور كان محترم جداً وفهم حالتي. المحادثة كانت آمنة تماماً وحسيت براحة كبيرة.',
-    name: 'مستخدم مجهول',
-  },
-  {
-    text: 'المجتمع هنا داعم جداً. حسيت إني مش لوحدي في اللي بمر بيه. شكراً ليكم.',
-    name: 'مستخدم مجهول',
-  },
-];
-
-/* ─── Component ─── */
 export default function LandingPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -116,16 +17,11 @@ export default function LandingPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-teal-600">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="text-center"
-        >
+      <div className="flex min-h-screen items-center justify-center gradient-hero">
+        <div className="text-center">
           <div className="text-6xl font-bold text-white mb-2">وصال</div>
-          <div className="text-teal-200 text-base">wesal</div>
-        </motion.div>
+          <div className="text-white/60 text-base">wesal</div>
+        </div>
       </div>
     );
   }
@@ -133,337 +29,404 @@ export default function LandingPage() {
   if (user) return null;
 
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden">
+    <div className="min-h-screen bg-background text-on-surface overflow-x-hidden">
 
       {/* ═══════════ 1. NAVBAR ═══════════ */}
-      <header className="fixed top-0 right-0 left-0 z-50 bg-white shadow-sm">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-600">
-              <Heart className="h-4 w-4 text-white" />
+      <header className="bg-surface-bright/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-teal-100/20 shadow-sm">
+        <nav className="flex justify-between items-center px-6 py-4 w-full max-w-screen-2xl mx-auto">
+          <div className="flex items-center gap-8">
+            <Link href="/" className="text-2xl font-bold text-teal-800">وصال</Link>
+            <div className="hidden md:flex gap-6 font-medium text-sm text-teal-900">
+              <a className="text-teal-700 border-b-2 border-teal-700 pb-1" href="#">الرئيسية</a>
+              <a className="text-slate-500 hover:text-teal-600 transition-colors" href="#">المجتمع</a>
+              <a className="text-slate-500 hover:text-teal-600 transition-colors" href="#">الأطباء</a>
             </div>
-            <span className="text-xl font-bold text-teal-600">وصال</span>
-          </Link>
-
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/login">تسجيل الدخول</Link>
-            </Button>
-            <Button
-              size="sm"
-              className="bg-teal-600 text-white hover:bg-teal-700"
-              asChild
-            >
-              <Link href="/register">إنشاء حساب</Link>
-            </Button>
           </div>
-        </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 ml-4">
+              <Link
+                href="/login"
+                className="px-4 py-2 text-sm font-semibold text-primary hover:bg-surface-container transition-colors rounded-lg"
+              >
+                تسجيل الدخول
+              </Link>
+              <Link
+                href="/register"
+                className="px-4 py-2 text-sm font-semibold bg-primary text-on-primary rounded-lg shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+              >
+                ابدأ الآن
+              </Link>
+            </div>
+            <Link href="/login" className="md:hidden text-slate-500 cursor-pointer hover:text-teal-600 transition-colors">
+              <span className="material-symbols-outlined">notifications</span>
+            </Link>
+            <Link href="/login" className="md:hidden text-slate-500 cursor-pointer hover:text-teal-600 transition-colors">
+              <span className="material-symbols-outlined">account_circle</span>
+            </Link>
+          </div>
+        </nav>
       </header>
 
-      {/* ═══════════ 2. HERO ═══════════ */}
-      <section className="bg-teal-600 pt-28 pb-20 sm:pt-32 sm:pb-28">
-        <div className="mx-auto max-w-3xl px-5 text-center">
-          <motion.div {...fadeUp} transition={{ duration: 0.5, delay: 0.1 }}>
-            <Badge className="mb-6 bg-white/15 text-white border-white/20 hover:bg-white/20">
-              <Sparkles className="h-3.5 w-3.5 ml-1" />
-              مجتمع الصحة النفسية الأول عربياً
-            </Badge>
-          </motion.div>
+      <main className="pt-[72px]">
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-4xl font-extrabold text-white sm:text-5xl md:text-6xl leading-tight"
-          >
-            مساحتك الآمنة للصحة النفسية
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.35 }}
-            className="mt-6 max-w-lg mx-auto text-base text-teal-100 sm:text-lg leading-relaxed"
-          >
-            شارك أفكارك ومشاعرك بأمان تام. تواصل مع أطباء موثوقين في مجتمع
-            يفهمك ويدعمك.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.5 }}
-            className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
-          >
-            <Button
-              size="lg"
-              className="bg-white text-teal-700 hover:bg-teal-50 font-bold rounded-xl px-8 shadow-lg"
-              asChild
-            >
-              <Link href="/register" className="flex items-center gap-2">
-                ابدأ دلوقتي مجاناً
-                <ArrowLeft className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white/30 text-white bg-white/5 hover:bg-white/10 hover:text-white rounded-xl px-8"
-              asChild
-            >
-              <Link href="/login">عندي حساب</Link>
-            </Button>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.7 }}
-            className="mt-8 flex flex-wrap items-center justify-center gap-4 text-xs text-teal-200"
-          >
-            <div className="flex items-center gap-1.5">
-              <Lock className="h-3.5 w-3.5" />
-              <span>مشفر بالكامل</span>
-            </div>
-            <div className="w-1 h-1 rounded-full bg-teal-300" />
-            <div className="flex items-center gap-1.5">
-              <EyeOff className="h-3.5 w-3.5" />
-              <span>هوية مخفية</span>
-            </div>
-            <div className="w-1 h-1 rounded-full bg-teal-300" />
-            <div className="flex items-center gap-1.5">
-              <Shield className="h-3.5 w-3.5" />
-              <span>خصوصية تامة</span>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ═══════════ 3. STATS ═══════════ */}
-      <section className="py-14 sm:py-20 bg-gray-50">
-        <div className="mx-auto max-w-6xl px-5">
-          <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">
-            {stats.map((stat, i) => (
-              <motion.div key={stat.label} {...fadeUp} transition={{ duration: 0.5, delay: i * 0.1 }}>
-                <Card className="bg-white text-center py-6 sm:py-8 hover:shadow-md transition-shadow">
-                  <CardContent className="flex flex-col items-center gap-3 px-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
-                      <stat.icon className="h-5 w-5" />
-                    </div>
-                    <div className="text-2xl sm:text-3xl font-bold text-teal-600">
-                      {stat.value}
-                    </div>
-                    <div className="text-sm text-gray-500 font-medium">
-                      {stat.label}
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ 4. FEATURES ═══════════ */}
-      <section className="py-14 sm:py-20" id="features">
-        <div className="mx-auto max-w-6xl px-5">
-          <motion.div {...fadeUp} className="text-center mb-10 sm:mb-14">
-            <Badge className="mb-4 bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100">
-              <Sparkles className="h-3.5 w-3.5 ml-1" />
-              المميزات
-            </Badge>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              ليه <span className="text-teal-600">وصال</span> مختلفة؟
-            </h2>
-            <p className="mt-3 text-gray-500 text-base sm:text-lg max-w-md mx-auto">
-              منصة عربية متكاملة بتركز على خصوصيتك وراحتك النفسية
-            </p>
-          </motion.div>
-
-          <div className="grid gap-5 sm:gap-6 md:grid-cols-2">
-            {features.map((feature, i) => (
-              <motion.div key={feature.title} {...fadeUp} transition={{ duration: 0.5, delay: i * 0.1 }}>
-                <Card className="bg-white hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-0">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-600 text-white mb-3">
-                      <feature.icon className="h-5 w-5" />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {feature.title}
-                    </h3>
-                    <p className="mt-1.5 text-gray-500 text-sm leading-relaxed">
-                      {feature.desc}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ 5. HOW IT WORKS ═══════════ */}
-      <section className="py-14 sm:py-20 bg-gray-50">
-        <div className="mx-auto max-w-6xl px-5">
-          <motion.div {...fadeUp} className="text-center mb-10 sm:mb-14">
-            <Badge className="mb-4 bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100">
-              إزاي تشتغل؟
-            </Badge>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              ثلاث خطوات بس
-            </h2>
-            <p className="mt-3 text-gray-500 text-base sm:text-lg max-w-md mx-auto">
-              ابدأ رحلتك في دقائق معدودة
-            </p>
-          </motion.div>
-
-          <div className="grid gap-5 sm:grid-cols-3 sm:gap-6">
-            {steps.map((step, i) => (
-              <motion.div key={step.title} {...fadeUp} transition={{ duration: 0.5, delay: i * 0.15 }}>
-                <Card className="relative bg-white text-center hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-0 relative">
-                    <div className="absolute top-0 left-0 flex h-7 w-7 items-center justify-center rounded-full bg-teal-600 text-xs font-bold text-white">
-                      {i + 1}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex flex-col items-center text-center pt-2">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 mb-4">
-                      <step.icon className="h-7 w-7" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {step.title}
-                    </h3>
-                    <p className="mt-1.5 text-gray-500 text-sm leading-relaxed max-w-[260px]">
-                      {step.desc}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ 6. TESTIMONIALS ═══════════ */}
-      <section className="bg-teal-700 py-14 sm:py-20">
-        <div className="mx-auto max-w-6xl px-5 text-center">
-          <motion.div {...fadeUp}>
-            <Badge className="mb-5 bg-white/10 text-teal-100 border-white/15 hover:bg-white/15">
-              <Star className="h-3.5 w-3.5 ml-1" />
-              آراء المستخدمين
-            </Badge>
-            <h2 className="text-3xl sm:text-4xl text-white font-bold mb-8 sm:mb-10">
-              ناس حقيقية، تجارب حقيقية
-            </h2>
-          </motion.div>
-
-          <div className="grid gap-5 sm:gap-6 sm:grid-cols-3">
-            {testimonials.map((review, i) => (
-              <motion.div key={i} {...fadeUp} transition={{ duration: 0.5, delay: i * 0.1 }}>
-                <Card className="bg-white/10 border-white/10 text-right hover:bg-white/15 transition-colors">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-0.5 mb-4 justify-start">
-                      {[1, 2, 3, 4, 5].map((s) => (
-                        <Star
-                          key={s}
-                          className="h-4 w-4 text-amber-400 fill-amber-400"
-                        />
-                      ))}
-                    </div>
-                    <p className="text-white/85 text-sm leading-relaxed mb-5">
-                      {review.text}
-                    </p>
-                    <div className="flex items-center gap-2.5">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15">
-                        <UserPlus className="h-3.5 w-3.5 text-white/60" />
-                      </div>
-                      <span className="text-xs text-white/50 font-medium">
-                        {review.name}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ 7. CTA ═══════════ */}
-      <section className="py-14 sm:py-20">
-        <div className="mx-auto max-w-2xl px-5">
-          <motion.div {...fadeUp}>
-            <Card className="bg-gradient-to-br from-teal-600 to-teal-800 border-0 shadow-2xl overflow-hidden">
-              <CardContent className="p-8 sm:p-12 text-center">
-                <h2 className="text-3xl sm:text-4xl text-white font-bold">
-                  جاهز تبدأ رحلتك؟
-                </h2>
-                <p className="mt-4 text-teal-100 max-w-sm mx-auto leading-relaxed">
-                  انضم لآلاف الأشخاص اللي اختاروا يعتنوا بصحتهم النفسية في مكان آمن وداعم.
-                </p>
-
-                <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-                  <Button
-                    size="lg"
-                    className="bg-white text-teal-700 hover:bg-teal-50 font-bold rounded-xl px-8 shadow-lg"
-                    asChild
-                  >
-                    <Link href="/register" className="flex items-center gap-2">
-                      ابدأ دلوقتي مجاناً
-                      <ArrowLeft className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                </div>
-
-                <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-teal-200 text-xs">
-                  <div className="flex items-center gap-1">
-                    <CheckCircle className="h-3.5 w-3.5" />
-                    <span>مجاني بالكامل</span>
-                  </div>
-                  <div className="w-1 h-1 rounded-full bg-teal-300 hidden sm:block" />
-                  <div className="flex items-center gap-1">
-                    <CheckCircle className="h-3.5 w-3.5" />
-                    <span>بدون بطاقة ائتمان</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ═══════════ 8. FOOTER ═══════════ */}
-      <footer className="bg-white border-t border-gray-200">
-        <div className="mx-auto max-w-6xl px-5 py-8 sm:py-10">
-          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-teal-50">
-                <Heart className="h-4 w-4 text-teal-600" />
+        {/* ═══════════ 2. HERO ═══════════ */}
+        <section className="gradient-hero relative min-h-[870px] flex items-center overflow-hidden px-6">
+          <div className="max-w-[1280px] mx-auto grid md:grid-cols-2 gap-10 items-center relative z-10">
+            <div className="text-right">
+              <h1 className="text-[clamp(2rem,5vw,3rem)] font-bold text-white mb-6 leading-tight">
+                مساحتك الآمنة للصحة النفسية
+              </h1>
+              <p className="text-lg text-white/80 mb-10 max-w-xl leading-relaxed">
+                نحن نوفر لك بيئة سرية تماماً للتعبير عن نفسك والتواصل مع خبراء متخصصين. خصوصيتك هي أولويتنا القصوى في رحلة تعافيك النفسي.
+              </p>
+              <div className="flex flex-wrap gap-4 justify-start">
+                <Link
+                  href="/register"
+                  className="px-10 py-4 text-sm font-semibold bg-on-primary-container text-primary-container rounded-full hover:bg-white transition-all shadow-xl shadow-black/10"
+                >
+                  ابدأ دلوقتي مجاناً
+                </Link>
+                <Link
+                  href="/login"
+                  className="px-10 py-4 text-sm font-semibold border-2 border-white/30 text-white rounded-full hover:bg-white/10 transition-all"
+                >
+                  عندي حساب
+                </Link>
               </div>
-              <span className="text-lg font-bold text-teal-600">وصال</span>
-              <span className="text-xs text-gray-400">wesal</span>
+              <div className="mt-16 flex gap-6 items-center opacity-80">
+                <div className="flex items-center gap-1 text-white text-sm">
+                  <span className="material-symbols-outlined text-sm filled">lock</span>
+                  Encrypted
+                </div>
+                <div className="flex items-center gap-1 text-white text-sm">
+                  <span className="material-symbols-outlined text-sm filled">visibility_off</span>
+                  Anonymous
+                </div>
+                <div className="flex items-center gap-1 text-white text-sm">
+                  <span className="material-symbols-outlined text-sm filled">verified_user</span>
+                  Privacy
+                </div>
+              </div>
             </div>
-
-            <div className="text-xs text-gray-400">
-              مجتمع الصحة النفسية العربي
-            </div>
-
-            <div className="flex items-center gap-4 text-xs text-gray-400">
-              <span className="hover:text-teal-600 cursor-pointer transition-colors">
-                سياسة الخصوصية
-              </span>
-              <span className="hover:text-teal-600 cursor-pointer transition-colors">
-                شروط الاستخدام
-              </span>
+            <div className="hidden md:block relative">
+              <div className="absolute inset-0 bg-secondary/20 rounded-full blur-[100px]" />
+              {/* Decorative illustration placeholder */}
+              <div className="relative z-10 w-full flex items-center justify-center" style={{ minHeight: 400 }}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="glass-card p-6 rounded-2xl text-white">
+                    <span className="material-symbols-outlined text-4xl mb-3">psychology</span>
+                    <div className="text-sm font-medium">دعم نفسي</div>
+                    <div className="text-xs opacity-70 mt-1">متخصصون مرخصون</div>
+                  </div>
+                  <div className="glass-card p-6 rounded-2xl text-white mt-8">
+                    <span className="material-symbols-outlined text-4xl mb-3">favorite</span>
+                    <div className="text-sm font-medium">مجتمع آمن</div>
+                    <div className="text-xs opacity-70 mt-1">تجارب مشتركة</div>
+                  </div>
+                  <div className="glass-card p-6 rounded-2xl text-white">
+                    <span className="material-symbols-outlined text-4xl mb-3">shield</span>
+                    <div className="text-sm font-medium">خصوصية تامة</div>
+                    <div className="text-xs opacity-70 mt-1">تشفير كامل</div>
+                  </div>
+                  <div className="glass-card p-6 rounded-2xl text-white mt-8">
+                    <span className="material-symbols-outlined text-4xl mb-3">chat</span>
+                    <div className="text-sm font-medium">محادثات آمنة</div>
+                    <div className="text-xs opacity-70 mt-1">متاحة 24/7</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+        </section>
 
-          <Separator className="my-4" />
+        {/* ═══════════ 3. STATS ═══════════ */}
+        <section className="py-16 max-w-[1280px] mx-auto px-6 -mt-12 relative z-20">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { value: '1,000+', label: 'مستخدم نشط' },
+              { value: '50+', label: 'طبيب معتمد' },
+              { value: '100+', label: 'مقالات داعمة' },
+              { value: '98%', label: 'نسبة الرضا' },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="bg-surface-container-lowest p-10 rounded-xl border border-outline-variant/30 text-center shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="text-[clamp(1.5rem,3vw,3rem)] font-bold text-primary mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-sm font-semibold text-secondary">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </section>
 
-          <div className="text-center text-xs text-gray-300">
-            جميع المحادثات مشفرة ومحمية. هويتك في أمان تام.
+        {/* ═══════════ 4. FEATURES (BENTO GRID) ═══════════ */}
+        <section className="py-16 max-w-[1280px] mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-[clamp(1.5rem,3vw,2rem)] font-semibold text-primary mb-4">
+              ليه تختار وصال؟
+            </h2>
+            <p className="text-base text-secondary max-w-2xl mx-auto leading-relaxed">
+              صممنا المنصة لتكون ملاذك الآمن الذي يجمع بين التكنولوجيا المتطورة والخبرة البشرية العميقة.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Feature 1: Privacy (spans 2 cols) */}
+            <div className="md:col-span-2 bg-white p-10 rounded-xl border border-outline-variant/20 shadow-sm flex flex-col justify-between group hover:border-primary/20 transition-all">
+              <div>
+                <span className="material-symbols-outlined text-4xl text-primary mb-4">security</span>
+                <h3 className="text-2xl font-semibold text-primary mb-2">خصوصية لا تقبل المساومة</h3>
+                <p className="text-base text-secondary leading-relaxed">
+                  بياناتك مشفرة بالكامل. يمكنك اختيار اسم مستعار والتحكم الكامل فيما تشاركه ومع من تشاركه.
+                </p>
+              </div>
+              <div className="mt-10 h-48 bg-surface-container rounded-lg overflow-hidden relative">
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="material-symbols-outlined text-8xl text-primary/20">lock</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature 2: Certified Doctors */}
+            <div className="bg-primary text-on-primary p-10 rounded-xl flex flex-col justify-center">
+              <span className="material-symbols-outlined text-4xl mb-4">verified</span>
+              <h3 className="text-2xl font-semibold mb-2">أطباء معتمدون</h3>
+              <p className="text-base opacity-80 leading-relaxed">
+                فريقنا يضم نخبة من المتخصصين المرخصين الذين خضعوا لتدقيق صارم لضمان جودة الرعاية المقدمة.
+              </p>
+            </div>
+
+            {/* Feature 3: Supportive Community */}
+            <div className="bg-secondary-container p-10 rounded-xl border border-outline-variant/20 shadow-sm">
+              <span className="material-symbols-outlined text-4xl text-on-secondary-container mb-4">groups</span>
+              <h3 className="text-2xl font-semibold text-on-secondary-container mb-2">مجتمع داعم</h3>
+              <p className="text-base text-on-secondary-container/80 leading-relaxed">
+                تواصل مع أشخاص يمرون بتجارب مشابهة في مساحات نقاشية آمنة ومراقبة باحترافية.
+              </p>
+            </div>
+
+            {/* Feature 4: Safe Chats (spans 2 cols) */}
+            <div className="md:col-span-2 bg-white p-10 rounded-xl border border-outline-variant/20 shadow-sm flex items-center gap-6 group hover:border-primary/20 transition-all">
+              <div className="w-1/3 min-h-[160px] bg-tertiary-container/10 rounded-lg flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-6xl text-primary">chat_bubble</span>
+              </div>
+              <div className="w-2/3">
+                <h3 className="text-2xl font-semibold text-primary mb-2">محادثات آمنة</h3>
+                <p className="text-base text-secondary leading-relaxed">
+                  جلسات فردية فورية عبر رسائل نصية أو صوتية مشفرة تضمن لك الراحة في أي وقت وأي مكان.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════ 5. HOW IT WORKS ═══════════ */}
+        <section className="py-16 bg-surface-container-low">
+          <div className="max-w-[1280px] mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-[clamp(1.5rem,3vw,2rem)] font-semibold text-primary mb-4">
+                خطواتك نحو السلام النفسي
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative">
+              {[
+                {
+                  step: '1',
+                  title: 'سجل حسابك',
+                  desc: 'أنشئ حسابك في ثوانٍ. لا نحتاج لهويتك الحقيقية لتبدأ.',
+                },
+                {
+                  step: '2',
+                  title: 'شارك قصتك',
+                  desc: 'ابحث عن الطبيب المناسب أو شارك في المجتمعات المفتوحة.',
+                },
+                {
+                  step: '3',
+                  title: 'تواصل وتعافى',
+                  desc: 'ابدأ رحلة العلاج مع متخصص يدعمك في كل خطوة.',
+                },
+              ].map((item) => (
+                <div key={item.step} className="text-center relative z-10">
+                  <div className="w-16 h-16 bg-primary text-on-primary rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">
+                    {item.step}
+                  </div>
+                  <h3 className="text-xl font-medium text-primary mb-2">{item.title}</h3>
+                  <p className="text-base text-secondary leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+              {/* Connector Line (Hidden on Mobile) */}
+              <div className="hidden md:block absolute top-8 left-1/4 right-1/4 h-0.5 border-t-2 border-dashed border-primary/20 -z-0" />
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════ 6. SECURITY CARDS ═══════════ */}
+        <section className="py-16 max-w-[1280px] mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-[clamp(1.5rem,3vw,2rem)] font-semibold text-primary mb-4">
+              أمانك أولويتنا القصوى
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                icon: 'lock_open',
+                title: 'تشفير كامل للبيانات',
+                desc: 'نستخدم بروتوكولات تشفير عسكرية لضمان أن لا أحد غيرك وطبيبك يمكنه الوصول للمحادثات.',
+              },
+              {
+                icon: 'masks',
+                title: 'هوية مخفية تماماً',
+                desc: 'لك كامل الحرية في اختيار اسم مستعار وعدم مشاركة أي تفاصيل شخصية تكشف هويتك.',
+              },
+              {
+                icon: 'badge',
+                title: 'خبراء موثوقون',
+                desc: 'كل مقدم خدمة على المنصة يتم التحقق من تراخيصه المهنية وخبراته العملية بدقة.',
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="p-10 rounded-xl border-2 border-primary/5 hover:border-primary/20 transition-all text-right"
+              >
+                <div className="w-12 h-12 bg-primary-container text-on-primary-container rounded-lg flex items-center justify-center mb-6">
+                  <span className="material-symbols-outlined">{item.icon}</span>
+                </div>
+                <h3 className="text-xl font-medium text-primary mb-2">{item.title}</h3>
+                <p className="text-sm text-secondary leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ═══════════ 7. TESTIMONIALS ═══════════ */}
+        <section className="py-16 bg-primary/5">
+          <div className="max-w-[1280px] mx-auto px-6">
+            <h2 className="text-[clamp(1.5rem,3vw,2rem)] font-semibold text-primary text-center mb-16">
+              قصص نجاح من مجتمعنا
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                {
+                  text: '"وجدت هنا الأمان والسرية اللي كنت بدور عليها. الطبيب اللي تواصلت معاه كان مستمع رائع وساعدني كتير."',
+                  name: 'مستخدم هادئ',
+                  time: 'منذ شهرين',
+                  avatarBg: 'bg-secondary-fixed',
+                },
+                {
+                  text: '"مجتمع وصال خلاني أحس إني مش لوحدي. النقاشات الجماعية مفيدة جداً وتحت إشراف متخصصين."',
+                  name: 'صديق وصال',
+                  time: 'منذ ٥ أشهر',
+                  avatarBg: 'bg-tertiary-fixed',
+                },
+                {
+                  text: '"التجربة سهلة ومريحة جداً. ما تخيلتش إن الحصول على استشارة نفسية ممكن يكون بالسهولة والخصوصية دي."',
+                  name: 'باحث عن الهدوء',
+                  time: 'منذ سنة',
+                  avatarBg: 'bg-primary-fixed',
+                },
+              ].map((review, i) => (
+                <div
+                  key={i}
+                  className="bg-white p-10 rounded-xl shadow-sm border border-outline-variant/10"
+                >
+                  <div className="flex gap-1 text-yellow-500 mb-4">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <span
+                        key={s}
+                        className="material-symbols-outlined filled"
+                        style={{ fontSize: '20px' }}
+                      >
+                        star
+                      </span>
+                    ))}
+                  </div>
+                  <p className="text-base text-primary italic mb-6 leading-relaxed">
+                    {review.text}
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-full ${review.avatarBg}`} />
+                    <div>
+                      <div className="text-sm font-semibold text-primary">{review.name}</div>
+                      <div className="text-xs text-secondary">{review.time}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════ 8. FINAL CTA ═══════════ */}
+        <section className="py-16 max-w-[1280px] mx-auto px-6 text-center">
+          <div className="gradient-hero p-16 rounded-[2rem] text-white shadow-2xl relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
+            <div className="relative z-10">
+              <h2 className="text-[clamp(2rem,4vw,3rem)] font-bold text-white mb-6">
+                جاهز تبدأ رحلتك؟
+              </h2>
+              <p className="text-lg text-white/80 mb-10 max-w-xl mx-auto leading-relaxed">
+                نحن هنا لندعمك في كل خطوة. ابدأ أولى خطواتك نحو حياة نفسية أكثر اتزاناً اليوم.
+              </p>
+              <Link
+                href="/register"
+                className="inline-block px-16 py-4 bg-white text-primary text-xl font-medium rounded-full hover:scale-105 active:scale-95 transition-all shadow-lg"
+              >
+                سجل مجاناً الآن
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* ═══════════ 9. FOOTER ═══════════ */}
+      <footer className="bg-surface-container py-16 border-t border-outline-variant/30">
+        <div className="max-w-[1280px] mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10">
+          <div className="md:col-span-1">
+            <div className="text-2xl font-bold text-teal-800 mb-6">وصال</div>
+            <p className="text-sm text-secondary leading-relaxed">
+              منصة رقمية متكاملة تهدف لرفع الوعي بالصحة النفسية وتوفير سبل الدعم الاحترافية بسرية تامة.
+            </p>
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-primary mb-6">روابط سريعة</h4>
+            <ul className="space-y-4 text-sm text-secondary">
+              <li><a className="hover:text-primary transition-colors" href="#">عن المنصة</a></li>
+              <li><a className="hover:text-primary transition-colors" href="#">كيف نعمل</a></li>
+              <li><a className="hover:text-primary transition-colors" href="#">الأطباء</a></li>
+              <li><a className="hover:text-primary transition-colors" href="#">الأسئلة الشائعة</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-primary mb-6">قانوني</h4>
+            <ul className="space-y-4 text-sm text-secondary">
+              <li><a className="hover:text-primary transition-colors" href="#">سياسة الخصوصية</a></li>
+              <li><a className="hover:text-primary transition-colors" href="#">شروط الاستخدام</a></li>
+              <li><a className="hover:text-primary transition-colors" href="#">اتفاقية السرية</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-primary mb-6">تواصل معنا</h4>
+            <div className="flex gap-4 mb-6">
+              <a href="#" className="text-secondary hover:text-primary transition-colors">
+                <span className="material-symbols-outlined">mail</span>
+              </a>
+              <a href="#" className="text-secondary hover:text-primary transition-colors">
+                <span className="material-symbols-outlined">share</span>
+              </a>
+              <a href="#" className="text-secondary hover:text-primary transition-colors">
+                <span className="material-symbols-outlined">language</span>
+              </a>
+            </div>
+            <p className="text-sm text-secondary">info@wesal.com</p>
+          </div>
+        </div>
+        <div className="max-w-[1280px] mx-auto px-6 mt-16 pt-6 border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-secondary">© 2024 وصال (Wesal). جميع الحقوق محفوظة.</p>
+          <div className="flex gap-4 items-center">
+            <span className="material-symbols-outlined text-teal-800 text-sm filled">verified</span>
+            <span className="text-xs text-secondary">معتمد طبياً</span>
           </div>
         </div>
       </footer>

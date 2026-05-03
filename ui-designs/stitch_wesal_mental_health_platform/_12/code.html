@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html class="light" dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Wesal - Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed": "#002021",
+                      "surface": "#f8f9f9",
+                      "on-secondary-container": "#526576",
+                      "surface-tint": "#306669",
+                      "secondary-container": "#cee2f6",
+                      "on-primary-fixed-variant": "#134e51",
+                      "surface-bright": "#f8f9f9",
+                      "on-surface-variant": "#404849",
+                      "tertiary": "#002b31",
+                      "on-tertiary-fixed": "#001f24",
+                      "tertiary-fixed": "#b2ecf6",
+                      "surface-container-low": "#f3f4f3",
+                      "surface-container-highest": "#e1e3e2",
+                      "secondary-fixed": "#d1e5f9",
+                      "secondary": "#4e6071",
+                      "on-secondary": "#ffffff",
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed": "#091d2c",
+                      "on-primary": "#ffffff",
+                      "inverse-primary": "#9ad0d3",
+                      "surface-container": "#edeeee",
+                      "secondary-fixed-dim": "#b5c9dc",
+                      "on-tertiary-fixed-variant": "#094e57",
+                      "error-container": "#ffdad6",
+                      "primary-fixed": "#b6ecef",
+                      "inverse-on-surface": "#f0f1f0",
+                      "outline": "#707979",
+                      "outline-variant": "#bfc8c8",
+                      "surface-container-high": "#e7e8e8",
+                      "on-background": "#191c1c",
+                      "on-tertiary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "on-error": "#ffffff",
+                      "surface-variant": "#e1e3e2",
+                      "on-secondary-fixed-variant": "#364959",
+                      "primary": "#002b2d",
+                      "on-surface": "#191c1c",
+                      "surface-dim": "#d9dada",
+                      "background": "#f8f9f9",
+                      "on-primary-container": "#7aafb2",
+                      "primary-container": "#004346",
+                      "tertiary-fixed-dim": "#96d0da",
+                      "inverse-surface": "#2e3131",
+                      "primary-fixed-dim": "#9ad0d3",
+                      "tertiary-container": "#00434b",
+                      "on-tertiary-container": "#77b0b9",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "xxl": "64px",
+                      "gutter": "24px",
+                      "container-max": "1280px",
+                      "unit": "4px",
+                      "xl": "40px",
+                      "lg": "24px",
+                      "xs": "4px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "body-md": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "h2": ["Manrope"],
+                      "label-md": ["Inter"],
+                      "h1": ["Manrope"],
+                      "display": ["Manrope"],
+                      "h3": ["Manrope"]
+              },
+              "fontSize": {
+                      "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                      "h2": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "h1": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "display": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "h3": ["20px", {"lineHeight": "1.5", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .ambient-shadow {
+            box-shadow: 0 4px 20px 0 rgba(23, 42, 57, 0.05);
+        }
+        .soft-border {
+            border: 1px solid rgba(115, 179, 206, 0.2);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen selection:bg-primary-fixed selection:text-on-primary-fixed pb-[90px]">
+<!-- TopAppBar JSON Render -->
+<header class="top-0 sticky z-40 bg-[#F8F5F0]/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-[#73B3CE]/20 shadow-sm dark:shadow-none flex flex-row-reverse justify-between items-center w-full px-6 py-4">
+<div class="flex items-center gap-3">
+<img alt="User profile photo" class="w-10 h-10 rounded-full object-cover soft-border" data-alt="A professional, warm, minimalist profile portrait of a calm individual. The background is a soft, light-mode off-white. The lighting is diffused and natural, creating a safe, serene mood suitable for a mental health app. Touches of deep teal and soft cyan are subtly integrated into the clothing or background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZ4rP9MgSzK2cMKVzeP6Egml_VMR9JWj8-_c2BgUoqeY1jyVkAv0KyUy5-C-m-8wz6rMwJmFF7RnE_kLLBX0FJ_Wxukg3ZEmRaLDZpYYjFaOaV8F3VQixeQ2MvuZ2hzs1GIs_iavjuNoFv08-L6IVxAbKn9Fn6NYNxG-zvXj4WruX2zZsCcsyb-c0fT3cTgU4sn4NxofUPx-9VIUer-aLqL7I9mokY71uWwVcFdaYkbqivCn2VnBGR3T7w3BwMdv-e8XcUgi_yafw"/>
+<span class="text-2xl font-bold text-[#004346] dark:text-[#D6F3F4] font-h2 text-h2">Wesal</span>
+</div>
+<button class="hover:opacity-80 transition-opacity flex items-center justify-center p-2 rounded-full active:scale-95 duration-150">
+<span class="material-symbols-outlined text-[#004346] dark:text-[#D6F3F4]">notifications</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-container-max mx-auto md:px-gutter">
+<!-- Profile Header Gradient Section -->
+<section class="relative bg-gradient-to-b from-primary-container/10 to-transparent pt-lg pb-md px-gutter flex flex-col items-center text-center">
+<div class="relative mb-4">
+<img alt="Avatar" class="w-24 h-24 rounded-full object-cover ambient-shadow ring-4 ring-surface" data-alt="A professional, warm, minimalist profile portrait of a calm individual. The background is a soft, light-mode off-white. The lighting is diffused and natural, creating a safe, serene mood suitable for a mental health app. Touches of deep teal and soft cyan are subtly integrated into the clothing or background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDa8RyJ_CleD3o2vjg1d097zkz76gVeoeN19mcGdiKArEXhVBvk9m8GKsGzfzLdlSAS0_3hUgUIktDoB_Sp5qDajvOd3Nx4Odj3cH6tceqh6wBDnpAURyrRfTmylTDQ2usOTfxbfCbPkTKHmOAEUFpIqLLLj6C76p9T4JA9Gh5ShwNFQGt6g2XxrmWZA3C2wY_5lMPgkZrmGK92u4oJnB9OQ_nYOB49Cp53bn9kGVn3eVbND5PxGwbLZ4KjSeUP46HUJtUgaJvTz0E"/>
+<div aria-label="Verified" class="absolute bottom-0 right-0 bg-primary-container text-on-primary rounded-full p-1 border-2 border-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<h1 class="font-h1 text-h1 text-on-background mb-1">مستخدم مجهول</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">@user_8923</p>
+<div class="flex gap-2">
+<span class="bg-secondary-container text-on-secondary-container font-label-md text-label-md rounded-full px-4 py-1.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">stars</span>
+                    مستوى 3
+                </span>
+<span class="bg-surface-variant text-on-surface-variant font-label-md text-label-md rounded-full px-4 py-1.5 flex items-center gap-1">
+                    عضو منذ 2023
+                </span>
+</div>
+</section>
+<!-- Stats Card -->
+<section class="px-gutter mb-lg">
+<div class="bg-surface rounded-xl p-md soft-border ambient-shadow relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-fixed-dim/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+<div class="flex items-center justify-between mb-4 relative z-10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+</div>
+<div>
+<h3 class="font-h3 text-h3 text-on-surface">نقاط الدعم</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">450 نقطة متبقية للمستوى التالي</p>
+</div>
+</div>
+<span class="font-h2 text-h2 text-primary-container">1250</span>
+</div>
+<div class="relative z-10">
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant mb-2">
+<span>مستوى 3</span>
+<span>مستوى 4</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-l from-primary-container to-primary rounded-full w-[73%]"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bio Section -->
+<section class="px-gutter mb-lg">
+<h2 class="font-h3 text-h3 text-on-surface mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-outline">info</span>
+                نبذة عني
+            </h2>
+<div class="bg-surface-container-lowest rounded-xl p-md soft-border text-on-surface-variant font-body-md text-body-md leading-relaxed">
+                أنا هنا لمشاركة رحلتي في التعافي ودعم الآخرين. أؤمن بأن الاستماع المتعاطف هو الخطوة الأولى نحو الشفاء. مهتم بالنقاشات حول إدارة القلق والتأمل الموجه.
+            </div>
+</section>
+<!-- Specialties / Interests -->
+<section class="px-gutter mb-xl">
+<h2 class="font-h3 text-h3 text-on-surface mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-outline">psychology</span>
+                الاهتمامات
+            </h2>
+<div class="flex flex-wrap gap-2">
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm rounded-full px-4 py-2">إدارة القلق</span>
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm rounded-full px-4 py-2">التأمل</span>
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm rounded-full px-4 py-2">دعم الأقران</span>
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm rounded-full px-4 py-2">اليقظة الذهنية</span>
+</div>
+</section>
+<!-- Recent Posts (Bento/Card Style) -->
+<section class="px-gutter mb-xxl">
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-h3 text-h3 text-on-surface">المشاركات الأخيرة</h2>
+<button class="font-label-md text-label-md text-primary-container hover:opacity-80 transition-opacity">عرض الكل</button>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Post Card 1 -->
+<article class="bg-surface rounded-xl p-md soft-border ambient-shadow">
+<div class="flex items-start justify-between mb-3">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[18px]">forum</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">تجربتي مع التأمل الصباحي</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">قبل يومين</p>
+</div>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4 line-clamp-2">
+                        بدأت مؤخراً بتخصيص 10 دقائق كل صباح للتأمل الموجه. لاحظت فرقاً كبيراً في مستوى تركيزي وهدوئي خلال بقية اليوم. هل جرب أحدكم هذا الروتين؟
+                    </p>
+<div class="flex items-center gap-4 text-outline font-label-sm text-label-sm border-t border-surface-variant pt-3 mt-2">
+<div class="flex items-center gap-1 cursor-pointer hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+                            24 إعجاب
+                        </div>
+<div class="flex items-center gap-1 cursor-pointer hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span>
+                            8 تعليقات
+                        </div>
+</div>
+</article>
+<!-- Post Card 2 -->
+<article class="bg-surface rounded-xl p-md soft-border ambient-shadow">
+<div class="flex items-start justify-between mb-3">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[18px]">forum</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">كيف تتعامل مع الإرهاق؟</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">قبل أسبوع</p>
+</div>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4 line-clamp-2">
+                        أشعر ببعض الإرهاق العاطفي مؤخراً بسبب ضغوط العمل. ما هي استراتيجياتكم المفضلة لفصل العمل عن الحياة الشخصية؟
+                    </p>
+<div class="flex items-center gap-4 text-outline font-label-sm text-label-sm border-t border-surface-variant pt-3 mt-2">
+<div class="flex items-center gap-1 cursor-pointer hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+                            42 إعجاب
+                        </div>
+<div class="flex items-center gap-1 cursor-pointer hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span>
+                            15 تعليق
+                        </div>
+</div>
+</article>
+</div>
+</section>
+</main>
+<!-- BottomNavBar JSON Render (Active Tab: الملف الشخصي) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex flex-row-reverse justify-around items-center px-4 pb-safe pt-2 bg-[#F8F5F0]/90 dark:bg-slate-900/90 backdrop-blur-lg rounded-t-2xl border-t border-[#73B3CE]/20 shadow-[0_-4px_20px_0_rgba(23,42,57,0.05)] text-[11px] font-manrope font-medium">
+<!-- Inactive: الرئيسية -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:bg-[#D6F3F4]/50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]">home</span>
+<span>الرئيسية</span>
+</a>
+<!-- Inactive: المجتمع -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:bg-[#D6F3F4]/50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]">group</span>
+<span>المجتمع</span>
+</a>
+<!-- Inactive: الأطباء -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:bg-[#D6F3F4]/50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]">medical_services</span>
+<span>الأطباء</span>
+</a>
+<!-- Inactive: التنبيهات -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:bg-[#D6F3F4]/50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]">notifications</span>
+<span>التنبيهات</span>
+</a>
+<!-- Active: الملف الشخصي -->
+<a class="flex flex-col items-center justify-center text-[#004346] dark:text-[#D6F3F4] bg-[#D6F3F4] dark:bg-[#004346]/40 rounded-xl px-3 py-1.5 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]" style="font-variation-settings: 'FILL' 1;">person</span>
+<span>الملف الشخصي</span>
+</a>
+</nav>
+</body></html>

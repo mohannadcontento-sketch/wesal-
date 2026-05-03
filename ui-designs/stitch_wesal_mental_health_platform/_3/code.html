@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Wesal - Community</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#002021",
+                        "surface": "#f8f9f9",
+                        "on-secondary-container": "#526576",
+                        "surface-tint": "#306669",
+                        "secondary-container": "#cee2f6",
+                        "on-primary-fixed-variant": "#134e51",
+                        "surface-bright": "#f8f9f9",
+                        "on-surface-variant": "#404849",
+                        "tertiary": "#002b31",
+                        "on-tertiary-fixed": "#001f24",
+                        "tertiary-fixed": "#b2ecf6",
+                        "surface-container-low": "#f3f4f3",
+                        "surface-container-highest": "#e1e3e2",
+                        "secondary-fixed": "#d1e5f9",
+                        "secondary": "#4e6071",
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#091d2c",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#9ad0d3",
+                        "surface-container": "#edeeee",
+                        "secondary-fixed-dim": "#b5c9dc",
+                        "on-tertiary-fixed-variant": "#094e57",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#b6ecef",
+                        "inverse-on-surface": "#f0f1f0",
+                        "outline": "#707979",
+                        "outline-variant": "#bfc8c8",
+                        "surface-container-high": "#e7e8e8",
+                        "on-background": "#191c1c",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e1e3e2",
+                        "on-secondary-fixed-variant": "#364959",
+                        "primary": "#002b2d",
+                        "on-surface": "#191c1c",
+                        "surface-dim": "#d9dada",
+                        "background": "#f8f9f9",
+                        "on-primary-container": "#7aafb2",
+                        "primary-container": "#004346",
+                        "tertiary-fixed-dim": "#96d0da",
+                        "inverse-surface": "#2e3131",
+                        "primary-fixed-dim": "#9ad0d3",
+                        "tertiary-container": "#00434b",
+                        "on-tertiary-container": "#77b0b9",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "xxl": "64px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "unit": "4px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "h2": ["Manrope"],
+                        "label-md": ["Inter"],
+                        "h1": ["Manrope"],
+                        "display": ["Manrope"],
+                        "h3": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                        "h2": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "h1": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "display": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "h3": ["20px", {"lineHeight": "1.5", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="bg-[#F8F5F0]/80 dark:bg-slate-950/80 backdrop-blur-md font-manrope font-semibold docked full-width top-0 sticky border-b border-[#73B3CE]/20 shadow-sm dark:shadow-none z-40">
+<div class="flex flex-row-reverse justify-between items-center w-full px-6 py-4">
+<div class="text-2xl font-bold text-[#004346] dark:text-[#D6F3F4]">Wesal</div>
+<div class="flex items-center gap-4">
+<button class="hover:opacity-80 transition-opacity text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-[24px]" data-icon="notifications">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-[#73B3CE]/20">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A close-up portrait of a young woman with a warm, natural smile, wearing a simple beige top. The lighting is soft and natural, emphasizing a calm and approachable mood. The background is a gently blurred, light-colored modern interior, fitting a professional yet empathetic digital profile avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNTVibEGMsV8vt-t2jaO0p94SBE3czs10aLYFQuT_6L2esP-7TMPlXt0MQtTqEK6wgiN_ux-m2TsaBw6VFeeofALxq1acDBxWFI8r1BKno8xOeH01uV-imtS3s-F5n9I6PMWGVV4u6Oin3AFLt_hAryP4fGqweiU6rRCQVK0vmLohctsDqyOeZWfeWrfFUaxcpChFH7BI-iFakSHokjJI7M68wxer3XtGbArxXdqueH53b_scdB9rxLxt9ZrZBe1DfrG8Rk_7tVVY"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="max-w-container-max mx-auto px-lg mt-lg md:mt-xl flex flex-col gap-lg">
+<!-- Post Creation Form -->
+<section class="bg-surface-bright rounded-xl border border-outline-variant/30 p-md shadow-[0_4px_20px_0_rgba(23,42,57,0.02)]">
+<div class="flex gap-md items-start">
+<div class="w-10 h-10 rounded-full overflow-hidden shrink-0 mt-1">
+<img alt="User avatar" class="w-full h-full object-cover" data-alt="A close-up portrait of a young woman with a warm, natural smile, wearing a simple beige top. The lighting is soft and natural, emphasizing a calm and approachable mood. The background is a gently blurred, light-colored modern interior, fitting a professional yet empathetic digital profile avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeJ6ECOO968mobOODBZUzXj0Q2Mm8MzzNa2T4BMQrN30z9F5FbgDNCmDxp0--u5cxEzioP2tK8FZOOGDg5DVckR7xbhzqVpchpGJphb3KRIO0TsvJ5Zy7WOYk7KzRBXaOSR_OQmPwrhyTM_TFTk2l0nNpGoDgQUxrG-h8ENlITfoEyC8wtHvt7O5Xs85r0o7DL57kd8MAwf8wQ8LwQT3YsaW-SHKNxjceZJ2INzRLn9VR9SHU7JA3Y1-wsyvr3Uzi2hfdZ3AWEM38"/>
+</div>
+<div class="flex-1">
+<textarea class="w-full bg-surface-container-low rounded-lg p-sm font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant border-none focus:ring-2 focus:ring-primary-container resize-none min-h-[80px]" placeholder="بم تفكر؟ شاركنا..."></textarea>
+<div class="flex justify-between items-center mt-sm">
+<div class="flex gap-xs">
+<button class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="image">image</span>
+</button>
+<button class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="mood">mood</span>
+</button>
+</div>
+<button class="bg-primary-container text-on-primary font-label-md text-label-md px-md py-sm rounded-full hover:opacity-90 transition-opacity">
+                            نشر
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Tabs -->
+<nav class="flex gap-sm border-b border-outline-variant/30 pb-xs overflow-x-auto hide-scrollbar">
+<button class="px-md py-sm font-label-md text-label-md text-primary-container border-b-2 border-primary-container whitespace-nowrap">
+                مشاركات
+            </button>
+<button class="px-md py-sm font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors whitespace-nowrap">
+                رائج
+            </button>
+<button class="px-md py-sm font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors whitespace-nowrap flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]" data-icon="verified">verified</span>
+                أطباء
+            </button>
+</nav>
+<!-- Feed -->
+<div class="flex flex-col gap-lg">
+<!-- Post Card 1 -->
+<article class="bg-surface-bright rounded-xl border border-outline-variant/30 p-md shadow-[0_4px_20px_0_rgba(23,42,57,0.02)]">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex gap-sm items-center">
+<div class="w-10 h-10 rounded-full overflow-hidden shrink-0">
+<img alt="User avatar" class="w-full h-full object-cover" data-alt="A close-up portrait of a young man with glasses, looking thoughtfully off-camera. He is wearing a dark, casual shirt. The lighting is slightly dramatic yet warm, set against a blurred, muted grey-blue background, evoking a sense of calm contemplation suitable for a professional profile avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTCXdXmTKXRGQHJacrHRa8tYgUK6TMc0XFnxlqtZKi350hotN_ToiZJp7NbmxDOhdB4W44EZswFdNyzmWGLo73meauobv-vDjy67-Fbhu1JlLYIgFNrgxgtmJjiL5sBWCDphkxZPIa_IVAI9_uSFLgNuVTRd4LWb9BSfVEr83_h9ElghlWIQSgaSjr-GuNm-5aRTEg3LfWQVTQ606LveiKFX7HJG2FIU39kNCX4Ev_CEWQFAONODkljxOxkHbJnaEP_JA05DRb9Vg"/>
+</div>
+<div>
+<h3 class="font-h3 text-h3 text-on-surface">أحمد محمود</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">قبل ساعتين</p>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<div class="mb-md">
+<p class="font-body-md text-body-md text-on-surface">
+                        أعتقد أن التحدث عن الصحة النفسية في مكان العمل أصبح أكثر أهمية من أي وقت مضى. هل لدى أحدكم تجارب إيجابية مع برامج الدعم النفسي في شركاتكم؟
+                    </p>
+</div>
+<div class="flex gap-sm mb-md">
+<span class="bg-surface-container-high text-primary-container px-3 py-1 rounded-full font-label-sm text-label-sm">بيئة العمل</span>
+<span class="bg-surface-container-high text-primary-container px-3 py-1 rounded-full font-label-sm text-label-sm">نقاش</span>
+</div>
+<div class="flex items-center justify-between border-t border-outline-variant/30 pt-sm mt-sm">
+<div class="flex gap-md">
+<button class="flex items-center gap-xs text-on-surface-variant hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="favorite">favorite</span>
+<span class="font-label-md text-label-md">24</span>
+</button>
+<button class="flex items-center gap-xs text-on-surface-variant hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="chat_bubble">chat_bubble</span>
+<span class="font-label-md text-label-md">8</span>
+</button>
+</div>
+<button class="text-on-surface-variant hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="share">share</span>
+</button>
+</div>
+</article>
+<!-- Post Card 2 (Sensitive/Doctor) -->
+<article class="bg-surface-bright rounded-xl border border-primary-container/20 p-md shadow-[0_4px_20px_0_rgba(23,42,57,0.05)]">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex gap-sm items-center">
+<div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-primary-container">
+<img alt="Doctor avatar" class="w-full h-full object-cover" data-alt="A portrait of a female doctor wearing a white coat and a stethoscope around her neck. She has a reassuring, professional smile. The background is a clean, well-lit medical office setting with soft, cool-toned lighting, conveying expertise, trust, and clinical care." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIcjwlQgqDPQKTxkN2kSDaNnLazWjT3sl94O2YyklU5PmYr0ZJAFHPAdNSTJ4xtzrhkQhGNRNBin1n748OqW4sb7neFg6R6unQRsy38EMa_PEt4lyaPBvkXVNq3qrzaDYD6Stg3pT-X87_ZTLK0b_xS9gMA1Yc6HP38vfXeV2xRCxcVElEXWuEmqeOqz_cUCW7Qw4ohBMG30c2i1wJV-4UxKQiM7ffmukoFLLbIf6iOKVjhJ4y7fmnmkBZ4dUUASfg5VP_UD7xXPc"/>
+</div>
+<div>
+<div class="flex items-center gap-xs">
+<h3 class="font-h3 text-h3 text-on-surface">د. سارة خليل</h3>
+<span class="material-symbols-outlined text-[16px] text-primary-container fill" data-icon="verified">verified</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">أخصائية طب نفسي · قبل 5 ساعات</p>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<div class="mb-md relative">
+<div class="bg-surface-container-low rounded-lg p-md border border-outline-variant/30 flex flex-col items-center justify-center text-center backdrop-blur-sm">
+<span class="material-symbols-outlined text-[32px] text-primary-container mb-xs" data-icon="visibility_off">visibility_off</span>
+<h4 class="font-h2 text-h2 text-on-surface mb-xs">محتوى حساس</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-sm max-w-[250px]">هذا المنشور يحتوي على نقاش قد يكون حساساً للبعض حول نوبات الهلع.</p>
+<button class="bg-surface text-primary-container border border-primary-container font-label-md text-label-md px-md py-sm rounded-full hover:bg-surface-container transition-colors">
+                            عرض المحتوى
+                        </button>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-outline-variant/30 pt-sm mt-sm">
+<div class="flex gap-md">
+<button class="flex items-center gap-xs text-on-surface-variant hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="favorite">favorite</span>
+<span class="font-label-md text-label-md">156</span>
+</button>
+<button class="flex items-center gap-xs text-on-surface-variant hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="chat_bubble">chat_bubble</span>
+<span class="font-label-md text-label-md">42</span>
+</button>
+</div>
+<button class="text-on-surface-variant hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="bookmark">bookmark</span>
+</button>
+</div>
+</article>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-[#F8F5F0]/90 dark:bg-slate-900/90 backdrop-blur-lg text-[11px] font-manrope font-medium docked full-width bottom-0 rounded-t-2xl border-t border-[#73B3CE]/20 shadow-[0_-4px_20px_0_rgba(23,42,57,0.05)] fixed bottom-0 left-0 w-full z-50 flex flex-row-reverse justify-around items-center px-4 pb-safe pt-2">
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:bg-[#D6F3F4]/50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="home">home</span>
+<span class="mt-1">الرئيسية</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#004346] dark:text-[#D6F3F4] bg-[#D6F3F4] dark:bg-[#004346]/40 rounded-xl px-3 py-1.5 transform scale-90 duration-200" href="#">
+<span class="material-symbols-outlined text-[24px] fill" data-icon="group">group</span>
+<span class="mt-1">المجتمع</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:bg-[#D6F3F4]/50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="medical_services">medical_services</span>
+<span class="mt-1">الأطباء</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:bg-[#D6F3F4]/50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="notifications">notifications</span>
+<span class="mt-1">التنبيهات</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1.5 hover:bg-[#D6F3F4]/50 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="person">person</span>
+<span class="mt-1">الملف الشخصي</span>
+</a>
+</nav>
+</body></html>

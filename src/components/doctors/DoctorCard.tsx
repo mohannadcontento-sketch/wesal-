@@ -1,11 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { Star, MapPin, BadgeCheck, Calendar } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import type { Profile, User } from '@/types';
 
 interface DoctorCardProps {
@@ -17,12 +12,10 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
   const profile = doctor.profile;
   const displayName = profile?.realName || 'طبيب';
   const specialty = profile?.specialty || 'طب نفسي';
-  const location = profile?.location;
   const rating = profile?.rating || 0;
   const isVerified = profile?.isVerified;
   const bio = profile?.bio;
   const avatarUrl = profile?.avatarUrl;
-
   const initials = displayName
     .split(' ')
     .map(n => n[0])
@@ -32,81 +25,79 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
   const renderStars = (ratingValue: number) => {
     const stars: React.ReactNode[] = [];
     for (let i = 1; i <= 5; i++) {
-      stars.push(
-        <Star
-          key={i}
-          className={`size-3.5 ${
-            i <= Math.round(ratingValue)
-              ? 'fill-amber-400 text-amber-400'
-              : 'text-gray-300'
-          }`}
-        />
-      );
+      if (i <= Math.floor(ratingValue)) {
+        stars.push(
+          <span key={i} className="material-symbols-outlined filled text-amber-500 text-sm">star</span>
+        );
+      } else if (i - 0.5 <= ratingValue) {
+        stars.push(
+          <span key={i} className="material-symbols-outlined filled text-amber-500 text-sm">star_half</span>
+        );
+      } else {
+        stars.push(
+          <span key={i} className="material-symbols-outlined text-amber-500 text-sm">star</span>
+        );
+      }
     }
     return stars;
   };
 
+  // Build tags from specialty and bio keywords
+  const tags = bio
+    ? [specialty, ...bio.split(/[,،.؛]/).map(s => s.trim()).filter(s => s.length > 0 && s.length < 20).slice(0, 2)]
+    : [specialty];
+
   return (
-    <Card className="rounded-xl shadow-sm border-gray-100 p-0 overflow-hidden">
-      <CardContent className="p-5 flex flex-col h-full">
-        {/* Doctor Header */}
-        <div className="flex items-start gap-4">
-          <Avatar className="size-14 shrink-0 ring-2 ring-teal-100">
-            {avatarUrl && <AvatarImage src={avatarUrl} alt={displayName} />}
-            <AvatarFallback className="bg-teal-50 text-teal-700 font-bold text-base">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-bold text-gray-900 truncate text-sm">
-                {displayName}
-              </h3>
-              {isVerified && (
-                <BadgeCheck className="size-5 text-emerald-500 shrink-0" />
-              )}
-            </div>
-            <Badge className="bg-teal-600 text-white hover:bg-teal-600">
-              {specialty}
-            </Badge>
-          </div>
-        </div>
+    <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6 shadow-[0_8px_32px_0_rgba(0,67,70,0.05)] hover:shadow-[0_16px_48px_0_rgba(0,67,70,0.1)] transition-all duration-300 flex flex-col group relative overflow-hidden">
+      {/* Decorative glow */}
+      <div className="absolute -right-12 -top-12 w-32 h-32 bg-tertiary-fixed/30 rounded-full blur-3xl group-hover:bg-tertiary-fixed/50 transition-colors pointer-events-none" />
 
-        {/* Info Section */}
-        <div className="mt-4 flex flex-col gap-2 flex-1">
-          {location && (
-            <div className="flex items-center gap-1.5 text-sm text-gray-500">
-              <MapPin className="size-3.5 text-gray-400 shrink-0" />
-              <span className="truncate">{location}</span>
+      {/* Doctor Header */}
+      <div className="flex items-start gap-4 mb-6 z-10">
+        <div className="relative shrink-0">
+          {avatarUrl ? (
+            <img
+              alt={displayName}
+              src={avatarUrl}
+              className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-sm"
+            />
+          ) : (
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-fixed to-primary-container flex items-center justify-center border-4 border-white shadow-sm">
+              <span className="text-xl font-bold text-on-primary-fixed">{initials}</span>
             </div>
           )}
-
+          {isVerified && (
+            <div className="absolute bottom-0 right-0 w-5 h-5 bg-green-500 border-2 border-white rounded-full" />
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-[20px] font-semibold text-on-surface mb-1">{displayName}</h3>
+          <p className="text-sm text-primary-container font-medium mb-2">{specialty}</p>
           {rating > 0 && (
-            <div className="flex items-center gap-1.5">
-              <div className="flex items-center gap-0.5">
-                {renderStars(rating)}
-              </div>
-              <span className="text-sm text-gray-500 font-medium">
-                {rating.toFixed(1)}
-              </span>
+            <div className="flex items-center gap-1">
+              {renderStars(rating)}
+              <span className="text-xs text-on-surface-variant mr-2">({Math.round(rating * 20)} تقييم)</span>
             </div>
           )}
-
-          {bio && (
-            <p className="text-sm text-gray-500 line-clamp-2 mt-1 leading-relaxed">
-              {bio}
-            </p>
-          )}
         </div>
+      </div>
 
-        {/* CTA Button */}
-        <Button asChild className="w-full mt-4 gap-2 bg-teal-600 hover:bg-teal-700 text-white">
-          <Link href={`/book/${doctor.id}`}>
-            <Calendar className="size-4" />
-            احجز موعد
-          </Link>
-        </Button>
-      </CardContent>
-    </Card>
+      {/* Specialty Tags */}
+      <div className="flex gap-2 mb-6 z-10 flex-wrap">
+        {tags.slice(0, 3).map((tag, i) => (
+          <span key={i} className="px-3 py-1 rounded-full bg-surface-container-low text-on-surface-variant text-xs font-medium">
+            {tag}
+          </span>
+        ))}
+      </div>
+
+      {/* Book Button */}
+      <Link
+        href={`/book/${doctor.id}`}
+        className="mt-auto w-full py-3 rounded-xl bg-gradient-to-l from-primary to-primary-container text-on-primary font-bold text-sm shadow-md hover:shadow-lg hover:from-primary-container hover:to-primary transition-all z-10 text-center block"
+      >
+        حجز موعد
+      </Link>
+    </div>
   );
 }

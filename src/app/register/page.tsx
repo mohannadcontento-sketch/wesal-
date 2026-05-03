@@ -5,14 +5,6 @@ import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import {
-  Mail, Lock, Eye, EyeOff, User, Stethoscope, Phone, Shield,
-  Loader2, ArrowLeft, UserCircle, GraduationCap,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -84,78 +76,129 @@ export default function RegisterPage() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-teal-600 to-teal-700">
-        <Loader2 className="w-8 h-8 animate-spin text-white/60" />
+      <div className="flex min-h-screen items-center justify-center bg-surface">
+        <span className="material-symbols-outlined animate-spin text-[32px] text-primary">progress_activity</span>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-teal-600 to-teal-700 px-4 py-8">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-white">
-            انضم لوصال
-          </h1>
-          <p className="text-white/60 mt-1">
-            اعمل حساب جديد في ثواني
-          </p>
+    <div className="min-h-screen flex items-center justify-center bg-surface p-6">
+      <div className="w-full max-w-6xl bg-surface-container-lowest rounded-xl shadow-[0_8px_32px_0_rgba(0,67,70,0.1)] overflow-hidden flex flex-col md:flex-row min-h-[700px] md:min-h-[800px]">
+        {/* Right Side: Branding & Features */}
+        <div className="hidden md:flex flex-col justify-between w-5/12 p-12 relative overflow-hidden gradient-primary text-on-primary">
+          {/* Abstract background elements */}
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-tertiary-fixed rounded-full mix-blend-screen blur-[80px] opacity-20" />
+          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-inverse-primary rounded-full mix-blend-screen blur-[100px] opacity-30" />
+
+          <div className="relative z-10">
+            <h1 className="text-[40px] font-bold leading-tight tracking-tight mb-6">وصال</h1>
+            <p className="text-lg leading-relaxed text-surface-variant max-w-sm">
+              منصة متكاملة للصحة النفسية، تجمع بين الاحترافية السريرية والبيئة الداعمة لرحلة تعافيك.
+            </p>
+          </div>
+
+          <div className="relative z-10 flex flex-col gap-6 mt-12">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center backdrop-blur-md border border-white/20">
+                <span className="material-symbols-outlined filled text-tertiary-fixed">shield</span>
+              </div>
+              <div>
+                <h3 className="text-sm font-bold mb-1">خصوصية تامة</h3>
+                <p className="text-sm text-surface-variant opacity-90">بياناتك مشفرة ومحمية بأعلى معايير الأمان العالمية.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center backdrop-blur-md border border-white/20">
+                <span className="material-symbols-outlined filled text-tertiary-fixed">favorite</span>
+              </div>
+              <div>
+                <h3 className="text-sm font-bold mb-1">دعم مستمر</h3>
+                <p className="text-sm text-surface-variant opacity-90">فريق متخصص متاح للإجابة على استفساراتك وتقديم المساعدة.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-on-primary/10 flex items-center justify-center backdrop-blur-md border border-white/20">
+                <span className="material-symbols-outlined filled text-tertiary-fixed">verified_user</span>
+              </div>
+              <div>
+                <h3 className="text-sm font-bold mb-1">موثوقية وأمان</h3>
+                <p className="text-sm text-surface-variant opacity-90">أطباء معتمدون وبروتوكولات صارمة لضمان جودة الرعاية.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative z-10 mt-auto pt-6 text-sm text-surface-variant opacity-70">
+            © ٢٠٢٤ وصال للصحة النفسية
+          </div>
         </div>
 
-        {/* Card */}
-        <Card className="rounded-2xl shadow-lg border-0 p-6 sm:p-8">
-          <CardContent className="p-0">
-            {/* Error message */}
-            {errorMsg && (
-              <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm text-center font-medium">
-                {errorMsg}
-              </div>
-            )}
-
-            {/* Tab switch */}
-            <div className="flex gap-1 p-1 rounded-xl bg-gray-100 mb-6">
-              <button
-                type="button"
-                onClick={() => { setActiveTab('user'); setErrorMsg(''); }}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200
-                  ${activeTab === 'user'
-                    ? 'bg-teal-600 text-white shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                  }
-                `}
-              >
-                <User className="w-4 h-4" />
-                مستخدم
-              </button>
-              <button
-                type="button"
-                onClick={() => { setActiveTab('doctor'); setErrorMsg(''); }}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200
-                  ${activeTab === 'doctor'
-                    ? 'bg-teal-600 text-white shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                  }
-                `}
-              >
-                <Stethoscope className="w-4 h-4" />
-                طبيب
-              </button>
+        {/* Left Side: Sign Up Form */}
+        <div className="w-full md:w-7/12 p-6 md:p-12 lg:p-16 flex flex-col justify-center bg-surface-container-lowest">
+          {/* Mobile Logo */}
+          <div className="md:hidden mb-6 text-center">
+            <div className="w-14 h-14 bg-primary-container rounded-xl flex items-center justify-center shadow-sm mx-auto mb-3">
+              <span className="material-symbols-outlined filled text-on-primary text-[28px]">favorite</span>
             </div>
+            <h1 className="text-2xl font-bold text-primary-container">Wesal</h1>
+          </div>
 
-            {/* User form */}
-            {activeTab === 'user' ? (
-              <form onSubmit={handleUserRegister} className="space-y-4">
+          <div className="mb-6 text-center md:text-right">
+            <h2 className="text-[32px] font-bold text-primary mb-1 leading-tight tracking-tight">إنشاء حساب جديد</h2>
+            <p className="text-base text-on-surface-variant">انضم إلى مجتمع وصال وابدأ رحلتك نحو صحة نفسية أفضل.</p>
+          </div>
+
+          {/* Error message */}
+          {errorMsg && (
+            <div className="mb-5 p-3.5 rounded-xl bg-error-container border border-error/20 text-error text-sm text-center font-medium">
+              {errorMsg}
+            </div>
+          )}
+
+          {/* Role Toggle */}
+          <div className="flex p-1 bg-surface-container rounded-lg mb-6">
+            <button
+              type="button"
+              onClick={() => { setActiveTab('user'); setErrorMsg(''); }}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-md text-sm font-bold transition-all duration-200
+                ${activeTab === 'user'
+                  ? 'bg-surface-container-lowest shadow-sm text-primary'
+                  : 'text-on-surface-variant opacity-70 hover:opacity-100'
+                }
+              `}
+            >
+              <span className="material-symbols-outlined text-[20px]">person</span>
+              مستخدم
+            </button>
+            <button
+              type="button"
+              onClick={() => { setActiveTab('doctor'); setErrorMsg(''); }}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-md text-sm font-bold transition-all duration-200
+                ${activeTab === 'doctor'
+                  ? 'bg-surface-container-lowest shadow-sm text-primary'
+                  : 'text-on-surface-variant opacity-70 hover:opacity-100'
+                }
+              `}
+            >
+              <span className="material-symbols-outlined text-[20px]">medical_services</span>
+              طبيب
+            </button>
+          </div>
+
+          {/* User Form */}
+          {activeTab === 'user' ? (
+            <form onSubmit={handleUserRegister} className="flex flex-col gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Username */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-900">اسم المستخدم</Label>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-on-surface-variant">اسم المستخدم</label>
                   <div className="relative">
-                    <User className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
-                    <Input
-                      placeholder="cool_user23"
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">account_circle</span>
+                    <input
+                      placeholder="أدخل اسم المستخدم"
                       value={userForm.username}
                       onChange={(e) => { setUserForm({ ...userForm, username: e.target.value }); setErrorMsg(''); }}
-                      className="h-12 rounded-lg border-gray-200 pr-11"
+                      className="w-full pl-3 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
                       required
                       disabled={loading}
                     />
@@ -163,33 +206,37 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Email */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-900">الإيميل</Label>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-on-surface-variant">البريد الإلكتروني</label>
                   <div className="relative">
-                    <Mail className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
-                    <Input
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">mail</span>
+                    <input
                       type="email"
                       placeholder="example@email.com"
+                      dir="ltr"
                       value={userForm.email}
                       onChange={(e) => { setUserForm({ ...userForm, email: e.target.value }); setErrorMsg(''); }}
-                      className="h-12 rounded-lg border-gray-200 pr-11"
+                      className="w-full pl-3 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
                       required
                       disabled={loading}
                     />
                   </div>
                 </div>
+              </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Phone */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-900">رقم الموبايل</Label>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-on-surface-variant">رقم الجوال</label>
                   <div className="relative">
-                    <Phone className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
-                    <Input
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">phone_iphone</span>
+                    <input
                       type="tel"
-                      placeholder="01xxxxxxxxx"
+                      placeholder="05X XXX XXXX"
+                      dir="ltr"
                       value={userForm.phone}
                       onChange={(e) => { setUserForm({ ...userForm, phone: e.target.value }); setErrorMsg(''); }}
-                      className="h-12 rounded-lg border-gray-200 pr-11"
+                      className="w-full pl-3 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
                       required
                       disabled={loading}
                     />
@@ -197,16 +244,16 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Password */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-900">كلمة المرور</Label>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-on-surface-variant">كلمة المرور</label>
                   <div className="relative">
-                    <Lock className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
-                    <Input
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">lock</span>
+                    <input
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="6 أحرف على الأقل"
+                      placeholder="••••••••"
                       value={userForm.password}
                       onChange={(e) => { setUserForm({ ...userForm, password: e.target.value }); setErrorMsg(''); }}
-                      className="h-12 rounded-lg border-gray-200 pr-11 pl-11"
+                      className="w-full pl-10 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
                       required
                       minLength={6}
                       disabled={loading}
@@ -214,50 +261,62 @@ export default function RegisterPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors"
                       aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
                     >
-                      {showPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
+                      <span className="material-symbols-outlined text-[20px]">
+                        {showPassword ? 'visibility' : 'visibility_off'}
+                      </span>
                     </button>
                   </div>
                 </div>
+              </div>
 
-                {/* Privacy note */}
-                <div className="flex items-start gap-3 rounded-xl bg-teal-50 p-4 border border-teal-100">
-                  <Shield className="w-4 h-4 text-teal-600 mt-0.5 shrink-0" />
-                  <p className="text-xs text-gray-600 leading-relaxed">
-                    اسمك الحقيقي مش هيظهر لأي حد. اختار اسم مستعار وشارك براحتك.
-                  </p>
-                </div>
+              {/* Privacy note */}
+              <div className="flex items-start gap-2 mt-2 bg-tertiary-fixed/20 p-3 rounded-lg border border-tertiary-fixed/30">
+                <span className="material-symbols-outlined text-primary-container text-sm mt-0.5 flex-shrink-0">info</span>
+                <p className="text-xs text-on-surface-variant leading-relaxed">
+                  بإنشاء حساب، أنت توافق على{' '}
+                  <Link href="#" className="text-primary font-bold underline decoration-primary/30 underline-offset-4">الشروط والأحكام</Link>
+                  {' '}و{' '}
+                  <Link href="#" className="text-primary font-bold underline decoration-primary/30 underline-offset-4">سياسة الخصوصية</Link>
+                  {' '}الخاصة بمنصة وصال. نحن نلتزم بحماية بياناتك الشخصية.
+                </p>
+              </div>
 
-                {/* Submit */}
-                <Button
-                  type="submit"
-                  className="w-full h-11 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-semibold text-base"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      جاري التسجيل...
-                    </>
-                  ) : (
-                    'إنشاء حساب'
-                  )}
-                </Button>
-              </form>
-            ) : (
-              <form onSubmit={handleDoctorRegister} className="space-y-4">
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-4 w-full py-3 px-6 rounded-lg bg-gradient-to-l from-primary to-primary-container text-on-primary text-sm font-bold shadow-md hover:shadow-lg hover:opacity-90 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+                    جاري التسجيل...
+                  </>
+                ) : (
+                  <>
+                    إنشاء حساب
+                    <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward</span>
+                  </>
+                )}
+              </button>
+            </form>
+          ) : (
+            /* Doctor Form */
+            <form onSubmit={handleDoctorRegister} className="flex flex-col gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Real Name */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-900">الاسم الحقيقي</Label>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-on-surface-variant">الاسم الحقيقي</label>
                   <div className="relative">
-                    <UserCircle className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
-                    <Input
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">badge</span>
+                    <input
                       placeholder="د. أحمد محمود"
                       value={doctorForm.realName}
                       onChange={(e) => { setDoctorForm({ ...doctorForm, realName: e.target.value }); setErrorMsg(''); }}
-                      className="h-12 rounded-lg border-gray-200 pr-11"
+                      className="w-full pl-3 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
                       required
                       disabled={loading}
                     />
@@ -265,32 +324,35 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Specialty */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-900">التخصص</Label>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-on-surface-variant">التخصص</label>
                   <div className="relative">
-                    <GraduationCap className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
-                    <Input
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">school</span>
+                    <input
                       placeholder="طب نفسي"
                       value={doctorForm.specialty}
                       onChange={(e) => { setDoctorForm({ ...doctorForm, specialty: e.target.value }); setErrorMsg(''); }}
-                      className="h-12 rounded-lg border-gray-200 pr-11"
+                      className="w-full pl-3 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
                       required
                       disabled={loading}
                     />
                   </div>
                 </div>
+              </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Email */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-900">الإيميل</Label>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-on-surface-variant">البريد الإلكتروني</label>
                   <div className="relative">
-                    <Mail className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
-                    <Input
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">mail</span>
+                    <input
                       type="email"
                       placeholder="doctor@hospital.com"
+                      dir="ltr"
                       value={doctorForm.email}
                       onChange={(e) => { setDoctorForm({ ...doctorForm, email: e.target.value }); setErrorMsg(''); }}
-                      className="h-12 rounded-lg border-gray-200 pr-11"
+                      className="w-full pl-3 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
                       required
                       disabled={loading}
                     />
@@ -298,91 +360,93 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Phone */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-900">رقم الموبايل</Label>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-on-surface-variant">رقم الجوال</label>
                   <div className="relative">
-                    <Phone className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
-                    <Input
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">phone_iphone</span>
+                    <input
                       type="tel"
-                      placeholder="01xxxxxxxxx"
+                      placeholder="05X XXX XXXX"
+                      dir="ltr"
                       value={doctorForm.phone}
                       onChange={(e) => { setDoctorForm({ ...doctorForm, phone: e.target.value }); setErrorMsg(''); }}
-                      className="h-12 rounded-lg border-gray-200 pr-11"
+                      className="w-full pl-3 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
                       required
                       disabled={loading}
                     />
                   </div>
                 </div>
+              </div>
 
-                {/* Password */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-900">كلمة المرور</Label>
-                  <div className="relative">
-                    <Lock className="absolute right-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
-                    <Input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="6 أحرف على الأقل"
-                      value={doctorForm.password}
-                      onChange={(e) => { setDoctorForm({ ...doctorForm, password: e.target.value }); setErrorMsg(''); }}
-                      className="h-12 rounded-lg border-gray-200 pr-11 pl-11"
-                      required
-                      minLength={6}
-                      disabled={loading}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                      aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
-                    >
-                      {showPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
-                    </button>
-                  </div>
+              {/* Password (full width) */}
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-medium text-on-surface-variant">كلمة المرور</label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">lock</span>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    value={doctorForm.password}
+                    onChange={(e) => { setDoctorForm({ ...doctorForm, password: e.target.value }); setErrorMsg(''); }}
+                    className="w-full pl-10 pr-10 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary-container focus:border-primary-container text-base outline-none transition-all disabled:opacity-50"
+                    required
+                    minLength={6}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors"
+                    aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
+                  >
+                    <span className="material-symbols-outlined text-[20px]">
+                      {showPassword ? 'visibility' : 'visibility_off'}
+                    </span>
+                  </button>
                 </div>
+              </div>
 
-                {/* Doctor note */}
-                <div className="flex items-start gap-3 rounded-xl bg-teal-50 p-4 border border-teal-100">
-                  <Stethoscope className="w-4 h-4 text-teal-600 mt-0.5 shrink-0" />
-                  <p className="text-xs text-gray-600 leading-relaxed">
-                    هنتحقق من مؤهلاتك الطبية قبل ما حسابك يظهر كطبيب موثوق.
-                  </p>
-                </div>
+              {/* Doctor note */}
+              <div className="flex items-start gap-2 mt-2 bg-tertiary-fixed/20 p-3 rounded-lg border border-tertiary-fixed/30">
+                <span className="material-symbols-outlined text-primary-container text-sm mt-0.5 flex-shrink-0">info</span>
+                <p className="text-xs text-on-surface-variant leading-relaxed">
+                  هنتحقق من مؤهلاتك الطبية قبل ما حسابك يظهر كطبيب موثوق على المنصة.
+                </p>
+              </div>
 
-                {/* Submit */}
-                <Button
-                  type="submit"
-                  className="w-full h-11 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-semibold text-base"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      جاري التسجيل...
-                    </>
-                  ) : (
-                    'إنشاء حساب دكتور'
-                  )}
-                </Button>
-              </form>
-            )}
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-4 w-full py-3 px-6 rounded-lg bg-gradient-to-l from-primary to-primary-container text-on-primary text-sm font-bold shadow-md hover:shadow-lg hover:opacity-90 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+                    جاري التسجيل...
+                  </>
+                ) : (
+                  <>
+                    إنشاء حساب دكتور
+                    <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward</span>
+                  </>
+                )}
+              </button>
+            </form>
+          )}
 
-            {/* Login link */}
-            <div className="mt-6 text-center text-sm text-gray-500">
-              عندك حساب؟{' '}
-              <Link href="/login" className="text-teal-600 hover:text-teal-700 font-semibold transition-colors inline-flex items-center gap-1">
+          {/* Login link */}
+          <div className="mt-6 text-center">
+            <p className="text-base text-on-surface-variant">
+              لديك حساب؟{' '}
+              <Link
+                href="/login"
+                className="text-primary font-bold hover:text-primary-container underline decoration-primary/30 underline-offset-4 transition-colors"
+              >
                 سجل دخول
-                <ArrowLeft className="w-3.5 h-3.5" />
               </Link>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Back link */}
-        <div className="mt-5 text-center">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-white/50 hover:text-white/80 transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-            رجوع للصفحة الرئيسية
-          </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

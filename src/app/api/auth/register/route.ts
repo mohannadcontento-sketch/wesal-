@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { hash } from 'bcryptjs';
 import { buildAuthUser, createSessionToken } from '@/lib/auth/session';
 import { randomInt } from 'crypto';
+import { sendOtpEmail } from '@/lib/email';
 
 export async function POST(req: Request) {
   try {
@@ -110,9 +111,17 @@ export async function POST(req: Request) {
       path: '/',
     });
 
-    // TODO: Send OTP email via email service
-    // For now, we'll log it (in production, integrate with an email service)
-    console.log(`[AUTH] OTP for ${email}: ${otpCode}`);
+    // Send OTP email via Supabase Edge Function (with fallback)
+    const emailResult = await sendOtpEmail(email, otpCode);
+
+    if (!emailResult.success) {
+      console.error(`[AUTH] Failed to send registration OTP to ${email} via ${emailResult.method}: ${emailResult.error}`);
+    }
+
+    console.log(`[AUTH] Registration OTP for ${email}: ${otpCode} (sent via: ${emailResult.method})`);
+
+    // Include delivery method info in response
+    response.headers.set('X-Email-Method', emailResult.method);
 
     return response;
   } catch (error) {

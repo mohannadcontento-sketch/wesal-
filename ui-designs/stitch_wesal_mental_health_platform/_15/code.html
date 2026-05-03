@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#edeeee",
+                    "inverse-primary": "#9ad0d3",
+                    "on-primary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#d1e5f9",
+                    "secondary": "#4e6071",
+                    "on-secondary-fixed": "#091d2c",
+                    "error": "#ba1a1a",
+                    "surface-container-highest": "#e1e3e2",
+                    "surface-container-low": "#f3f4f3",
+                    "tertiary-fixed": "#b2ecf6",
+                    "on-tertiary-fixed": "#001f24",
+                    "tertiary": "#002b31",
+                    "on-surface-variant": "#404849",
+                    "surface-bright": "#f8f9f9",
+                    "on-primary-fixed-variant": "#134e51",
+                    "on-secondary-container": "#526576",
+                    "surface": "#f8f9f9",
+                    "on-primary-fixed": "#002021",
+                    "secondary-container": "#cee2f6",
+                    "surface-tint": "#306669",
+                    "tertiary-container": "#00434b",
+                    "primary-fixed-dim": "#9ad0d3",
+                    "inverse-surface": "#2e3131",
+                    "tertiary-fixed-dim": "#96d0da",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-container": "#77b0b9",
+                    "on-primary-container": "#7aafb2",
+                    "surface-dim": "#d9dada",
+                    "background": "#f8f9f9",
+                    "primary": "#002b2d",
+                    "on-surface": "#191c1c",
+                    "primary-container": "#004346",
+                    "on-error-container": "#93000a",
+                    "on-tertiary": "#ffffff",
+                    "on-background": "#191c1c",
+                    "on-secondary-fixed-variant": "#364959",
+                    "surface-variant": "#e1e3e2",
+                    "on-error": "#ffffff",
+                    "outline": "#707979",
+                    "inverse-on-surface": "#f0f1f0",
+                    "primary-fixed": "#b6ecef",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#b5c9dc",
+                    "on-tertiary-fixed-variant": "#094e57",
+                    "surface-container-high": "#e7e8e8",
+                    "outline-variant": "#bfc8c8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "unit": "4px",
+                    "container-max": "1280px",
+                    "xl": "40px",
+                    "xxl": "64px",
+                    "sm": "8px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "h2": ["Manrope"],
+                    "body-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display": ["Manrope"],
+                    "h3": ["Manrope"],
+                    "label-md": ["Inter"],
+                    "h1": ["Manrope"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                    "h2": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "h3": ["20px", {"lineHeight": "1.5", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "h1": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #F8F5F0;
+            color: #191c1c;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .gradient-hero {
+            background: linear-gradient(135deg, #172A39 0%, #004346 35%, #508992 70%, #73B3CE 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(115, 179, 206, 0.2);
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-background selection:bg-on-primary-container/30">
+<!-- TopNavBar Shared Component -->
+<header class="bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-teal-100/20 dark:border-teal-900/20 shadow-sm">
+<nav class="flex justify-between items-center px-6 py-4 w-full max-w-screen-2xl mx-auto rtl">
+<div class="flex items-center gap-8">
+<div class="text-2xl font-bold text-teal-800 dark:text-teal-400">وصال</div>
+<div class="hidden md:flex gap-6 font-manrope font-medium text-sm text-teal-900 dark:text-teal-50">
+<a class="text-teal-700 dark:text-teal-300 border-b-2 border-teal-700 pb-1" href="#">Home</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-teal-600 hover:bg-teal-50/50 dark:hover:bg-teal-900/30 transition-colors" href="#">Community</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-teal-600 hover:bg-teal-50/50 dark:hover:bg-teal-900/30 transition-colors" href="#">Doctors</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 ml-4">
+<button class="px-md py-sm font-label-md text-primary hover:bg-surface-container transition-colors rounded-lg">تسجيل الدخول</button>
+<button class="px-md py-sm font-label-md bg-primary text-on-primary rounded-lg shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">ابدأ الآن</button>
+</div>
+<span class="material-symbols-outlined text-slate-500 cursor-pointer hover:text-teal-600 transition-colors" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-slate-500 cursor-pointer hover:text-teal-600 transition-colors" data-icon="account_circle">account_circle</span>
+</div>
+</nav>
+</header>
+<main class="pt-[72px]">
+<!-- Hero Section -->
+<section class="gradient-hero relative min-h-[870px] flex items-center overflow-hidden px-gutter">
+<div class="container-max mx-auto grid md:grid-cols-2 gap-xl items-center relative z-10">
+<div class="text-right">
+<h1 class="font-display text-white mb-lg leading-tight">مساحتك الآمنة للصحة النفسية</h1>
+<p class="font-body-lg text-white/80 mb-xl max-w-xl">
+                        نحن نوفر لك بيئة سرية تماماً للتعبير عن نفسك والتواصل مع خبراء متخصصين. خصوصيتك هي أولويتنا القصوى في رحلة تعافيك النفسي.
+                    </p>
+<div class="flex flex-wrap gap-md justify-start">
+<button class="px-xl py-md font-label-md bg-on-primary-container text-primary-container rounded-full hover:bg-white transition-all shadow-xl shadow-black/10">ابدأ دلوقتي مجاناً</button>
+<button class="px-xl py-md font-label-md border-2 border-white/30 text-white rounded-full hover:bg-white/10 transition-all">عندي حساب</button>
+</div>
+<div class="mt-xxl flex gap-lg items-center opacity-80">
+<div class="flex items-center gap-xs text-white text-body-sm">
+<span class="material-symbols-outlined text-sm" data-icon="lock" data-weight="fill" style="font-variation-settings: 'FILL' 1;">lock</span>
+                            Encrypted
+                        </div>
+<div class="flex items-center gap-xs text-white text-body-sm">
+<span class="material-symbols-outlined text-sm" data-icon="visibility_off" data-weight="fill" style="font-variation-settings: 'FILL' 1;">visibility_off</span>
+                            Anonymous
+                        </div>
+<div class="flex items-center gap-xs text-white text-body-sm">
+<span class="material-symbols-outlined text-sm" data-icon="verified_user" data-weight="fill" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+                            Privacy
+                        </div>
+</div>
+</div>
+<div class="hidden md:block relative">
+<div class="absolute inset-0 bg-secondary/20 rounded-full blur-[100px]"></div>
+<img alt="Mental Wellness Illustration" class="relative z-10 w-full h-auto drop-shadow-2xl" data-alt="A serene and ethereal digital illustration representing mental wellness and peace. It features soft, fluid organic shapes in varying shades of deep teal and soft cyan, blending harmoniously. In the center, a stylized silhouette of a human head is filled with glowing stars and gentle light paths, symbolizing clarity and support. The overall aesthetic is minimalist and modern, set against a dark, calming gradient background that evokes a sense of quiet clinical care and safety." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgUiKR_JpFBq9mJiH72yfTdAFqNhAKMYPjo2tWAKCP1mLyb7DXOvMEd5qCjHMIHm-Kw7NtLvhBnDKiZfbamXyr83RXLCMJqpsEIWTX1L8L6rkpDuqMr1nGXNRgvHxBgRoqBwiU442kSBTEtv7aK2AIeOKLYS4S1rPfQTiFvfP3YMaNuTgXWxij1LvPCrWwQ4cxmiO1lu79TWh5Y_4QzcoE3-Jk0v7DhZAFq-CHdnQdRd38IQ0WZqGgV3QMBIji17dbcLnXED0BkSA"/>
+</div>
+</div>
+</section>
+<!-- Stats Section -->
+<section class="py-xxl container-max mx-auto px-gutter -mt-xl relative z-20">
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-md">
+<div class="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant/30 text-center shadow-sm hover:shadow-md transition-shadow">
+<div class="font-display text-primary mb-xs">1,000+</div>
+<div class="font-label-md text-secondary">مستخدم نشط</div>
+</div>
+<div class="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant/30 text-center shadow-sm hover:shadow-md transition-shadow">
+<div class="font-display text-primary mb-xs">50+</div>
+<div class="font-label-md text-secondary">طبيب معتمد</div>
+</div>
+<div class="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant/30 text-center shadow-sm hover:shadow-md transition-shadow">
+<div class="font-display text-primary mb-xs">100+</div>
+<div class="font-label-md text-secondary">مقالات داعمة</div>
+</div>
+<div class="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant/30 text-center shadow-sm hover:shadow-md transition-shadow">
+<div class="font-display text-primary mb-xs">98%</div>
+<div class="font-label-md text-secondary">نسبة الرضا</div>
+</div>
+</div>
+</section>
+<!-- Features Section (Bento Grid Style) -->
+<section class="py-xxl container-max mx-auto px-gutter">
+<div class="text-center mb-xxl">
+<h2 class="font-h1 text-primary mb-md">ليه تختار وصال؟</h2>
+<p class="font-body-md text-secondary max-w-2xl mx-auto">صممنا المنصة لتكون ملاذك الآمن الذي يجمع بين التكنولوجيا المتطورة والخبرة البشرية العميقة.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="md:col-span-2 bg-white p-xl rounded-xl border border-outline-variant/20 shadow-sm flex flex-col justify-between group hover:border-primary/20 transition-all">
+<div>
+<span class="material-symbols-outlined text-4xl text-primary mb-md" data-icon="security">security</span>
+<h3 class="font-h2 text-primary mb-sm">خصوصية لا تقبل المساومة</h3>
+<p class="font-body-md text-secondary">بياناتك مشفرة بالكامل. يمكنك اختيار اسم مستعار والتحكم الكامل فيما تشاركه ومع من تشاركه.</p>
+</div>
+<div class="mt-xl h-48 bg-surface-container rounded-lg overflow-hidden relative">
+<img alt="Privacy Visualization" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A clean, minimalist 3D rendering of digital shields and glowing lock icons floating in a soft, bright office-like environment. The scene uses a palette of soft cyan and white with subtle deep teal accents. The lighting is diffused and warm, creating a sense of safety and professional medical-grade security. The overall mood is high-tech yet approachable and calm." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCifhLmdwPk-VBx52w06iFCQrxJ4uJQxrXUVa7oqj01PxShUAxa9NrybEuAoS44eCuQs0v2msdBDqHW4hDEjSlMw4d-s5y_lnm29OlHQrdYUF30iE-d5rhUnBEn3HCxdfxDEGVxBj6V-l03omppaX-tXF-nMbRO6OtcsfAOuk6iiTuo8MbdLnLI3Fprj5AdzCL2ahhvaRFlXzqJmxtPuGsjEBL5pkfypXK58RENZgQWA35v4DfAOEQL4rgukyG54Ah-wLJ7fOPwAmQ"/>
+</div>
+</div>
+<div class="bg-primary text-on-primary p-xl rounded-xl flex flex-col justify-center">
+<span class="material-symbols-outlined text-4xl mb-md" data-icon="verified">verified</span>
+<h3 class="font-h2 mb-sm">أطباء معتمدون</h3>
+<p class="font-body-md opacity-80">فريقنا يضم نخبة من المتخصصين المرخصين الذين خضعوا لتدقيق صارم لضمان جودة الرعاية المقدمة.</p>
+</div>
+<div class="bg-secondary-container p-xl rounded-xl border border-outline-variant/20 shadow-sm">
+<span class="material-symbols-outlined text-4xl text-on-secondary-container mb-md" data-icon="groups">groups</span>
+<h3 class="font-h2 text-on-secondary-container mb-sm">مجتمع داعم</h3>
+<p class="font-body-md text-on-secondary-container/80">تواصل مع أشخاص يمرون بتجارب مشابهة في مساحات نقاشية آمنة ومراقبة باحترافية.</p>
+</div>
+<div class="md:col-span-2 bg-white p-xl rounded-xl border border-outline-variant/20 shadow-sm flex items-center gap-lg group hover:border-primary/20 transition-all">
+<div class="w-1/3 h-full min-h-[160px] bg-tertiary-container/10 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl text-primary" data-icon="chat_bubble">chat_bubble</span>
+</div>
+<div class="w-2/3">
+<h3 class="font-h2 text-primary mb-sm">محادثات آمنة</h3>
+<p class="font-body-md text-secondary">جلسات فردية فورية عبر رسائل نصية أو صوتية مشفرة تضمن لك الراحة في أي وقت وأي مكان.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- How it Works -->
+<section class="py-xxl bg-surface-container-low">
+<div class="container-max mx-auto px-gutter">
+<div class="text-center mb-xxl">
+<h2 class="font-h1 text-primary mb-md">خطواتك نحو السلام النفسي</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-xl relative">
+<div class="text-center relative z-10">
+<div class="w-16 h-16 bg-primary text-on-primary rounded-full flex items-center justify-center mx-auto mb-lg font-display text-h2">1</div>
+<h3 class="font-h3 text-primary mb-sm">سجل حسابك</h3>
+<p class="font-body-md text-secondary">أنشئ حسابك في ثوانٍ. لا نحتاج لهويتك الحقيقية لتبدأ.</p>
+</div>
+<div class="text-center relative z-10">
+<div class="w-16 h-16 bg-primary text-on-primary rounded-full flex items-center justify-center mx-auto mb-lg font-display text-h2">2</div>
+<h3 class="font-h3 text-primary mb-sm">شارك قصتك</h3>
+<p class="font-body-md text-secondary">ابحث عن الطبيب المناسب أو شارك في المجتمعات المفتوحة.</p>
+</div>
+<div class="text-center relative z-10">
+<div class="w-16 h-16 bg-primary text-on-primary rounded-full flex items-center justify-center mx-auto mb-lg font-display text-h2">3</div>
+<h3 class="font-h3 text-primary mb-sm">تواصل وتعافى</h3>
+<p class="font-body-md text-secondary">ابدأ رحلة العلاج مع متخصص يدعمك في كل خطوة.</p>
+</div>
+<!-- Connector Line (Hidden on Mobile) -->
+<div class="hidden md:block absolute top-8 left-1/4 right-1/4 h-0.5 border-t-2 border-dashed border-primary/20 -z-0"></div>
+</div>
+</div>
+</section>
+<!-- Security Cards -->
+<section class="py-xxl container-max mx-auto px-gutter">
+<div class="text-center mb-xxl">
+<h2 class="font-h1 text-primary mb-md">أمانك أولويتنا القصوى</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="p-xl rounded-xl border-2 border-primary/5 hover:border-primary/20 transition-all text-right">
+<div class="w-12 h-12 bg-primary-container text-on-primary-container rounded-lg flex items-center justify-center mb-lg">
+<span class="material-symbols-outlined" data-icon="lock_open">lock_open</span>
+</div>
+<h3 class="font-h3 text-primary mb-sm">تشفير كامل للبيانات</h3>
+<p class="font-body-sm text-secondary">نستخدم بروتوكولات تشفير عسكرية لضمان أن لا أحد غيرك وطبيبك يمكنه الوصول للمحادثات.</p>
+</div>
+<div class="p-xl rounded-xl border-2 border-primary/5 hover:border-primary/20 transition-all text-right">
+<div class="w-12 h-12 bg-primary-container text-on-primary-container rounded-lg flex items-center justify-center mb-lg">
+<span class="material-symbols-outlined" data-icon="mask">masks</span>
+</div>
+<h3 class="font-h3 text-primary mb-sm">هوية مخفية تماماً</h3>
+<p class="font-body-sm text-secondary">لك كامل الحرية في اختيار اسم مستعار وعدم مشاركة أي تفاصيل شخصية تكشف هويتك.</p>
+</div>
+<div class="p-xl rounded-xl border-2 border-primary/5 hover:border-primary/20 transition-all text-right">
+<div class="w-12 h-12 bg-primary-container text-on-primary-container rounded-lg flex items-center justify-center mb-lg">
+<span class="material-symbols-outlined" data-icon="badge">badge</span>
+</div>
+<h3 class="font-h3 text-primary mb-sm">خبراء موثوقون</h3>
+<p class="font-body-sm text-secondary">كل مقدم خدمة على المنصة يتم التحقق من تراخيصه المهنية وخبراته العملية بدقة.</p>
+</div>
+</div>
+</section>
+<!-- Testimonials -->
+<section class="py-xxl bg-primary/5">
+<div class="container-max mx-auto px-gutter">
+<h2 class="font-h1 text-primary text-center mb-xxl">قصص نجاح من مجتمعنا</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="bg-white p-xl rounded-xl shadow-sm border border-outline-variant/10">
+<div class="flex gap-1 text-yellow-500 mb-md">
+<span class="material-symbols-outlined fill" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined fill" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined fill" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined fill" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined fill" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="font-body-md text-primary italic mb-lg">"وجدت هنا الأمان والسرية اللي كنت بدور عليها. الطبيب اللي تواصلت معاه كان مستمع رائع وساعدني كتير."</p>
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed"></div>
+<div>
+<div class="font-label-md text-primary">مستخدم هادئ</div>
+<div class="font-label-sm text-secondary">منذ شهرين</div>
+</div>
+</div>
+</div>
+<div class="bg-white p-xl rounded-xl shadow-sm border border-outline-variant/10">
+<div class="flex gap-1 text-yellow-500 mb-md">
+<span class="material-symbols-outlined fill" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined fill" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined fill" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined fill" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined fill" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="font-body-md text-primary italic mb-lg">"مجتمع وصال خلاني أحس إني مش لوحدي. النقاشات الجماعية مفيدة جداً وتحت إشراف متخصصين."</p>
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed"></div>
+<div>
+<div class="font-label-md text-primary">صديق وصال</div>
+<div class="font-label-sm text-secondary">منذ ٥ أشهر</div>
+</div>
+</div>
+</div>
+<div class="bg-white p-xl rounded-xl shadow-sm border border-outline-variant/10">
+<div class="flex gap-1 text-yellow-500 mb-md">
+<span class="material-symbols-outlined fill" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined fill" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined fill" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined fill" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined fill" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="font-body-md text-primary italic mb-lg">"التجربة سهلة ومريحة جداً. ما تخيلتش إن الحصول على استشارة نفسية ممكن يكون بالسهولة والخصوصية دي."</p>
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary-fixed"></div>
+<div>
+<div class="font-label-md text-primary">باحث عن الهدوء</div>
+<div class="font-label-sm text-secondary">منذ سنة</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-xxl container-max mx-auto px-gutter text-center">
+<div class="gradient-hero p-xxl rounded-[2rem] text-white shadow-2xl relative overflow-hidden">
+<div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+<div class="relative z-10">
+<h2 class="font-display text-white mb-lg">جاهز تبدأ رحلتك؟</h2>
+<p class="font-body-lg text-white/80 mb-xl max-w-xl mx-auto">نحن هنا لندعمك في كل خطوة. ابدأ أولى خطواتك نحو حياة نفسية أكثر اتزاناً اليوم.</p>
+<button class="px-xxl py-md bg-white text-primary font-h3 rounded-full hover:scale-105 active:scale-95 transition-all shadow-lg">سجل مجاناً الآن</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container py-xxl border-t border-outline-variant/30">
+<div class="container-max mx-auto px-gutter grid grid-cols-1 md:grid-cols-4 gap-xl">
+<div class="md:col-span-1">
+<div class="text-2xl font-bold text-teal-800 mb-lg">وصال</div>
+<p class="font-body-sm text-secondary">منصة رقمية متكاملة تهدف لرفع الوعي بالصحة النفسية وتوفير سبل الدعم الاحترافية بسرية تامة.</p>
+</div>
+<div>
+<h4 class="font-label-md text-primary mb-lg">روابط سريعة</h4>
+<ul class="space-y-md font-body-sm text-secondary">
+<li><a class="hover:text-primary transition-colors" href="#">عن المنصة</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">كيف نعمل</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">الأطباء</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">الأسئلة الشائعة</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-primary mb-lg">قانوني</h4>
+<ul class="space-y-md font-body-sm text-secondary">
+<li><a class="hover:text-primary transition-colors" href="#">سياسة الخصوصية</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">شروط الاستخدام</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">اتفاقية السرية</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-primary mb-lg">تواصل معنا</h4>
+<div class="flex gap-md mb-lg">
+<span class="material-symbols-outlined text-secondary hover:text-primary cursor-pointer" data-icon="mail">mail</span>
+<span class="material-symbols-outlined text-secondary hover:text-primary cursor-pointer" data-icon="share">share</span>
+<span class="material-symbols-outlined text-secondary hover:text-primary cursor-pointer" data-icon="language">language</span>
+</div>
+<p class="font-body-sm text-secondary">info@wesal.com</p>
+</div>
+</div>
+<div class="container-max mx-auto px-gutter mt-xxl pt-lg border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-center gap-md">
+<p class="font-label-sm text-secondary">© 2024 وصال (Wesal). جميع الحقوق محفوظة.</p>
+<div class="flex gap-lg">
+<span class="material-symbols-outlined text-teal-800 text-sm" data-icon="verified" data-weight="fill" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-sm text-secondary">معتمد طبياً</span>
+</div>
+</div>
+</footer>
+</body></html>

@@ -3,9 +3,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { Send, Loader2 } from 'lucide-react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 
 interface CommentFormProps {
   postId: string;
@@ -54,11 +51,10 @@ export function CommentForm({ postId, parentId, onCommentAdded }: CommentFormPro
 
   return (
     <div className="flex gap-2.5 items-start">
-      <Avatar size="sm">
-        <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-[10px]">
-          {user.badge}
-        </AvatarFallback>
-      </Avatar>
+      {/* Avatar */}
+      <div className="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center shrink-0">
+        <span className="text-[10px] font-semibold text-primary-container">{user.badge}</span>
+      </div>
       <div className="flex-1 flex items-center gap-2">
         <input
           type="text"
@@ -66,24 +62,22 @@ export function CommentForm({ postId, parentId, onCommentAdded }: CommentFormPro
           value={content}
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="flex-1 h-9 px-3 rounded-xl border border-gray-200 bg-gray-50 text-xs text-gray-900 placeholder:text-gray-400 transition-all duration-200 focus:border-teal-600 focus:ring-2 focus:ring-teal-600/10 focus:bg-white outline-none"
+          className="flex-1 h-9 px-3 rounded-xl border border-outline-variant bg-surface-container-low text-xs text-on-surface placeholder:text-on-surface-variant transition-all duration-200 focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 focus:bg-surface-container-lowest outline-none"
           maxLength={1000}
           disabled={loading}
         />
-        <Button
-          variant="default"
-          size="icon-sm"
+        <button
           onClick={handleSubmit}
           disabled={loading || !content.trim()}
+          className="shrink-0 h-8 w-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
           title="إرسال"
-          className="shrink-0 h-8 w-8"
         >
           {loading ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
           ) : (
-            <Send className="w-3.5 h-3.5" />
+            <span className="material-symbols-outlined text-[16px]">send</span>
           )}
-        </Button>
+        </button>
       </div>
     </div>
   );

@@ -5,10 +5,11 @@ import { useRef, useState, KeyboardEvent, ClipboardEvent, useEffect } from 'reac
 interface OTPInputProps {
   length?: number;
   onComplete: (code: string) => void;
+  onChange?: (code: string) => void;
   disabled?: boolean;
 }
 
-export default function OTPInput({ length = 6, onComplete, disabled = false }: OTPInputProps) {
+export default function OTPInput({ length = 6, onComplete, onChange, disabled = false }: OTPInputProps) {
   const [values, setValues] = useState<string[]>(Array(length).fill(''));
   const [focusedIndex, setFocusedIndex] = useState<number>(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -32,6 +33,8 @@ export default function OTPInput({ length = 6, onComplete, disabled = false }: O
     }
 
     const code = newValues.join('');
+    onChange?.(code);
+
     if (code.length === length && !newValues.includes('')) {
       onComplete(code);
     }
@@ -44,6 +47,7 @@ export default function OTPInput({ length = 6, onComplete, disabled = false }: O
       const newValues = [...values];
       newValues[index - 1] = '';
       setValues(newValues);
+      onChange?.(newValues.join(''));
     }
     if (e.key === 'ArrowLeft' && index < length - 1) {
       inputRefs.current[index + 1]?.focus();
@@ -71,13 +75,15 @@ export default function OTPInput({ length = 6, onComplete, disabled = false }: O
     setFocusedIndex(focusTarget);
 
     const code = newValues.join('');
+    onChange?.(code);
+
     if (code.length === length && !newValues.includes('')) {
       onComplete(code);
     }
   };
 
   return (
-    <div className="flex gap-2.5 sm:gap-3 justify-center" dir="ltr">
+    <div className="flex justify-between w-full gap-2" dir="ltr">
       {values.map((value, index) => (
         <input
           key={index}
@@ -93,18 +99,9 @@ export default function OTPInput({ length = 6, onComplete, disabled = false }: O
           onPaste={index === 0 ? handlePaste : undefined}
           onFocus={() => setFocusedIndex(index)}
           disabled={disabled}
-          className={`w-11 h-13 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-bold tracking-wider rounded-lg border-2 transition-all duration-200 outline-none
-            ${value
-              ? 'border-teal-500 bg-teal-50 text-teal-700'
-              : focusedIndex === index
-                ? 'border-teal-400 ring-2 ring-teal-100'
-                : 'border-gray-200 bg-white text-gray-900'
-            }
+          className={`w-12 h-14 bg-surface/50 border border-outline-variant rounded-xl text-center text-xl font-semibold text-on-surface focus:border-tertiary-fixed focus:ring-2 focus:ring-tertiary-fixed outline-none transition-all shadow-sm
             ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
           `}
-          style={{
-            animationDelay: `${index * 50}ms`,
-          }}
         />
       ))}
     </div>

@@ -1,8 +1,5 @@
-import { LucideIcon, Inbox } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-
 interface EmptyStateProps {
-  icon?: LucideIcon;
+  icon?: string;
   title: string;
   description?: string;
   actionLabel?: string;
@@ -10,7 +7,7 @@ interface EmptyStateProps {
 }
 
 export default function EmptyState({
-  icon: Icon = Inbox,
+  icon = 'inbox',
   title,
   description,
   actionLabel,
@@ -18,21 +15,24 @@ export default function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4">
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 mb-3">
-        <Icon className="w-7 h-7" />
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-container/10 text-primary-container mb-3">
+        <span className="material-symbols-outlined text-[28px] filled">{icon}</span>
       </div>
-      <h3 className="text-sm font-semibold text-gray-900 mb-1">
+      <h3 className="text-sm font-semibold text-on-surface mb-1">
         {title}
       </h3>
       {description && (
-        <p className="text-xs text-gray-500 text-center max-w-sm mb-3">
+        <p className="text-xs text-on-surface-variant text-center max-w-sm mb-3">
           {description}
         </p>
       )}
       {actionLabel && onAction && (
-        <Button size="sm" onClick={onAction}>
+        <button
+          onClick={onAction}
+          className="bg-primary-container text-on-primary text-sm font-semibold px-5 py-2.5 rounded-full hover:opacity-90 transition-opacity"
+        >
           {actionLabel}
-        </Button>
+        </button>
       )}
     </div>
   );

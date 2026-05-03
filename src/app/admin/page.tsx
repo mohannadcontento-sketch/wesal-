@@ -5,33 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import AnimatedCard from '@/components/animations/AnimatedCard';
-import EmptyState from '@/components/shared/EmptyState';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Shield,
-  Users,
-  Stethoscope,
-  FileText,
-  CheckCircle,
-  XCircle,
-  Clock,
-  AlertCircle,
-  BarChart3,
-  Activity,
-  Eye,
-  TrendingUp,
-  ArrowLeft,
-} from 'lucide-react';
 
 interface VerificationRequest {
   id: string;
@@ -75,7 +48,6 @@ export default function AdminPage() {
       return;
     }
     if (user?.role === 'admin') {
-      // Fetch verification requests (existing logic)
       fetch('/api/admin/verification-requests')
         .then((r) => r.json())
         .then((data) => {
@@ -88,7 +60,6 @@ export default function AdminPage() {
           }));
         });
 
-      // Fetch dashboard stats
       fetch('/api/admin/stats')
         .then((r) => r.json())
         .then((data) => {
@@ -100,7 +71,6 @@ export default function AdminPage() {
           }));
         })
         .catch(() => {
-          // Use verification data as fallback
           setStats((prev) => ({ ...prev }));
         })
         .finally(() => setIsLoadingStats(false));
@@ -129,295 +99,119 @@ export default function AdminPage() {
 
   if (!user || user.role !== 'admin') return null;
 
-  const statCards = [
-    {
-      label: 'إجمالي المستخدمين',
-      value: stats.totalUsers,
-      icon: Users,
-      color: 'bg-teal-50 text-teal-600',
-      trend: '+12%',
-      trendUp: true,
-    },
-    {
-      label: 'الأطباء',
-      value: stats.doctors,
-      icon: Stethoscope,
-      color: 'bg-purple-50 text-purple-600',
-      trend: '+5%',
-      trendUp: true,
-    },
-    {
-      label: 'المنشورات',
-      value: stats.posts,
-      icon: FileText,
-      color: 'bg-green-50 text-green-600',
-      trend: '+8%',
-      trendUp: true,
-    },
-    {
-      label: 'طلبات التوثيق',
-      value: stats.pendingVerifications,
-      icon: Clock,
-      color: 'bg-amber-50 text-amber-600',
-      trend:
-        stats.pendingVerifications > 0
-          ? `${stats.pendingVerifications} جديد`
-          : 'لا يوجد',
-      trendUp: null,
-    },
-  ];
-
-  const quickActions = [
-    {
-      label: 'مراجعة الطلبات',
-      href: '/admin/verification',
-      icon: Eye,
-      variant: 'primary' as const,
-    },
-  ];
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(hours / 24);
-
-    if (hours < 1) return 'منذ قليل';
-    if (hours < 24) return `منذ ${hours} ساعة`;
-    if (days < 7) return `منذ ${days} يوم`;
-    return date.toLocaleDateString('ar-EG');
-  };
-
   return (
-    <div className="space-y-6">
+    <div>
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-600 text-white shadow-sm">
-            <BarChart3 className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">لوحة التحكم</h1>
-            <p className="text-sm text-muted-foreground">
-              نظرة عامة على منصة وصال
-            </p>
-          </div>
+      <div className="flex items-center gap-4 mb-6">
+        <span className="material-symbols-outlined filled text-4xl text-primary">admin_panel_settings</span>
+        <div>
+          <h1 className="text-[32px] font-bold text-primary leading-tight">لوحة الإدارة</h1>
+          <p className="text-sm text-on-surface-variant mt-1">إدارة المنصة والتحقق من الطلبات</p>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {statCards.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <AnimatedCard key={stat.label} delay={index * 0.08}>
-              <Card className="p-4 sm:p-5">
-                <div className="flex items-start justify-between mb-3">
-                  <div
-                    className={`flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl ${stat.color}`}
-                  >
-                    <Icon className="w-5 h-5 sm:w-[22px] sm:h-[22px]" />
-                  </div>
-                  {stat.trendUp !== null && (
-                    <div
-                      className={`flex items-center gap-0.5 text-xs font-medium ${
-                        stat.trendUp ? 'text-green-600' : 'text-red-600'
-                      }`}
-                    >
-                      <TrendingUp
-                        className={`w-3 h-3 ${
-                          !stat.trendUp ? 'rotate-180' : ''
-                        }`}
-                      />
-                      {stat.trend}
-                    </div>
-                  )}
-                </div>
-                <p className="text-3xl font-bold text-foreground">
-                  {isLoadingStats ? (
-                    <Skeleton className="inline-block w-12 h-8 rounded-md" />
-                  ) : (
-                    stat.value
-                  )}
-                </p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {stat.label}
-                </p>
-              </Card>
-            </AnimatedCard>
-          );
-        })}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        {/* Pending */}
+        <div className="bg-white/10 backdrop-blur-[40px] border border-white/40 rounded-xl p-6 shadow-[0_4px_24px_0_rgba(0,43,45,0.05)] relative overflow-hidden group">
+          <div className="absolute -right-10 -top-10 w-32 h-32 bg-primary-fixed opacity-20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="text-sm font-bold text-outline">طلبات معلقة</h3>
+            <span className="material-symbols-outlined text-primary-container">pending_actions</span>
+          </div>
+          <p className="text-[32px] font-bold text-primary">
+            {isLoadingStats ? '...' : stats.pendingVerifications}
+          </p>
+        </div>
+
+        {/* Verified Today */}
+        <div className="bg-white/10 backdrop-blur-[40px] border border-white/40 rounded-xl p-6 shadow-[0_4px_24px_0_rgba(0,43,45,0.05)] relative overflow-hidden group">
+          <div className="absolute -right-10 -top-10 w-32 h-32 bg-tertiary-fixed opacity-20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="text-sm font-bold text-outline">تم التحقق اليوم</h3>
+            <span className="material-symbols-outlined text-tertiary-container">how_to_reg</span>
+          </div>
+          <p className="text-[32px] font-bold text-tertiary-container">
+            {isLoadingStats ? '...' : stats.doctors}
+          </p>
+        </div>
+
+        {/* Total Users */}
+        <div className="bg-white/10 backdrop-blur-[40px] border border-white/40 rounded-xl p-6 shadow-[0_4px_24px_0_rgba(0,43,45,0.05)] relative overflow-hidden group">
+          <div className="absolute -right-10 -top-10 w-32 h-32 bg-error-container opacity-20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="text-sm font-bold text-outline">إجمالي المستخدمين</h3>
+            <span className="material-symbols-outlined text-error">group</span>
+          </div>
+          <p className="text-[32px] font-bold text-error">
+            {isLoadingStats ? '...' : stats.totalUsers}
+          </p>
+        </div>
       </div>
 
-      {/* Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Recent Verification Requests */}
-        <div className="lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <Activity className="w-5 h-5 text-teal-600" />
-              طلبات التوثيق الأخيرة
-            </h2>
-            <Link href="/admin/verification">
-              <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
-                عرض الكل
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-            </Link>
+      {/* Verification Requests List */}
+      <div className="bg-white/10 backdrop-blur-[40px] border border-white/40 rounded-xl shadow-[0_4px_24px_0_rgba(0,43,45,0.05)] overflow-hidden">
+        <div className="p-6 border-b border-surface-variant flex justify-between items-center bg-surface-container-lowest/50">
+          <h2 className="text-xl font-semibold text-primary">طلبات التحقق من الهوية</h2>
+          <Link
+            href="/admin/verification"
+            className="flex items-center gap-2 text-sm font-bold text-primary-container hover:text-primary transition-colors"
+          >
+            عرض الكل
+            <span className="material-symbols-outlined text-sm">chevron_left</span>
+          </Link>
+        </div>
+
+        {requests.length === 0 ? (
+          <div className="p-12 text-center">
+            <span className="material-symbols-outlined text-5xl text-outline-variant mx-auto mb-3 block">verified_user</span>
+            <p className="text-base font-semibold text-on-surface">لا توجد طلبات معلقة</p>
+            <p className="text-sm text-on-surface-variant mt-1">جميع طلبات التوثيق تمت مراجعتها</p>
           </div>
-
-          {requests.length === 0 ? (
-            <AnimatedCard>
-              <Card className="p-6">
-                <EmptyState
-                  icon={CheckCircle}
-                  title="لا توجد طلبات معلقة"
-                  description="جميع طلبات التوثيق تمت مراجعتها"
-                />
-              </Card>
-            </AnimatedCard>
-          ) : (
-            <div className="space-y-3">
-              {requests.slice(0, 5).map((req, index) => (
-                <AnimatedCard key={req.id} delay={index * 0.06}>
-                  <Card className="p-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-50 text-teal-600 shrink-0">
-                          <Users className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-foreground">
-                            {req.user.profile.realName}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            @{req.user.profile.username || '—'} · {req.user.profile.reputationScore} نقطة
-                          </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="outline" className="text-xs">
-                              {req.user.profile.reputationTier}
-                            </Badge>
-                            <span className="text-[11px] text-muted-foreground">
-                              {formatDate(req.createdAt)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 sm:flex-shrink-0">
-                        <Button
-                          size="sm"
-                          onClick={() => handleAction(req.id, 'approved')}
-                          className="bg-teal-600 hover:bg-teal-700 text-white gap-1.5"
-                        >
-                          <CheckCircle className="w-3.5 h-3.5" />
-                          توثيق
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleAction(req.id, 'rejected')}
-                          className="text-red-600 hover:bg-red-50 gap-1.5"
-                        >
-                          <XCircle className="w-3.5 h-3.5" />
-                          رفض
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                </AnimatedCard>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Quick Actions & Summary */}
-        <div className="space-y-4">
-          {/* Quick Actions */}
-          <AnimatedCard delay={0.2}>
-            <Card className="p-5">
-              <CardHeader className="p-0 pb-4">
-                <CardTitle className="text-lg font-semibold">
-                  إجراءات سريعة
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="space-y-2">
-                  {quickActions.map((action) => {
-                    const Icon = action.icon;
-                    return (
-                      <Link key={action.href} href={action.href}>
-                        <Button
-                          variant={action.variant === 'primary' ? 'default' : 'ghost'}
-                          className="w-full justify-start gap-3 bg-teal-600 hover:bg-teal-700 text-white"
-                        >
-                          <Icon className="w-4 h-4" />
-                          {action.label}
-                          <ArrowLeft className="w-4 h-4 mr-auto" />
-                        </Button>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          </AnimatedCard>
-
-          {/* Platform Summary */}
-          <AnimatedCard delay={0.3}>
-            <Card className="p-5">
-              <CardHeader className="p-0 pb-4">
-                <CardTitle className="text-lg font-semibold">
-                  ملخص المنصة
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="w-2 h-2 rounded-full bg-teal-600" />
-                    المستخدمون النشطون
+        ) : (
+          <div className="divide-y divide-surface-variant/50">
+            {requests.slice(0, 5).map((req) => (
+              <div key={req.id} className="p-6 flex items-center justify-between hover:bg-surface-container-low/30 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary-fixed bg-surface-container flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-primary-container">person</span>
                   </div>
-                  <span className="text-sm font-semibold text-foreground">
-                    {stats.totalUsers}
-                  </span>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="w-2 h-2 rounded-full bg-purple-600" />
-                    الأطباء الموثقون
+                  <div>
+                    <h4 className="text-sm font-bold text-on-surface">
+                      {req.user?.profile?.realName || 'مستخدم'}
+                    </h4>
+                    <p className="text-xs text-outline flex items-center gap-1 mt-1">
+                      <span className="material-symbols-outlined text-xs">star</span>
+                      {req.user?.profile?.reputationScore || 0} نقطة سمعة
+                    </p>
                   </div>
-                  <span className="text-sm font-semibold text-foreground">
-                    {stats.doctors}
-                  </span>
                 </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="w-2 h-2 rounded-full bg-green-600" />
-                    إجمالي المنشورات
-                  </div>
-                  <span className="text-sm font-semibold text-foreground">
-                    {stats.posts}
-                  </span>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="w-2 h-2 rounded-full bg-amber-600" />
-                    طلبات معلقة
-                  </div>
-                  <Badge
-                    variant={stats.pendingVerifications > 0 ? 'destructive' : 'secondary'}
-                    className="text-xs"
+                <div className="flex items-center gap-2">
+                  <button
+                    className="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center hover:bg-error hover:text-white transition-colors"
+                    title="رفض"
+                    onClick={() => handleAction(req.id, 'rejected')}
                   >
-                    {stats.pendingVerifications}
-                  </Badge>
+                    <span className="material-symbols-outlined">cancel</span>
+                  </button>
+                  <button
+                    className="w-10 h-10 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center hover:bg-primary-container hover:text-white transition-colors"
+                    title="قبول"
+                    onClick={() => handleAction(req.id, 'approved')}
+                  >
+                    <span className="material-symbols-outlined">check_circle</span>
+                  </button>
+                  <Link
+                    href="/admin/verification"
+                    className="px-4 py-2 text-sm font-bold text-primary border border-outline-variant rounded-lg hover:bg-surface-variant transition-colors mr-2 hidden sm:block"
+                  >
+                    عرض التفاصيل
+                  </Link>
                 </div>
-              </CardContent>
-            </Card>
-          </AnimatedCard>
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

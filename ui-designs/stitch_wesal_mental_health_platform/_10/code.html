@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Wesal Chat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed": "#002021",
+                      "surface": "#f8f9f9",
+                      "on-secondary-container": "#526576",
+                      "surface-tint": "#306669",
+                      "secondary-container": "#cee2f6",
+                      "on-primary-fixed-variant": "#134e51",
+                      "surface-bright": "#f8f9f9",
+                      "on-surface-variant": "#404849",
+                      "tertiary": "#002b31",
+                      "on-tertiary-fixed": "#001f24",
+                      "tertiary-fixed": "#b2ecf6",
+                      "surface-container-low": "#f3f4f3",
+                      "surface-container-highest": "#e1e3e2",
+                      "secondary-fixed": "#d1e5f9",
+                      "secondary": "#4e6071",
+                      "on-secondary": "#ffffff",
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed": "#091d2c",
+                      "on-primary": "#ffffff",
+                      "inverse-primary": "#9ad0d3",
+                      "surface-container": "#edeeee",
+                      "secondary-fixed-dim": "#b5c9dc",
+                      "on-tertiary-fixed-variant": "#094e57",
+                      "error-container": "#ffdad6",
+                      "primary-fixed": "#b6ecef",
+                      "inverse-on-surface": "#f0f1f0",
+                      "outline": "#707979",
+                      "outline-variant": "#bfc8c8",
+                      "surface-container-high": "#e7e8e8",
+                      "on-background": "#191c1c",
+                      "on-tertiary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "on-error": "#ffffff",
+                      "surface-variant": "#e1e3e2",
+                      "on-secondary-fixed-variant": "#364959",
+                      "primary": "#002b2d",
+                      "on-surface": "#191c1c",
+                      "surface-dim": "#d9dada",
+                      "background": "#f8f9f9",
+                      "on-primary-container": "#7aafb2",
+                      "primary-container": "#004346",
+                      "tertiary-fixed-dim": "#96d0da",
+                      "inverse-surface": "#2e3131",
+                      "primary-fixed-dim": "#9ad0d3",
+                      "tertiary-container": "#00434b",
+                      "on-tertiary-container": "#77b0b9",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "xxl": "64px",
+                      "gutter": "24px",
+                      "container-max": "1280px",
+                      "unit": "4px",
+                      "xl": "40px",
+                      "lg": "24px",
+                      "xs": "4px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "h2": [
+                              "Manrope"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "h1": [
+                              "Manrope"
+                      ],
+                      "display": [
+                              "Manrope"
+                      ],
+                      "h3": [
+                              "Manrope"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "h2": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "h1": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "h3": [
+                              "20px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md font-body-md antialiased h-screen flex flex-col max-w-md mx-auto relative shadow-2xl">
+<!-- Top App Bar -->
+<header class="bg-surface/80 backdrop-blur-md text-primary-container font-h3 font-h3 docked full-width top-0 sticky border-b border-primary-fixed/20 shadow-sm flex flex-row-reverse justify-between items-center w-full px-6 py-4 z-50">
+<div class="flex items-center gap-4 flex-row-reverse">
+<button class="text-on-surface hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="arrow_forward_ios">arrow_forward_ios</span>
+</button>
+<div class="relative">
+<img alt="Doctor avatar" class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a friendly Middle Eastern female doctor wearing a white coat, looking directly at the camera with a warm, reassuring smile. The background is a soft, blurred clinical setting. The lighting is bright and even, evoking a modern, professional, and trustworthy medical environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCgoLVAltd97Lfg55OdNxqQ7Zu5OVTI64cz2iaucXDU0ROT67ibSg67N7fQjKwmhItDvJL3NVxXS-32QuFmvr15qpFSoUW4-BC-9PltWy1BH65Qt0x-73CGDIkeOClUFK3dJ70bhomFKMjuH-rDgjYR3rqN6Xtv-O1-T5LYW6p6ukKa10rWmTpJC1LPbMTOywSQdAb1QKF6lW4cK7glCj0eMYv1ifnO7VF-sCVWvZOc6L_iFsNuxwJuwK_Yy-gHS6OhtSfiltgPs4"/>
+<span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface rounded-full"></span>
+</div>
+<div class="flex flex-col items-end text-right">
+<span class="font-label-md font-label-md text-on-surface">د. فاطمة أحمد</span>
+<span class="font-label-sm font-label-sm text-on-surface-variant">متصل الآن</span>
+</div>
+</div>
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</header>
+<!-- Chat Canvas -->
+<main class="flex-1 overflow-y-auto p-4 space-y-6 flex flex-col bg-surface pb-24">
+<!-- Date Divider -->
+<div class="flex justify-center">
+<span class="font-label-sm font-label-sm text-on-surface-variant bg-surface-container-low px-3 py-1 rounded-full">اليوم</span>
+</div>
+<!-- Received Message -->
+<div class="flex gap-3 max-w-[85%] self-end flex-row-reverse">
+<img alt="Doctor avatar" class="w-8 h-8 rounded-full object-cover mt-auto" data-alt="A professional headshot of a friendly Middle Eastern female doctor wearing a white coat, looking directly at the camera with a warm, reassuring smile. The background is a soft, blurred clinical setting. The lighting is bright and even, evoking a modern, professional, and trustworthy medical environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDU1BFl9fNqxFbqEqduoMCGZfMx9XgJ3llGC4ZeXVy0hTfDIMDY5y6c22N1O1DpOSHkhn629ZSCZRG44A5NPzdwZXVHJsOyfxmtZ3hAV0D6Ywz3_mQnnMHYVj139sFMIq22xILV3U9MxGhw4Kro6bA5sXDLxv3AS_kfDIBA5H3l9JB5DZZULJy3GI0X1hOrktFTkrk85_VOJNVWx2rvo7bjF_MPT4ZY8oWFep6EvT9ScM3vCxmUQSRLKZAs6WHujQMVqLtVFSsw3IE"/>
+<div class="flex flex-col gap-1">
+<div class="bg-surface-container-lowest text-on-surface p-4 rounded-2xl rounded-bl-sm shadow-[0_2px_8px_rgba(23,42,57,0.04)] border border-primary-fixed/20">
+<p class="font-body-md font-body-md text-right">مرحباً، كيف يمكنني مساعدتك اليوم؟ أنا هنا للاستماع.</p>
+</div>
+<span class="font-label-sm font-label-sm text-on-surface-variant text-left mr-1">10:00 ص</span>
+</div>
+</div>
+<!-- Sent Message -->
+<div class="flex gap-3 max-w-[85%] self-start">
+<div class="flex flex-col gap-1 w-full">
+<div class="bg-gradient-to-r from-primary-container to-tertiary-container text-on-primary p-4 rounded-2xl rounded-br-sm shadow-[0_4px_12px_rgba(0,67,70,0.1)]">
+<p class="font-body-md font-body-md text-right">أهلاً دكتورة. أشعر ببعض القلق مؤخراً وأجد صعوبة في النوم.</p>
+</div>
+<span class="font-label-sm font-label-sm text-on-surface-variant text-right ml-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary-container" data-icon="done_all">done_all</span>
+                    10:05 ص
+                </span>
+</div>
+</div>
+<!-- Voice Message Sent -->
+<div class="flex gap-3 max-w-[85%] self-start">
+<div class="flex flex-col gap-1 w-full">
+<div class="bg-gradient-to-r from-primary-container to-tertiary-container text-on-primary p-3 rounded-2xl rounded-br-sm shadow-[0_4px_12px_rgba(0,67,70,0.1)] flex items-center gap-3 w-64 flex-row-reverse">
+<button class="w-10 h-10 rounded-full bg-surface-container-lowest/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary" data-icon="play_arrow" data-weight="fill">play_arrow</span>
+</button>
+<div class="flex-1">
+<div class="h-6 w-full flex items-center gap-0.5 opacity-80">
+<!-- Simulated waveform -->
+<div class="w-1 bg-on-primary rounded-full h-2"></div>
+<div class="w-1 bg-on-primary rounded-full h-4"></div>
+<div class="w-1 bg-on-primary rounded-full h-6"></div>
+<div class="w-1 bg-on-primary rounded-full h-3"></div>
+<div class="w-1 bg-on-primary rounded-full h-5"></div>
+<div class="w-1 bg-on-primary rounded-full h-2"></div>
+<div class="w-1 bg-on-primary rounded-full h-4"></div>
+<div class="w-1 bg-on-primary rounded-full h-2"></div>
+<div class="w-1 bg-on-primary rounded-full h-3"></div>
+<div class="w-1 bg-on-primary rounded-full h-5"></div>
+</div>
+</div>
+<span class="font-label-sm font-label-sm text-on-primary/80 shrink-0">0:15</span>
+</div>
+<span class="font-label-sm font-label-sm text-on-surface-variant text-right ml-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary-container" data-icon="done_all">done_all</span>
+                    10:06 ص
+                </span>
+</div>
+</div>
+<!-- Received Typing Indicator -->
+<div class="flex gap-3 max-w-[85%] self-end flex-row-reverse">
+<img alt="Doctor avatar" class="w-8 h-8 rounded-full object-cover mt-auto" data-alt="A professional headshot of a friendly Middle Eastern female doctor wearing a white coat, looking directly at the camera with a warm, reassuring smile. The background is a soft, blurred clinical setting. The lighting is bright and even, evoking a modern, professional, and trustworthy medical environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDruW5uK3eGPQZdf8eZ03I-G5YkPH1L106LMa8WwWwNa8OCU1qzSP5GBUpGbzkzYvNvWfn-TRwULxKxA4U1DZGtEnDbeQBNvzcqHX5R447JG9SC-IxellKrKu8wKcuF90i4xGk_hVputWONIa7NpwsQttboyPIjlEatcXnRhgRRvipDHkLxOw0g1kNx38UpKRhvYabmPkvOoYxgJoinQDzEvC30f-JODyqhhZWEta1iv0nxtax8IEOMfFky3DRNuWukdjK3YD8MseM"/>
+<div class="bg-surface-container-lowest p-4 rounded-2xl rounded-bl-sm border border-primary-fixed/20 flex items-center gap-1 h-12">
+<div class="w-2 h-2 bg-on-surface-variant rounded-full opacity-40"></div>
+<div class="w-2 h-2 bg-on-surface-variant rounded-full opacity-60"></div>
+<div class="w-2 h-2 bg-on-surface-variant rounded-full opacity-80"></div>
+</div>
+</div>
+</main>
+<!-- Input Area -->
+<div class="absolute bottom-0 w-full bg-surface/95 backdrop-blur-md border-t border-primary-fixed/20 p-4">
+<div class="flex items-end gap-3 flex-row-reverse">
+<button class="w-12 h-12 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(0,67,70,0.2)] hover:bg-tertiary-container transition-colors">
+<span class="material-symbols-outlined" data-icon="mic" data-weight="fill">mic</span>
+</button>
+<div class="flex-1 relative">
+<textarea class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 pr-12 font-body-md font-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:ring-2 focus:ring-primary-container resize-none text-right" placeholder="اكتب رسالة..." rows="1"></textarea>
+<button class="absolute right-3 top-3 text-on-surface-variant hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined" data-icon="attach_file">attach_file</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

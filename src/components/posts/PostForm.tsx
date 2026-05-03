@@ -4,11 +4,6 @@ import { useState, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { MoodSelector } from './MoodSelector';
 import { toast } from 'sonner';
-import { Send, Loader2 } from 'lucide-react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 
 interface PostFormProps {
   onPostCreated?: () => void;
@@ -64,62 +59,68 @@ export function PostForm({ onPostCreated }: PostFormProps) {
   };
 
   return (
-    <Card className="py-0">
-      <CardContent className="p-4">
-        <div className="flex gap-3">
-          <Avatar size="lg">
-            <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-sm">
-              {user.badge}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 space-y-3 min-w-0">
-            {/* Textarea */}
-            <div className="relative">
-              <Textarea
-                ref={textareaRef as React.RefObject<HTMLTextAreaElement>}
-                placeholder="شارك فكرة أو تجربة..."
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="min-h-[80px] resize-none rounded-xl bg-gray-50 text-sm text-gray-900 placeholder:text-gray-400"
-                maxLength={maxChars}
-                disabled={loading}
-              />
-              {charCount > 0 && (
-                <div
-                  className={`absolute bottom-2.5 left-3 text-[10px] font-medium transition-colors ${
-                    isNearLimit ? 'text-amber-500' : 'text-gray-400'
-                  }`}
-                >
-                  {charCount}/{maxChars}
-                </div>
-              )}
+    <section className="bg-surface-bright rounded-xl border border-outline-variant/30 p-4 sm:p-5 shadow-[0_4px_20px_0_rgba(23,42,57,0.02)] mb-6">
+      <div className="flex gap-4 items-start">
+        {/* Avatar */}
+        <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 mt-1 bg-primary-container/10 flex items-center justify-center">
+          <span className="text-sm font-semibold text-primary-container">{user.badge}</span>
+        </div>
+
+        <div className="flex-1 min-w-0">
+          {/* Textarea */}
+          <div className="relative">
+            <textarea
+              ref={textareaRef}
+              placeholder="ماذا يدور في ذهنك؟ شارك المجتمع..."
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="w-full bg-surface-container-low rounded-lg p-3 text-base text-on-surface placeholder:text-on-surface-variant border-none focus:ring-2 focus:ring-primary-container/50 resize-none min-h-[80px] transition-shadow"
+              maxLength={maxChars}
+              disabled={loading}
+              rows={3}
+            />
+            {charCount > 0 && (
+              <span className={`absolute bottom-2.5 left-3 text-[11px] font-medium transition-colors ${
+                isNearLimit ? 'text-error' : 'text-on-surface-variant'
+              }`}>
+                {charCount}/{maxChars}
+              </span>
+            )}
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="flex justify-between items-center mt-3">
+            <div className="flex gap-1">
+              <button className="p-2 rounded-full text-on-surface-variant hover:bg-surface-container transition-colors" title="إضافة صورة">
+                <span className="material-symbols-outlined text-[20px]">image</span>
+              </button>
+              <button className="p-2 rounded-full text-on-surface-variant hover:bg-surface-container transition-colors" title="إضافة رابط">
+                <span className="material-symbols-outlined text-[20px]">link</span>
+              </button>
+              <MoodSelector selected={moods} onChange={setMoods} />
             </div>
 
-            {/* Bottom Bar */}
-            <div className="flex items-center justify-between gap-2">
-              <MoodSelector selected={moods} onChange={setMoods} />
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400 hidden sm:block">
-                  Ctrl+Enter للنشر
-                </span>
-                <Button
-                  size="sm"
-                  onClick={handleSubmit}
-                  disabled={loading || !content.trim()}
-                >
-                  {loading ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Send className="w-3.5 h-3.5" />
-                  )}
-                  {loading ? 'جاري النشر...' : 'نشر'}
-                </Button>
-              </div>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-on-surface-variant hidden sm:block">
+                Ctrl+Enter للنشر
+              </span>
+              <button
+                onClick={handleSubmit}
+                disabled={loading || !content.trim()}
+                className="bg-primary-container text-on-primary text-sm font-semibold px-5 py-2 rounded-full hover:opacity-90 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {loading ? (
+                  <span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
+                ) : (
+                  <span className="material-symbols-outlined text-[18px]">send</span>
+                )}
+                {loading ? 'جاري النشر...' : 'نشر'}
+              </button>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }
