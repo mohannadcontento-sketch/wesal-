@@ -31,9 +31,14 @@ export function TopNavbar() {
         {/* ── Right side: Logo + Nav links ── */}
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center group">
-            <div className="relative h-8 w-auto flex-shrink-0 rounded-lg ring-1 ring-wesal-ice/50">
-              <Image src="/logo.png" alt="وصال" fill className="object-contain" />
-            </div>
+            <Image
+              src="/logo.png"
+              alt="وصال"
+              width={93}
+              height={32}
+              className="object-contain flex-shrink-0 rounded-lg ring-1 ring-wesal-ice/50 group-hover:ring-wesal-sky/60 transition-all duration-300"
+              priority
+            />
           </Link>
           <div className="hidden md:flex gap-1 text-sm font-medium">
             {navLinks.map((link) => {
@@ -102,6 +107,16 @@ export function TopNavbar() {
                           <span className="material-symbols-outlined text-[20px] text-wesal-medium">person</span>
                           الملف الشخصي
                         </Link>
+                        {user.role === 'admin' && (
+                          <Link
+                            href="/admin"
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-wesal-navy hover:bg-wesal-ice/50 transition-colors"
+                            onClick={() => setShowLogoutMenu(false)}
+                          >
+                            <span className="material-symbols-outlined text-[20px] text-wesal-medium">admin_panel_settings</span>
+                            لوحة الإدارة
+                          </Link>
+                        )}
                         <Link
                           href="/settings"
                           className="flex items-center gap-3 px-4 py-2.5 text-sm text-wesal-navy hover:bg-wesal-ice/50 transition-colors"

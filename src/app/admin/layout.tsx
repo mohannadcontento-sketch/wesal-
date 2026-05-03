@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
@@ -132,7 +133,17 @@ export default function AdminLayout({
       {/* Top Navbar */}
       <nav className="fixed top-0 w-full z-50 flex justify-between items-center px-8 h-20 bg-white/40 backdrop-blur-md border-b border-white/20 shadow-[0_8px_32px_0_rgba(0,67,70,0.1)]">
         <div className="flex items-center gap-4">
-          <span className="text-3xl font-black text-on-surface">وصال</span>
+          <Link href="/" className="flex-shrink-0">
+            <Image
+              src="/logo.png"
+              alt="وصال"
+              width={100}
+              height={34}
+              className="object-contain rounded-lg"
+              priority
+            />
+          </Link>
+          <span className="hidden sm:inline text-xs font-medium text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-full">لوحة الإدارة</span>
         </div>
         <div className="hidden md:flex gap-6 items-center">
           <Link href="/community" className="text-sm font-medium text-on-surface-variant hover:text-primary-container hover:opacity-80 transition-all">

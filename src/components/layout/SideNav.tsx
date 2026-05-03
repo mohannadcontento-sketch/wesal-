@@ -23,6 +23,10 @@ export function SideNav() {
     },
   ];
 
+  const adminItems = user.role === 'admin'
+    ? [{ href: '/admin', label: 'لوحة الإدارة', icon: 'admin_panel_settings' }]
+    : [];
+
   const isActive = (href: string, icon: string) => {
     if (icon === 'person') return pathname.startsWith('/profile');
     if (href === '/') return pathname === '/';
@@ -33,9 +37,16 @@ export function SideNav() {
     <aside className="hidden md:flex fixed top-14 bottom-0 right-0 w-[272px] flex-col bg-wesal-cream/95 backdrop-blur-xl border-l border-wesal-ice/70 shadow-[0_1px_12px_rgba(0,67,70,0.04)] z-40">
       {/* ── Logo ── */}
       <div className="p-5 pb-4 flex items-center">
-        <div className="relative h-7 w-auto flex-shrink-0 rounded-lg ring-1 ring-wesal-ice/50">
-          <Image src="/logo.png" alt="وصال" fill className="object-contain" />
-        </div>
+        <Link href="/">
+          <Image
+            src="/logo.png"
+            alt="وصال"
+            width={82}
+            height={28}
+            className="object-contain flex-shrink-0 rounded-lg ring-1 ring-wesal-ice/50"
+            priority
+          />
+        </Link>
       </div>
 
       {/* ── Navigation Items ── */}
@@ -59,6 +70,32 @@ export function SideNav() {
             </Link>
           );
         })}
+
+        {/* ── Admin Section ── */}
+        {adminItems.length > 0 && (
+          <>
+            <div className="my-2 mx-2 border-t border-wesal-ice/60" />
+            {adminItems.map((item) => {
+              const active = pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${
+                    active
+                      ? 'bg-wesal-dark text-white font-semibold shadow-sm'
+                      : 'text-wesal-medium hover:bg-wesal-dark/10 hover:text-wesal-dark'
+                  }`}
+                >
+                  <span className={`material-symbols-outlined text-[22px] ${active ? 'filled' : ''}`}>
+                    {item.icon}
+                  </span>
+                  <span className="text-sm">{item.label}</span>
+                </Link>
+              );
+            })}
+          </>
+        )}
       </nav>
 
       {/* ── Reputation Card ── */}
