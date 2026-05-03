@@ -1,38 +1,25 @@
 /**
- * Email Service — sends OTP verification emails via Resend.
+ * Email Service — sends OTP verification emails via Supabase Edge Function.
  *
- * Resend is the same email provider that Supabase Edge Functions use under the hood.
+ * Architecture:
+ *   Our Next.js app → calls Supabase Edge Function → which calls Resend API
+ *
+ * This way the Resend API key stays secure inside Supabase, not in our code.
  *
  * Setup:
- *   1. Create a free account at https://resend.com (100 emails/day free)
- *   2. Get your API key from the dashboard
- *   3. Set in .env.local:
- *      RESEND_API_KEY=re_xxxxxxxxxxxxx
- *      EMAIL_FROM=Wesal <noreply@wesal-omega.vercel.app>
+ *   1. Go to your Supabase Dashboard
+ *   2. Settings → API → copy the "anon public" key
+ *   3. Set it in .env.local: NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+ *   4. In Supabase Dashboard → Edge Functions → set secret: RESEND_API_KEY=re_xxx
+ *      (get free Resend key from https://resend.com)
  */
-
-import { Resend } from 'resend'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface SendEmailResult {
   success: boolean
-  method: 'resend' | 'console-fallback'
+  method: 'supabase' | 'console-fallback'
   error?: string
-}
-
-// ─── Resend Client (lazy init) ───────────────────────────────────────────────
-
-let resendClient: Resend | null = null
-
-function getResendClient(): Resend | null {
-  if (resendClient) return resendClient
-
-  const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) return null
-
-  resendClient = new Resend(apiKey)
-  return resendClient
 }
 
 // ─── Email Template ──────────────────────────────────────────────────────────
@@ -102,7 +89,6 @@ function buildOtpHtml(otpCode: string): string {
       border: 2px solid #99f6e4;
       border-radius: 16px;
       padding: 20px 48px;
-      position: relative;
     }
     .otp-label {
       display: block;
@@ -131,9 +117,7 @@ function buildOtpHtml(otpCode: string): string {
       color: #9ca3af;
       line-height: 1.8;
     }
-    .note strong {
-      color: #6b7280;
-    }
+    .note strong { color: #6b7280; }
     .security-note {
       display: inline-flex;
       align-items: center;
@@ -161,14 +145,6 @@ function buildOtpHtml(otpCode: string): string {
     .footer-copy {
       font-size: 11px;
       color: #9ca3af;
-    }
-    .footer-links {
-      margin-top: 8px;
-    }
-    .footer-links a {
-      font-size: 11px;
-      color: #508992;
-      text-decoration: none;
     }
   </style>
 </head>
@@ -217,34 +193,60 @@ function buildOtpText(otpCode: string): string {
 — فريق وصال`
 }
 
-// ─── Send via Resend ──────────────────────────────────────────────────────────
+// ─── Send via Supabase Edge Function ──────────────────────────────────────────
 
-async function sendViaResend(email: string, otpCode: string): Promise<SendEmailResult> {
-  const resend = getResendClient()
-  if (!resend) {
-    return { success: false, method: 'resend', error: 'RESEND_API_KEY not set' }
+async function sendViaSupabase(
+  email: string,
+  otpCode: string,
+): Promise<SendEmailResult> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !anonKey) {
+    return {
+      success: false,
+      method: 'supabase',
+      error: 'NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY not set',
+    }
   }
 
   try {
-    const { data, error } = await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'Wesal <onboarding@resend.dev>',
-      to: [email],
-      subject: 'وصال — رمز التحقق ✨',
-      html: buildOtpHtml(otpCode),
-      text: buildOtpText(otpCode),
+    const functionUrl = `${supabaseUrl}/functions/v1/send-email`
+
+    const response = await fetch(functionUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${anonKey}`,
+      },
+      body: JSON.stringify({
+        to: email,
+        subject: 'وصال — رمز التحقق ✨',
+        htmlBody: buildOtpHtml(otpCode),
+        textBody: buildOtpText(otpCode),
+      }),
     })
 
-    if (error) {
-      console.error('[Email] Resend error:', error.message)
-      return { success: false, method: 'resend', error: error.message }
+    if (!response.ok) {
+      const errorBody = await response.text()
+      console.error(
+        `[Email] Supabase Edge Function error: ${response.status}`,
+        errorBody,
+      )
+      return {
+        success: false,
+        method: 'supabase',
+        error: `Edge Function ${response.status}: ${errorBody}`,
+      }
     }
 
-    console.log(`[Email] Sent via Resend: ${data?.id} → ${email}`)
-    return { success: true, method: 'resend' }
+    const data = await response.json()
+    console.log(`[Email] Sent via Supabase Edge Function: ${data.id} → ${email}`)
+    return { success: true, method: 'supabase' }
   } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Unknown Resend error'
-    console.error('[Email] Resend exception:', msg)
-    return { success: false, method: 'resend', error: msg }
+    const msg = err instanceof Error ? err.message : 'Unknown Supabase error'
+    console.error('[Email] Supabase exception:', msg)
+    return { success: false, method: 'supabase', error: msg }
   }
 }
 
@@ -259,9 +261,8 @@ function consoleFallback(email: string, otpCode: string): SendEmailResult {
   console.log(`│  Code:     ${otpCode.padEnd(47)}│`)
   console.log('│  Expiry:   10 minutes                                    │')
   console.log('├────────────────────────────────────────────────────────┤')
-  console.log('│  ⚠️  RESEND_API_KEY not set — email not sent          │')
-  console.log('│  Get a free key: https://resend.com                     │')
-  console.log('│  Then add to .env.local: RESEND_API_KEY=re_xxx         │')
+  console.log('│  ⚠️  Supabase Anon Key not set — email not sent       │')
+  console.log('│  Get it from: Supabase Dashboard → Settings → API     │')
   console.log('└────────────────────────────────────────────────────────┘')
   console.log('')
 
@@ -271,18 +272,26 @@ function consoleFallback(email: string, otpCode: string): SendEmailResult {
 // ─── Public API ──────────────────────────────────────────────────────────────
 
 /**
- * Send an OTP verification email to the given address.
+ * Send an OTP verification email via Supabase Edge Function.
  *
- * Uses Resend (same provider as Supabase Edge Functions) with console fallback.
+ * Flow: Next.js → Supabase Edge Function → Resend API
+ *
+ * The Resend API key is stored securely in Supabase secrets,
+ * not exposed in our application code.
  *
  * @returns {SendEmailResult} indicating which method was used and success status
  */
-export async function sendOtpEmail(email: string, otpCode: string): Promise<SendEmailResult> {
-  // Try Resend first (production)
-  const resendResult = await sendViaResend(email, otpCode)
-  if (resendResult.success) return resendResult
+export async function sendOtpEmail(
+  email: string,
+  otpCode: string,
+): Promise<SendEmailResult> {
+  // Try Supabase Edge Function first (production)
+  const supabaseResult = await sendViaSupabase(email, otpCode)
+  if (supabaseResult.success) return supabaseResult
 
-  console.warn(`[Email] Resend failed: ${resendResult.error}. Falling back to console.`)
+  console.warn(
+    `[Email] Supabase failed: ${supabaseResult.error}. Falling back to console.`,
+  )
 
   // Console fallback for development
   return consoleFallback(email, otpCode)
