@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -98,8 +99,8 @@ export default function RegisterPage() {
 
         {/* Logo & Description */}
         <div className="relative z-10 animate-fade-in-up">
-          <div className="w-14 h-14 rounded-2xl glass-panel flex items-center justify-center mb-6 shadow-lg">
-            <span className="material-symbols-outlined filled text-[28px] text-wesal-ice">favorite</span>
+          <div className="relative w-14 h-14 rounded-2xl overflow-hidden mb-6 shadow-lg ring-1 ring-white/20">
+            <Image src="/logo.png" alt="وصال" fill className="object-cover" />
           </div>
           <h1 className="text-[40px] font-bold leading-tight tracking-tight mb-6">وصال</h1>
           <p className="text-lg leading-relaxed text-white/75 max-w-sm">
@@ -149,8 +150,8 @@ export default function RegisterPage() {
         <div className="w-full max-w-md mx-auto animate-fade-in-up stagger-1">
           {/* Mobile Logo */}
           <div className="md:hidden mb-6 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-wesal-dark to-wesal-medium flex items-center justify-center shadow-lg mx-auto mb-3">
-              <span className="material-symbols-outlined filled text-[28px] text-white">favorite</span>
+            <div className="relative w-14 h-14 rounded-2xl overflow-hidden shadow-lg mx-auto mb-3">
+              <Image src="/logo.png" alt="وصال" fill className="object-cover" />
             </div>
             <h1 className="text-2xl font-bold text-wesal-navy">وصال</h1>
           </div>

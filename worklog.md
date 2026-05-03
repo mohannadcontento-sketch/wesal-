@@ -692,3 +692,43 @@ Complete UI/UX redesign of the Wesal mental health platform matching 17 HTML des
 - Zero lint errors in source files (only pre-existing errors in upload/)
 - Zero shadcn/ui imports in rebuilt pages/components
 - Zero lucide-react imports in rebuilt pages/components
+
+---
+
+## [2025-07-14] Logo Integration + Visual Design Enhancement + Spacing Fix
+
+### Scope
+Integrated the Wesal logo (Asset-1.png) across all pages and components, replacing the `spa` Material Symbols icon with the actual brand logo image. Enhanced the hero section with a phone mockup visual. Fixed header spacing issues. Added SVG decorative elements, wave dividers, and improved overall visual design.
+
+### Files Modified
+
+| # | File | Changes |
+|---|------|---------|
+| 1 | `public/logo.png` | NEW — Copied from `upload/Asset-1.png` (3423x1175 RGBA PNG) |
+| 2 | `src/components/layout/TopNavbar.tsx` | Replaced `spa` icon + colored div with `next/image` logo. Fixed header height to `h-14` (56px). Added `next/image` import. Enhanced dropdown with user info section and gradient background. Improved notification dot with `ring-2 ring-wesal-cream`. Added nav link icons. |
+| 3 | `src/components/layout/MainLayout.tsx` | Fixed content `pt` from `pt-[60px]` to `pt-14` (56px exact match). Fixed SideNav padding from `md:pr-72` to `md:pr-[272px]`. |
+| 4 | `src/components/layout/SideNav.tsx` | Replaced `spa` icon with logo image. Fixed positioning: `top-0` → `top-14` (below header). Updated width to `w-[272px]` for better spacing. Changed bg to `bg-wesal-cream/95 backdrop-blur-xl`. Enhanced reputation card with gradient and progress bar. |
+| 5 | `src/app/page.tsx` | **Major visual redesign**: Loading screen now shows logo. Landing page navbar uses logo. Hero section: replaced 4 icon glass-cards with a phone mockup showing app preview (greeting, quick actions, post card). Added floating decorative icons. Added wave SVG divider at hero bottom. Added dot pattern SVG. Added decorative watermark icons to feature/security cards. CTA section now includes logo. Footer uses logo. All `spa` icons replaced with `Image` component. |
+| 6 | `src/app/login/page.tsx` | Replaced `favorite` icon boxes with logo images (desktop branding panel + mobile header). Added `next/image` import. |
+| 7 | `src/app/register/page.tsx` | Replaced `favorite` icon boxes with logo images (desktop branding panel + mobile header). Added `next/image` import. |
+
+### Key Visual Improvements
+- **Phone Mockup in Hero**: Interactive phone preview showing app UI (greeting, quick actions with emoji, post card with engagement) — gives visitors a visual taste of the app
+- **Wave Divider**: SVG wave shape between hero and stats sections for smooth visual flow
+- **Dot Pattern**: Subtle SVG dot pattern in hero background for texture
+- **Floating Decorative Icons**: psychology, favorite, shield icons floating around the phone mockup with animations
+- **Enhanced Dropdown Menu**: User info section with gradient background, better spacing
+- **Progress Bar**: Added reputation progress bar to sidebar card
+- **Decorative Blurs**: Added subtle gradient blur circles to feature cards and accent cards
+
+### Spacing Fixes
+- Header fixed at `h-14` (56px) — exact match between TopNavbar, MainLayout padding, and SideNav offset
+- SideNav starts at `top-14` (below header) instead of `top-0`
+- SideNav width increased to `w-[272px]` with matching `md:pr-[272px]` in content area
+
+### Logic Preserved
+All auth logic, routing, state management, event handlers, and API calls remain unchanged.
+
+### TypeScript
+Zero new lint errors. Dev server compiles cleanly.
+

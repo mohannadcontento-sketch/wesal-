@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -89,11 +90,11 @@ function CommunityFeed({ user }: { user: NonNullable<ReturnType<typeof useAuth>[
       <div className="flex-1 min-w-0 max-w-2xl mx-auto lg:mx-0">
         {/* Greeting */}
         <div className="mb-6 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-wesal-ice flex items-center justify-center">
-            <span className="material-symbols-outlined filled text-wesal-dark">auto_awesome</span>
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-wesal-ice to-wesal-sky/30 flex items-center justify-center shadow-sm">
+            <span className="material-symbols-outlined filled text-wesal-dark text-xl">auto_awesome</span>
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-wesal-navy">المجتمع</h1>
+            <h1 className="text-xl font-bold text-wesal-navy">المجتمع</h1>
             <p className="text-sm text-wesal-medium">
               {greeting()}، {user.badge}
             </p>
@@ -126,24 +127,24 @@ function CommunityFeed({ user }: { user: NonNullable<ReturnType<typeof useAuth>[
       </div>
 
       {/* ── Right Sidebar (Desktop Only) ── */}
-      <aside className="hidden lg:flex flex-col gap-6 w-80 shrink-0 sticky top-24 self-start">
+      <aside className="hidden lg:flex flex-col gap-5 w-80 shrink-0 sticky top-20 self-start">
         {/* Reputation Points Card */}
-        <div className="bg-gradient-to-bl from-wesal-ice/40 via-wesal-ice/10 to-transparent rounded-2xl border border-wesal-ice p-5 ambient-shadow relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-24 h-24 bg-wesal-sky/20 rounded-full blur-3xl -ml-10 -mt-10 pointer-events-none" />
+        <div className="bg-gradient-to-bl from-wesal-ice/50 via-wesal-ice/15 to-transparent rounded-2xl border border-wesal-ice p-5 shadow-sm relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-24 h-24 bg-wesal-sky/15 rounded-full blur-3xl -ml-10 -mt-10 pointer-events-none" />
           <div className="flex items-center gap-3 mb-4 relative z-10">
-            <div className="w-12 h-12 rounded-full bg-wesal-ice flex items-center justify-center">
+            <div className="w-11 h-11 rounded-xl bg-wesal-ice flex items-center justify-center">
               <span className="material-symbols-outlined filled text-xl text-wesal-dark">shield_person</span>
             </div>
             <div>
-              <h3 className="font-semibold text-wesal-navy">نقاط السمعة</h3>
+              <h3 className="font-bold text-wesal-navy text-sm">نقاط السمعة</h3>
               <p className="text-xs text-wesal-medium">مجتمعك يدعمك</p>
             </div>
           </div>
           <div className="relative z-10">
-            <span className="text-3xl font-bold text-wesal-dark">1,250</span>
+            <span className="text-3xl font-extrabold text-wesal-dark">1,250</span>
             <p className="text-xs text-wesal-medium mt-1">450 نقطة للمستوى التالي</p>
             <div className="mt-3 h-2 w-full bg-wesal-cream rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-l from-wesal-sky to-wesal-dark rounded-full w-[73%]" />
+              <div className="h-full bg-gradient-to-l from-wesal-sky to-wesal-dark rounded-full w-[73%] transition-all duration-1000" />
             </div>
             <div className="flex justify-between text-xs text-wesal-medium mt-1.5">
               <span>مستوى 3</span>
@@ -153,24 +154,24 @@ function CommunityFeed({ user }: { user: NonNullable<ReturnType<typeof useAuth>[
         </div>
 
         {/* Trending Topics */}
-        <div className="bg-white rounded-2xl border border-wesal-ice p-5 ambient-shadow">
-          <h3 className="font-semibold text-wesal-navy mb-4 flex items-center gap-2">
-            <span className="material-symbols-outlined text-xl text-wesal-dark filled">trending_up</span>
+        <div className="bg-white rounded-2xl border border-wesal-ice p-5 shadow-sm">
+          <h3 className="font-bold text-wesal-navy text-sm mb-4 flex items-center gap-2">
+            <span className="material-symbols-outlined text-lg text-wesal-dark filled">trending_up</span>
             مواضيع رائجة
           </h3>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
             {trendingTopics.map((topic, i) => (
               <button
                 key={topic.tag}
-                className="flex items-center justify-between py-1.5 group transition-colors hover:bg-wesal-ice/50 rounded-lg px-2 -mx-2"
+                className="flex items-center justify-between py-2 group transition-colors hover:bg-wesal-ice/40 rounded-lg px-2.5 -mx-2.5"
               >
                 <div className="flex items-center gap-2.5">
-                  <span className="text-xs text-wesal-medium font-medium w-4">{i + 1}</span>
+                  <span className="text-[11px] text-wesal-medium font-bold w-4">{i + 1}</span>
                   <span className="text-sm font-medium text-wesal-navy group-hover:text-wesal-dark transition-colors">
                     {topic.tag}
                   </span>
                 </div>
-                <span className="text-xs text-wesal-medium">{topic.posts} مشاركة</span>
+                <span className="text-[11px] text-wesal-medium">{topic.posts} مشاركة</span>
               </button>
             ))}
           </div>
@@ -205,11 +206,48 @@ function LandingPage() {
   ];
 
   const features = [
-    { icon: 'shield', title: 'خصوصية لا تقبل المساومة', desc: 'بياناتك مشفرة بالكامل. يمكنك اختيار اسم مستعار والتحكم الكامل فيما تشاركه ومع من تشاركه.', span: 2, dark: false },
-    { icon: 'verified', title: 'أطباء معتمدون', desc: 'فريقنا يضم نخبة من المتخصصين المرخصين الذين خضعوا لتدقيق صارم لضمان جودة الرعاية.', span: 1, dark: true },
-    { icon: 'diversity_3', title: 'مجتمع داعم', desc: 'تواصل مع أشخاص يمرون بتجارب مشابهة في مساحات نقاشية آمنة ومراقبة باحترافية.', span: 1, dark: false, accent: true },
-    { icon: 'forum', title: 'محادثات آمنة ومشفرة', desc: 'جلسات فردية فورية عبر رسائل نصية أو صوتية مشفرة تضمن لك الراحة في أي وقت وأي مكان.', span: 2, dark: false },
-    { icon: 'self_improvement', title: 'محتوى تعليمي مخصص', desc: 'مقالات وأدوات تفاعلية تساعدك على فهم مشاعرك وتطوير مهاراتك في التعامل مع الضغوط.', span: 1, dark: false, accent: true },
+    { 
+      icon: 'shield', 
+      title: 'خصوصية لا تقبل المساومة', 
+      desc: 'بياناتك مشفرة بالكامل. يمكنك اختيار اسم مستعار والتحكم الكامل فيما تشاركه ومع من تشاركه.',
+      span: 2, 
+      dark: false,
+      visual: 'privacy'
+    },
+    { 
+      icon: 'verified', 
+      title: 'أطباء معتمدون', 
+      desc: 'فريقنا يضم نخبة من المتخصصين المرخصين الذين خضعوا لتدقيق صارم لضمان جودة الرعاية.',
+      span: 1, 
+      dark: true,
+      visual: 'doctors'
+    },
+    { 
+      icon: 'diversity_3', 
+      title: 'مجتمع داعم', 
+      desc: 'تواصل مع أشخاص يمرون بتجارب مشابهة في مساحات نقاشية آمنة ومراقبة باحترافية.',
+      span: 1, 
+      dark: false, 
+      accent: true,
+      visual: 'community'
+    },
+    { 
+      icon: 'forum', 
+      title: 'محادثات آمنة ومشفرة', 
+      desc: 'جلسات فردية فورية عبر رسائل نصية أو صوتية مشفرة تضمن لك الراحة في أي وقت وأي مكان.',
+      span: 2, 
+      dark: false,
+      visual: 'chat'
+    },
+    { 
+      icon: 'self_improvement', 
+      title: 'محتوى تعليمي مخصص', 
+      desc: 'مقالات وأدوات تفاعلية تساعدك على فهم مشاعرك وتطوير مهاراتك في التعامل مع الضغوط.',
+      span: 1, 
+      dark: false, 
+      accent: true,
+      visual: 'learn'
+    },
   ];
 
   const steps = [
@@ -234,13 +272,13 @@ function LandingPage() {
     <div className="min-h-screen flex flex-col bg-wesal-cream text-wesal-navy overflow-x-hidden">
 
       {/* ── NAVBAR ── */}
-      <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'glass-panel shadow-lg shadow-wesal-navy/5' : 'bg-transparent'}`}>
-        <nav className="flex justify-between items-center px-4 sm:px-6 lg:px-10 py-3.5 w-full max-w-[1400px] mx-auto">
+      <header className={`fixed top-0 w-full z-50 transition-all duration-500 h-14 ${scrolled ? 'glass-panel shadow-lg shadow-wesal-navy/5' : 'bg-transparent'}`}>
+        <nav className="flex justify-between items-center px-4 sm:px-6 lg:px-10 w-full h-full max-w-[1400px] mx-auto">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-500 ${scrolled ? 'bg-wesal-dark' : 'bg-white/15 backdrop-blur-sm'}`}>
-              <span className="material-symbols-outlined text-white text-xl">spa</span>
+            <div className={`relative w-8 h-8 rounded-xl overflow-hidden flex-shrink-0 transition-all duration-500 ${scrolled ? '' : 'ring-1 ring-white/20'}`}>
+              <Image src="/logo.png" alt="وصال" fill className="object-cover" />
             </div>
-            <span className={`text-xl font-bold tracking-tight transition-colors duration-500 ${scrolled ? 'text-wesal-dark' : 'text-white'}`}>وصال</span>
+            <span className={`text-lg font-bold tracking-tight transition-colors duration-500 ${scrolled ? 'text-wesal-dark' : 'text-white'}`}>وصال</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
@@ -272,13 +310,22 @@ function LandingPage() {
         )}
       </header>
 
-      <main className="flex-1 pt-[64px]">
-        {/* ── HERO ── */}
+      <main className="flex-1 pt-14">
+        {/* ══════════ HERO ══════════ */}
         <section className="gradient-hero relative min-h-[92vh] flex items-center overflow-hidden">
+          {/* Animated background elements */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
             <div className="hidden lg:block absolute -top-20 -left-20 w-[500px] h-[500px] rounded-full bg-white/[0.03] animate-float-slow" />
             <div className="hidden lg:block absolute bottom-10 right-10 w-[300px] h-[300px] rounded-full bg-wesal-sky/10 animate-float" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-wesal-sky/5 rounded-full blur-[120px]" />
+            {/* Decorative dots pattern */}
+            <div className="hidden lg:block absolute top-20 left-[15%] opacity-[0.07]">
+              <svg width="120" height="120" viewBox="0 0 120 120">
+                {Array.from({ length: 25 }).map((_, i) => (
+                  <circle key={i} cx={(i % 5) * 30 + 15} cy={Math.floor(i / 5) * 30 + 15} r="2" fill="white" />
+                ))}
+              </svg>
+            </div>
           </div>
 
           <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-16 md:py-20">
@@ -317,33 +364,111 @@ function LandingPage() {
                 </div>
               </div>
 
+              {/* ── Hero Visual: Phone Mockup with App Preview ── */}
               <div className="hidden lg:flex items-center justify-center relative">
-                <div className="relative w-full max-w-[480px]">
-                  <div className="absolute inset-0 bg-wesal-sky/10 rounded-full blur-[80px]" />
-                  <div className="relative z-10 grid grid-cols-2 gap-4">
-                    {[
-                      { icon: 'psychology', title: 'دعم نفسي', sub: 'متخصصون مرخصون', delay: 'stagger-1', y: 0 },
-                      { icon: 'favorite', title: 'مجتمع آمن', sub: 'تجارب مشتركة', delay: 'stagger-2', y: 8 },
-                      { icon: 'shield', title: 'خصوصية تامة', sub: 'تشفير كامل', delay: 'stagger-3', y: 0 },
-                      { icon: 'chat', title: 'محادثات آمنة', sub: 'متاحة ٢٤/٧', delay: 'stagger-4', y: 8 },
-                    ].map((card) => (
-                      <div key={card.title} className={`glass-card rounded-2xl p-6 animate-fade-in-up ${card.delay}`} style={{ marginTop: `${card.y}px` }}>
-                        <div className="w-12 h-12 rounded-xl bg-wesal-dark/10 flex items-center justify-center mb-4">
-                          <span className="material-symbols-outlined text-wesal-dark text-2xl">{card.icon}</span>
+                <div className="relative w-full max-w-[440px]">
+                  {/* Background glow */}
+                  <div className="absolute inset-0 bg-wesal-sky/10 rounded-[3rem] blur-[80px]" />
+                  
+                  {/* Phone mockup */}
+                  <div className="relative z-10">
+                    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-[2.5rem] p-3 shadow-2xl">
+                      <div className="bg-white/95 rounded-[2rem] overflow-hidden">
+                        {/* Status bar */}
+                        <div className="flex justify-between items-center px-6 pt-4 pb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="relative w-6 h-6 rounded-lg overflow-hidden">
+                              <Image src="/logo.png" alt="وصال" fill className="object-cover" />
+                            </div>
+                            <span className="text-xs font-bold text-wesal-dark">وصال</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 rounded-full bg-wesal-sky" />
+                            <div className="w-2 h-2 rounded-full bg-wesal-ice" />
+                            <div className="w-2 h-2 rounded-full bg-wesal-medium" />
+                          </div>
                         </div>
-                        <div className="text-wesal-navy text-sm font-bold mb-0.5">{card.title}</div>
-                        <div className="text-wesal-medium text-xs">{card.sub}</div>
+                        
+                        {/* Content preview */}
+                        <div className="px-5 pb-6 pt-2">
+                          {/* Greeting */}
+                          <div className="flex items-center gap-2.5 mb-4">
+                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-wesal-dark to-wesal-medium flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">م</span>
+                            </div>
+                            <div>
+                              <p className="text-[11px] text-wesal-medium">صباح الخير 👋</p>
+                              <p className="text-[13px] font-bold text-wesal-dark">كيف حالك اليوم؟</p>
+                            </div>
+                          </div>
+                          
+                          {/* Quick actions */}
+                          <div className="grid grid-cols-3 gap-2 mb-4">
+                            {[
+                              { emoji: '💬', label: 'محادثة', bg: 'from-wesal-dark to-wesal-medium' },
+                              { emoji: '👨‍⚕️', label: 'استشارة', bg: 'from-wesal-sky to-wesal-medium' },
+                              { emoji: '📝', label: 'مقالات', bg: 'from-wesal-ice to-wesal-sky/50' },
+                            ].map((action) => (
+                              <div key={action.label} className={`bg-gradient-to-br ${action.bg} rounded-2xl p-3 text-center`}>
+                                <div className="text-xl mb-1">{action.emoji}</div>
+                                <div className="text-[10px] font-semibold text-white">{action.label}</div>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          {/* Post card preview */}
+                          <div className="bg-wesal-cream/80 rounded-2xl p-3.5">
+                            <div className="flex items-center gap-2 mb-2.5">
+                              <div className="w-7 h-7 rounded-full bg-wesal-ice flex items-center justify-center">
+                                <span className="text-wesal-dark text-[10px] font-bold">ن</span>
+                              </div>
+                              <div>
+                                <p className="text-[11px] font-bold text-wesal-dark">نورا أحمد</p>
+                                <p className="text-[9px] text-wesal-medium">منذ ٣ ساعات</p>
+                              </div>
+                            </div>
+                            <p className="text-[11px] text-wesal-navy leading-relaxed mb-2.5">اليوم كان يوم صعب، لكنني تعلمت تقنية التنفس العميق وساعدتني كثيراً في الهدوء 🌿</p>
+                            <div className="flex items-center gap-4 text-[10px] text-wesal-medium">
+                              <span className="flex items-center gap-1">
+                                <span className="material-symbols-outlined filled text-red-400" style={{ fontSize: '14px' }}>favorite</span>
+                                ٢٤
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>chat_bubble</span>
+                                ٨
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    ))}
+                    </div>
+                    
+                    {/* Floating decorative elements */}
+                    <div className="absolute -top-4 -right-4 bg-white/15 backdrop-blur-sm border border-white/20 rounded-2xl p-3 animate-float shadow-lg">
+                      <span className="material-symbols-outlined filled text-wesal-ice text-2xl">psychology</span>
+                    </div>
+                    <div className="absolute -bottom-4 -left-4 bg-white/15 backdrop-blur-sm border border-white/20 rounded-2xl p-3 animate-float-slow shadow-lg">
+                      <span className="material-symbols-outlined filled text-wesal-ice text-2xl">favorite</span>
+                    </div>
+                    <div className="absolute top-1/2 -left-8 bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-2.5 animate-float stagger-2 shadow-lg">
+                      <span className="material-symbols-outlined filled text-wesal-ice text-lg">shield</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+          
+          {/* Wave divider */}
+          <div className="absolute bottom-0 left-0 right-0">
+            <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
+              <path d="M0 50C240 90 480 10 720 50C960 90 1200 10 1440 50V100H0V50Z" fill="#f8f5f0" />
+            </svg>
+          </div>
         </section>
 
-        {/* ── STATS ── */}
-        <section className="relative z-20 max-w-[1200px] mx-auto px-4 sm:px-6 -mt-14 md:-mt-20">
+        {/* ══════════ STATS ══════════ */}
+        <section className="relative z-20 max-w-[1200px] mx-auto px-4 sm:px-6 -mt-8 md:-mt-12">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {stats.map((stat, i) => (
               <FadeInSection key={stat.label} delay={`${i * 100}ms`} className="h-full">
@@ -359,7 +484,7 @@ function LandingPage() {
           </div>
         </section>
 
-        {/* ── FEATURES ── */}
+        {/* ══════════ FEATURES ══════════ */}
         <section className="py-20 md:py-28 max-w-[1200px] mx-auto px-4 sm:px-6">
           <FadeInSection className="text-center mb-14 md:mb-20">
             <div className="inline-flex items-center gap-2 bg-wesal-ice rounded-full px-4 py-1.5 mb-5">
@@ -372,16 +497,27 @@ function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
             {features.map((f, i) => (
               <FadeInSection key={f.title} delay={`${i * 80}ms`} className={f.span === 2 ? 'md:col-span-2' : ''}>
-                <div className={`h-full rounded-2xl p-7 sm:p-10 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl group ${f.dark ? 'gradient-primary text-white shadow-lg shadow-wesal-dark/20' : f.accent ? 'bg-wesal-ice/50 border border-wesal-ice hover:border-wesal-sky/40' : 'bg-white border border-wesal-ice hover:border-wesal-sky/30 shadow-sm'}`}>
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-all duration-300 ${f.dark ? 'bg-white/15 group-hover:bg-white/25' : f.accent ? 'bg-wesal-dark/10 group-hover:bg-wesal-dark group-hover:text-white' : 'bg-wesal-ice group-hover:bg-wesal-dark group-hover:text-white'}`}>
-                    <span className={`material-symbols-outlined text-xl transition-colors duration-300 ${f.dark ? 'text-white' : 'text-wesal-dark group-hover:text-white'}`}>{f.icon}</span>
-                  </div>
-                  <h3 className={`text-xl sm:text-2xl font-bold mb-3 ${f.dark ? 'text-white' : 'text-wesal-navy'}`}>{f.title}</h3>
-                  <p className={`text-sm sm:text-base leading-relaxed ${f.dark ? 'text-white/75' : 'text-wesal-medium'}`}>{f.desc}</p>
-                  {f.span === 2 && !f.dark && (
-                    <div className="mt-8 flex items-center justify-end opacity-[0.06]">
-                      <span className="material-symbols-outlined text-[120px] text-wesal-dark">{f.icon}</span>
+                <div className={`h-full rounded-2xl p-7 sm:p-10 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl group relative overflow-hidden ${f.dark ? 'gradient-primary text-white shadow-lg shadow-wesal-dark/20' : f.accent ? 'bg-wesal-ice/50 border border-wesal-ice hover:border-wesal-sky/40' : 'bg-white border border-wesal-ice hover:border-wesal-sky/30 shadow-sm'}`}>
+                  {/* Decorative background for dark cards */}
+                  {f.dark && (
+                    <div className="absolute top-0 left-0 w-40 h-40 bg-white/5 rounded-full blur-[60px]" />
+                  )}
+                  <div className="relative z-10">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-all duration-300 ${f.dark ? 'bg-white/15 group-hover:bg-white/25' : f.accent ? 'bg-wesal-dark/10 group-hover:bg-wesal-dark group-hover:text-white' : 'bg-wesal-ice group-hover:bg-wesal-dark group-hover:text-white'}`}>
+                      <span className={`material-symbols-outlined text-xl transition-colors duration-300 ${f.dark ? 'text-white' : 'text-wesal-dark group-hover:text-white'}`}>{f.icon}</span>
                     </div>
+                    <h3 className={`text-xl sm:text-2xl font-bold mb-3 ${f.dark ? 'text-white' : 'text-wesal-navy'}`}>{f.title}</h3>
+                    <p className={`text-sm sm:text-base leading-relaxed ${f.dark ? 'text-white/75' : 'text-wesal-medium'}`}>{f.desc}</p>
+                  </div>
+                  {/* Large watermark icon for wide cards */}
+                  {f.span === 2 && !f.dark && (
+                    <div className="absolute bottom-0 left-0 opacity-[0.04] pointer-events-none">
+                      <span className="material-symbols-outlined text-[140px] text-wesal-dark">{f.icon}</span>
+                    </div>
+                  )}
+                  {/* Decorative shape for accent cards */}
+                  {f.accent && (
+                    <div className="absolute -top-6 -left-6 w-24 h-24 bg-wesal-sky/10 rounded-full blur-2xl pointer-events-none" />
                   )}
                 </div>
               </FadeInSection>
@@ -389,10 +525,17 @@ function LandingPage() {
           </div>
         </section>
 
-        {/* ── HOW IT WORKS ── */}
+        {/* ══════════ HOW IT WORKS ══════════ */}
         <section className="py-20 md:py-28 gradient-warm relative">
           <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
             <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full bg-wesal-ice/50 blur-[80px]" />
+            <div className="hidden lg:block absolute bottom-10 left-[15%] opacity-[0.06]">
+              <svg width="100" height="100" viewBox="0 0 100 100">
+                {Array.from({ length: 16 }).map((_, i) => (
+                  <circle key={i} cx={(i % 4) * 28 + 10} cy={Math.floor(i / 4) * 28 + 10} r="3" fill="#004346" />
+                ))}
+              </svg>
+            </div>
           </div>
           <div className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6">
             <FadeInSection className="text-center mb-14 md:mb-20">
@@ -423,7 +566,7 @@ function LandingPage() {
           </div>
         </section>
 
-        {/* ── SECURITY ── */}
+        {/* ══════════ SECURITY ══════════ */}
         <section className="py-20 md:py-28 max-w-[1200px] mx-auto px-4 sm:px-6">
           <FadeInSection className="text-center mb-14 md:mb-20">
             <div className="inline-flex items-center gap-2 bg-wesal-ice rounded-full px-4 py-1.5 mb-5">
@@ -435,19 +578,24 @@ function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {security.map((item, i) => (
               <FadeInSection key={item.title} delay={`${i * 100}ms`}>
-                <div className="h-full bg-white rounded-2xl p-8 border border-wesal-ice hover:border-wesal-sky/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 group">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-wesal-ice to-wesal-cream flex items-center justify-center mb-5 group-hover:from-wesal-dark group-hover:to-wesal-medium transition-all duration-500">
-                    <span className="material-symbols-outlined text-wesal-dark text-2xl group-hover:text-white transition-colors duration-500">{item.icon}</span>
+                <div className="h-full bg-white rounded-2xl p-8 border border-wesal-ice hover:border-wesal-sky/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 group relative overflow-hidden">
+                  <div className="absolute -bottom-4 -left-4 opacity-[0.04] pointer-events-none">
+                    <span className="material-symbols-outlined text-[100px] text-wesal-dark">{item.icon}</span>
                   </div>
-                  <h3 className="text-lg font-bold text-wesal-dark mb-3">{item.title}</h3>
-                  <p className="text-sm text-wesal-medium leading-relaxed">{item.desc}</p>
+                  <div className="relative z-10">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-wesal-ice to-wesal-cream flex items-center justify-center mb-5 group-hover:from-wesal-dark group-hover:to-wesal-medium transition-all duration-500">
+                      <span className="material-symbols-outlined text-wesal-dark text-2xl group-hover:text-white transition-colors duration-500">{item.icon}</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-wesal-dark mb-3">{item.title}</h3>
+                    <p className="text-sm text-wesal-medium leading-relaxed">{item.desc}</p>
+                  </div>
                 </div>
               </FadeInSection>
             ))}
           </div>
         </section>
 
-        {/* ── TESTIMONIALS ── */}
+        {/* ══════════ TESTIMONIALS ══════════ */}
         <section className="py-20 md:py-28 gradient-warm relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-wesal-ice to-transparent" />
@@ -485,7 +633,7 @@ function LandingPage() {
           </div>
         </section>
 
-        {/* ── FINAL CTA ── */}
+        {/* ══════════ FINAL CTA ══════════ */}
         <section className="py-20 md:py-28 max-w-[1200px] mx-auto px-4 sm:px-6">
           <FadeInSection>
             <div className="gradient-hero rounded-[2rem] sm:rounded-[2.5rem] p-10 sm:p-16 md:p-20 text-center relative overflow-hidden shadow-2xl">
@@ -494,6 +642,10 @@ function LandingPage() {
                 <div className="absolute bottom-10 left-10 w-48 h-48 rounded-full bg-wesal-sky/10 animate-float-slow stagger-3" />
               </div>
               <div className="relative z-10">
+                {/* Logo in CTA */}
+                <div className="relative w-16 h-16 rounded-2xl overflow-hidden mx-auto mb-8 shadow-xl ring-4 ring-white/10">
+                  <Image src="/logo.png" alt="وصال" fill className="object-cover" />
+                </div>
                 <h2 className="text-[clamp(1.8rem,4.5vw,3rem)] font-extrabold text-white mb-6 leading-tight">جاهز تبدأ رحلتك<br />نحو <span className="text-wesal-ice">السلام النفسي</span>؟</h2>
                 <p className="text-base sm:text-lg text-white/75 mb-10 max-w-xl mx-auto leading-relaxed">نحن هنا لندعمك في كل خطوة. ابدأ أولى خطواتك نحو حياة نفسية أكثر اتزاناً وسلاماً.</p>
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
@@ -509,14 +661,14 @@ function LandingPage() {
         </section>
       </main>
 
-      {/* ── FOOTER ── */}
+      {/* ══════════ FOOTER ══════════ */}
       <footer className="bg-wesal-navy text-white mt-auto">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-14 md:py-20">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2.5 mb-5">
-                <div className="w-9 h-9 rounded-xl bg-wesal-dark flex items-center justify-center">
-                  <span className="material-symbols-outlined text-white text-xl">spa</span>
+                <div className="relative w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">
+                  <Image src="/logo.png" alt="وصال" fill className="object-cover" />
                 </div>
                 <span className="text-xl font-bold">وصال</span>
               </div>
@@ -540,10 +692,14 @@ function LandingPage() {
             </div>
             <div>
               <h4 className="text-sm font-bold text-white mb-5">تواصل معنا</h4>
-              <div className="flex gap-4 mb-6">
-                {['mail', 'share', 'language'].map((icon) => (
-                  <a key={icon} href="#" className="text-white/50 hover:text-wesal-ice transition-colors duration-300">
-                    <span className="material-symbols-outlined">{icon}</span>
+              <div className="flex gap-3 mb-6">
+                {[
+                  { icon: 'mail', label: 'بريد' },
+                  { icon: 'share', label: 'مشاركة' },
+                  { icon: 'language', label: 'لغة' },
+                ].map((item) => (
+                  <a key={item.icon} href="#" className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors duration-300" aria-label={item.label}>
+                    <span className="material-symbols-outlined text-lg text-white/60">{item.icon}</span>
                   </a>
                 ))}
               </div>
@@ -551,7 +707,12 @@ function LandingPage() {
             </div>
           </div>
           <div className="mt-14 pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-white/40">© ٢٠٢٤ وصال (Wesal). جميع الحقوق محفوظة.</p>
+            <div className="flex items-center gap-3">
+              <div className="relative w-6 h-6 rounded-lg overflow-hidden">
+                <Image src="/logo.png" alt="وصال" fill className="object-cover opacity-60" />
+              </div>
+              <p className="text-xs text-white/40">© ٢٠٢٤ وصال (Wesal). جميع الحقوق محفوظة.</p>
+            </div>
             <div className="flex gap-2 items-center">
               <span className="material-symbols-outlined text-wesal-ice text-sm filled">verified</span>
               <span className="text-xs text-white/40">معتمد طبياً</span>
@@ -573,10 +734,13 @@ export default function HomePage() {
     return (
       <div className="flex min-h-screen items-center justify-center gradient-hero">
         <div className="text-center animate-fade-in-up">
-          <div className="text-6xl font-extrabold text-white mb-2 tracking-tight">وصال</div>
-          <div className="text-white/50 text-sm tracking-widest">WESAL</div>
-          <div className="mt-6 w-10 h-1 bg-white/30 rounded-full mx-auto overflow-hidden">
-            <div className="h-full bg-white rounded-full animate-shimmer w-full" />
+          <div className="relative w-20 h-20 rounded-2xl overflow-hidden mx-auto mb-4 shadow-xl ring-4 ring-white/10">
+            <Image src="/logo.png" alt="وصال" fill className="object-cover" />
+          </div>
+          <div className="text-2xl font-extrabold text-white mb-1 tracking-tight">وصال</div>
+          <div className="text-white/40 text-xs tracking-[0.3em] font-medium">WESAL</div>
+          <div className="mt-6 w-16 h-1 bg-white/20 rounded-full mx-auto overflow-hidden">
+            <div className="h-full bg-wesal-ice rounded-full animate-shimmer w-full" />
           </div>
         </div>
       </div>
