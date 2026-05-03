@@ -37,16 +37,6 @@ export function useAuth() {
         return { success: true };
       }
 
-      // Handle specific error cases
-      if (res.status === 403 && data.needsVerification) {
-        return {
-          success: false,
-          error: data.error || 'لازم تأكد إيميلك الأول',
-          needsVerification: true,
-          email: data.email || email,
-        };
-      }
-
       return { success: false, error: data.error || 'الإيميل أو كلمة المرور غلط' };
     } catch {
       return { success: false, error: 'حصل خطأ في الاتصال بالسيرفر، جرب تاني' };

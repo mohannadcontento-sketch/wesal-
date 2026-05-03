@@ -44,18 +44,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if email is verified
-    if (!user.emailVerified) {
-      return NextResponse.json(
-        {
-          error: 'لازم تأكد إيميلك الأول. افحص إيميلك للرمز التأكيدي.',
-          needsVerification: true,
-          email: user.email
-        },
-        { status: 403 }
-      );
-    }
-
     const authUser = buildAuthUser(user);
 
     // Create session token

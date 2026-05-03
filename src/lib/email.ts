@@ -1,10 +1,18 @@
 /**
- * Email Service — sends OTP verification emails via Supabase Edge Functions.
+ * Email Service — sends OTP verification emails.
  *
  * Strategy (in order of preference):
- *   1. Supabase Edge Function (`send-otp-email`) — production
- *   2. Resend API directly (if RESEND_API_KEY is set) — fallback production
- *   3. Console.log — development / unconfigured environments
+ *   1. Supabase Edge Function (`send-email`) — production (requires Supabase project)
+ *   2. Console.log — development / unconfigured environments
+ *
+ * To enable email delivery via Supabase:
+ *   1. Create a Supabase project at https://supabase.com
+ *   2. Deploy the edge function: supabase functions deploy send-email
+ *   3. Set these env vars in your .env.local:
+ *      NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+ *      NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIs...
+ *      SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIs...
+ *   4. Set RESEND_API_KEY in Supabase Dashboard → Settings → Edge Functions
  *
  * The project uses custom JWT auth, NOT Supabase Auth.
  * We only use Supabase for email delivery via edge functions.
@@ -16,7 +24,7 @@ import { getSupabaseService, isSupabaseConfigured } from '@/lib/supabase/server'
 
 export interface SendEmailResult {
   success: boolean
-  method: 'supabase-edge-function' | 'resend-api' | 'console-fallback'
+  method: 'supabase-edge-function' | 'console-fallback'
   error?: string
 }
 
@@ -109,51 +117,7 @@ async function sendViaEdgeFunction(payload: EmailPayload): Promise<SendEmailResu
   }
 }
 
-// ─── Method 2: Resend API ────────────────────────────────────────────────────
-
-async function sendViaResend(payload: EmailPayload): Promise<SendEmailResult> {
-  const resendApiKey = process.env.RESEND_API_KEY
-  if (!resendApiKey) {
-    return { success: false, method: 'resend-api', error: 'RESEND_API_KEY not set' }
-  }
-
-  try {
-    const resendResponse = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: process.env.EMAIL_FROM || 'Wesal <noreply@wesal.app>',
-        to: [payload.to],
-        subject: payload.subject,
-        html: payload.htmlBody,
-        text: payload.textBody,
-      }),
-    })
-
-    if (!resendResponse.ok) {
-      const errorBody = await resendResponse.text()
-      console.error('[Email] Resend API error:', resendResponse.status, errorBody)
-      return {
-        success: false,
-        method: 'resend-api',
-        error: `Resend API ${resendResponse.status}: ${errorBody}`,
-      }
-    }
-
-    const responseData = await resendResponse.json()
-    console.log('[Email] Sent via Resend:', responseData.id)
-    return { success: true, method: 'resend-api' }
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Unknown Resend error'
-    console.error('[Email] Resend exception:', msg)
-    return { success: false, method: 'resend-api', error: msg }
-  }
-}
-
-// ─── Method 3: Console Fallback ──────────────────────────────────────────────
+// ─── Method 2: Console Fallback ──────────────────────────────────────────────
 
 function consoleFallback(email: string, otpCode: string): SendEmailResult {
   console.log('┌──────────────────────────────────────────────────────┐')
@@ -163,8 +127,13 @@ function consoleFallback(email: string, otpCode: string): SendEmailResult {
   console.log(`│  Code:    ${otpCode.padEnd(43)}│`)
   console.log('│  Expiry:  10 minutes                                 │')
   console.log('├──────────────────────────────────────────────────────┤')
-  console.log('│  Configure NEXT_PUBLIC_SUPABASE_URL + keys, or      │')
-  console.log('│  set RESEND_API_KEY for actual email delivery.      │')
+  console.log('│  To enable real email delivery, configure Supabase:  │')
+  console.log('│  NEXT_PUBLIC_SUPABASE_URL                           │')
+  console.log('│  NEXT_PUBLIC_SUPABASE_ANON_KEY                      │')
+  console.log('│  SUPABASE_SERVICE_ROLE_KEY                          │')
+  console.log('│                                                      │')
+  console.log('│  Then deploy the edge function:                      │')
+  console.log('│  supabase functions deploy send-email                │')
   console.log('└──────────────────────────────────────────────────────┘')
 
   return { success: true, method: 'console-fallback' }
@@ -175,10 +144,9 @@ function consoleFallback(email: string, otpCode: string): SendEmailResult {
 /**
  * Send an OTP verification email to the given address.
  *
- * Tries sending methods in order:
- *   1. Supabase Edge Function (production, requires Supabase project)
- *   2. Resend API (production, requires RESEND_API_KEY)
- *   3. Console log (development fallback — always succeeds)
+ * Strategy:
+ *   1. Supabase Edge Function (production, requires Supabase project with deployed function)
+ *   2. Console log (development fallback — always succeeds, shows OTP in terminal)
  *
  * @returns {SendEmailResult} indicating which method was used and success status
  */
@@ -189,14 +157,8 @@ export async function sendOtpEmail(email: string, otpCode: string): Promise<Send
   const edgeFnResult = await sendViaEdgeFunction(payload)
   if (edgeFnResult.success) return edgeFnResult
 
-  console.warn(`[Email] Edge function failed: ${edgeFnResult.error}. Trying next method...`)
+  console.warn(`[Email] Edge function failed: ${edgeFnResult.error}. Falling back to console.`)
 
-  // Method 2: Try Resend API directly
-  const resendResult = await sendViaResend(payload)
-  if (resendResult.success) return resendResult
-
-  console.warn(`[Email] Resend failed: ${resendResult.error}. Falling back to console.`)
-
-  // Method 3: Console fallback (always succeeds for development)
+  // Method 2: Console fallback (always succeeds for development)
   return consoleFallback(email, otpCode)
 }

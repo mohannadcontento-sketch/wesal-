@@ -39,9 +39,6 @@ export default function LoginPage() {
       if (result.success) {
         toast.success('أهلاً بيك!');
         router.push('/community');
-      } else if ((result as any).needsVerification) {
-        toast.error('لازم تأكد إيميلك الأول');
-        router.push(`/verify?email=${encodeURIComponent((result as any).email || email)}`);
       } else {
         setErrorMsg(result.error || 'الإيميل أو كلمة المرور غلط');
         toast.error(result.error || 'الإيميل أو كلمة المرور غلط');
