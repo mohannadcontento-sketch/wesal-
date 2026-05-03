@@ -11,7 +11,7 @@ export function SideNav() {
   if (loading || !user) return null;
 
   const navItems = [
-    { href: '/community', label: 'المجتمع', icon: 'forum' },
+    { href: '/', label: 'الرئيسية', icon: 'home' },
     { href: '/doctors', label: 'الأطباء', icon: 'medical_services' },
     { href: '/bookmarks', label: 'المحفوظات', icon: 'bookmark' },
     { href: '/notifications', label: 'التنبيهات', icon: 'notifications' },
@@ -24,24 +24,18 @@ export function SideNav() {
 
   const isActive = (href: string, icon: string) => {
     if (icon === 'person') return pathname.startsWith('/profile');
+    if (href === '/') return pathname === '/';
     return pathname === href || pathname.startsWith(href + '/');
   };
 
   return (
-    <aside className="hidden md:flex fixed top-0 bottom-0 right-0 w-64 flex-col p-6 z-40 glass-panel border-l border-outline-variant/20 shadow-2xl shadow-primary/5">
-      {/* ── Reputation Card ── */}
-      <div className="mb-8 text-center">
-        <div className="w-16 h-16 mx-auto rounded-full bg-secondary-container flex items-center justify-center mb-3">
-          <span className="material-symbols-outlined text-3xl text-primary">
-            shield
-          </span>
+    <aside className="hidden md:flex fixed top-0 bottom-0 right-0 w-64 flex-col p-5 z-40 glass-panel border-l border-wesal-ice shadow-xl">
+      {/* ── Logo ── */}
+      <div className="mb-8 flex items-center gap-2.5">
+        <div className="w-9 h-9 rounded-xl bg-wesal-dark flex items-center justify-center">
+          <span className="material-symbols-outlined text-white text-lg">spa</span>
         </div>
-        <h2 className="text-lg font-semibold text-on-surface font-[var(--font-heading)]">
-          مركز السمعة
-        </h2>
-        <p className="text-sm text-on-surface-variant mt-1">
-          ١٥٠٠ نقطة • مستوى بلاتيني
-        </p>
+        <span className="text-lg font-bold text-wesal-dark">وصال</span>
       </div>
 
       {/* ── Navigation Items ── */}
@@ -52,17 +46,13 @@ export function SideNav() {
             <Link
               key={item.href + item.label}
               href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                 active
-                  ? 'bg-primary/10 text-primary font-medium'
-                  : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
+                  ? 'bg-wesal-ice text-wesal-dark font-semibold'
+                  : 'text-wesal-medium hover:bg-wesal-ice/40 hover:text-wesal-dark'
               }`}
             >
-              <span
-                className={`material-symbols-outlined ${
-                  active ? 'filled' : ''
-                }`}
-              >
+              <span className={`material-symbols-outlined text-[22px] ${active ? 'filled' : ''}`}>
                 {item.icon}
               </span>
               <span className="text-sm">{item.label}</span>
@@ -71,16 +61,24 @@ export function SideNav() {
         })}
       </nav>
 
-      {/* ── Logout ── */}
-      <div className="mt-auto pt-4 border-t border-outline-variant/30">
-        <button
-          onClick={logout}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 text-error hover:bg-error-container/50 rounded-lg transition-colors text-sm font-medium"
-        >
-          <span className="material-symbols-outlined text-[20px]">logout</span>
-          تسجيل الخروج
-        </button>
+      {/* ── Reputation Card ── */}
+      <div className="mb-4 p-4 rounded-xl bg-gradient-to-bl from-wesal-ice/40 via-wesal-ice/10 to-transparent border border-wesal-ice">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="material-symbols-outlined filled text-wesal-dark text-lg">stars</span>
+          <span className="text-sm font-semibold text-wesal-dark">نقاط السمعة</span>
+        </div>
+        <div className="text-2xl font-bold text-wesal-dark">1,500</div>
+        <div className="text-xs text-wesal-medium">مستوى بلاتيني</div>
       </div>
+
+      {/* ── Logout ── */}
+      <button
+        onClick={logout}
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors text-sm font-medium border border-transparent hover:border-red-100"
+      >
+        <span className="material-symbols-outlined text-[20px]">logout</span>
+        تسجيل الخروج
+      </button>
     </aside>
   );
 }

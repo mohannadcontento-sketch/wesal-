@@ -1,42 +1,51 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { useState } from 'react';
 
 export function TopNavbar() {
   const pathname = usePathname();
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
+  const [showLogoutMenu, setShowLogoutMenu] = useState(false);
+  const router = useRouter();
 
   const navLinks = [
-    { href: '/community', label: 'المجتمع' },
+    { href: '/', label: 'الرئيسية' },
     { href: '/doctors', label: 'الأطباء' },
     { href: '/bookmarks', label: 'المحفوظات' },
   ];
 
+  const handleLogout = async () => {
+    setShowLogoutMenu(false);
+    await logout();
+    router.push('/');
+  };
+
   return (
-    <header className="fixed top-0 right-0 left-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/20 shadow-sm">
-      <nav className="flex justify-between items-center w-full max-w-screen-2xl mx-auto px-6 py-4">
+    <header className="fixed top-0 right-0 left-0 z-50 bg-wesal-cream/80 backdrop-blur-md border-b border-wesal-ice shadow-sm">
+      <nav className="flex justify-between items-center w-full max-w-screen-2xl mx-auto px-4 sm:px-6 py-3">
         {/* ── Right side: Logo + Nav links ── */}
-        <div className="flex items-center gap-8">
-          <Link
-            href={user ? '/community' : '/'}
-            className="text-2xl font-bold text-primary hover:opacity-80 transition-opacity"
-          >
-            وصال
+        <div className="flex items-center gap-6">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-wesal-dark flex items-center justify-center">
+              <span className="material-symbols-outlined text-white text-lg">spa</span>
+            </div>
+            <span className="text-lg font-bold text-wesal-dark">وصال</span>
           </Link>
-          <div className="hidden md:flex gap-6 text-sm font-medium">
+          <div className="hidden md:flex gap-1 text-sm font-medium">
             {navLinks.map((link) => {
-              const isActive =
-                pathname === link.href || pathname.startsWith(link.href + '/');
+              const isActive = pathname === link.href || (link.href === '/' && pathname === '/');
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`transition-colors ${
+                  className={`px-3 py-2 rounded-lg transition-all duration-200 ${
                     isActive
-                      ? 'text-primary border-b-2 border-primary pb-1'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container/50 px-2 py-1 rounded-lg'
+                      ? 'text-wesal-dark bg-wesal-ice font-semibold'
+                      : 'text-wesal-medium hover:text-wesal-dark hover:bg-wesal-ice/50'
                   }`}
                 >
                   {link.label}
@@ -47,38 +56,77 @@ export function TopNavbar() {
         </div>
 
         {/* ── Left side: Actions ── */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {!loading && user ? (
             <>
               <Link
                 href="/notifications"
-                className="text-on-surface-variant hover:text-primary transition-colors"
+                className="relative text-wesal-medium hover:text-wesal-dark transition-colors p-1.5 rounded-lg hover:bg-wesal-ice/50"
                 aria-label="التنبيهات"
               >
-                <span className="material-symbols-outlined text-[24px]">
-                  notifications
-                </span>
+                <span className="material-symbols-outlined text-[22px]">notifications</span>
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
               </Link>
-              <Link
-                href={`/profile/${user.username || 'me'}`}
-                className="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/20 hover:border-primary/30 transition-colors"
-              >
-                <div className="w-full h-full bg-primary-container flex items-center justify-center text-on-primary text-sm font-bold">
-                  {user.realName?.charAt(0) || '?'}
-                </div>
-              </Link>
+
+              {/* Profile / Logout Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowLogoutMenu(!showLogoutMenu)}
+                  className="flex items-center gap-2 p-1 pr-2 rounded-xl hover:bg-wesal-ice/50 transition-colors"
+                >
+                  <span className="text-sm font-medium text-wesal-navy hidden sm:inline">
+                    {user.realName || user.username || 'مستخدم'}
+                  </span>
+                  <div className="w-8 h-8 rounded-full bg-wesal-dark flex items-center justify-center text-white text-sm font-bold">
+                    {user.realName?.charAt(0) || '?'}
+                  </div>
+                </button>
+
+                {/* Dropdown Menu */}
+                {showLogoutMenu && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowLogoutMenu(false)} />
+                    <div className="absolute left-0 top-full mt-2 z-50 w-52 bg-white rounded-xl border border-wesal-ice shadow-xl animate-scale-in overflow-hidden">
+                      <Link
+                        href={`/profile/${user.username || 'me'}`}
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-wesal-navy hover:bg-wesal-ice/50 transition-colors"
+                        onClick={() => setShowLogoutMenu(false)}
+                      >
+                        <span className="material-symbols-outlined text-[20px] text-wesal-medium">person</span>
+                        الملف الشخصي
+                      </Link>
+                      <Link
+                        href="/settings"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-wesal-navy hover:bg-wesal-ice/50 transition-colors"
+                        onClick={() => setShowLogoutMenu(false)}
+                      >
+                        <span className="material-symbols-outlined text-[20px] text-wesal-medium">settings</span>
+                        الإعدادات
+                      </Link>
+                      <div className="border-t border-wesal-ice" />
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-[20px]">logout</span>
+                        تسجيل الخروج
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </>
           ) : !loading ? (
             <div className="hidden sm:flex items-center gap-2">
               <Link
                 href="/login"
-                className="px-4 py-2 text-sm font-medium text-on-surface hover:bg-surface-container transition-colors rounded-lg"
+                className="px-4 py-2 text-sm font-medium text-wesal-dark hover:bg-wesal-ice/50 transition-colors rounded-lg"
               >
                 تسجيل الدخول
               </Link>
               <Link
                 href="/register"
-                className="px-4 py-2 text-sm font-medium bg-primary text-on-primary rounded-lg shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+                className="px-4 py-2 text-sm font-medium bg-wesal-dark text-white rounded-lg shadow-lg shadow-wesal-dark/20 hover:bg-wesal-navy transition-all"
               >
                 ابدأ الآن
               </Link>

@@ -6,7 +6,7 @@ import { MobileBottomNav } from './MobileBottomNav';
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-wesal-cream flex flex-col">
       {/* ── Fixed Top Navbar ── */}
       <TopNavbar />
 
@@ -14,7 +14,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       <SideNav />
 
       {/* ── Main Content Area ── */}
-      <main className="w-full max-w-screen-2xl mx-auto flex-1 pt-20 px-4 md:px-8 md:pr-72 pb-24 md:pb-8">
+      <main className="w-full max-w-screen-2xl mx-auto flex-1 pt-[60px] px-4 md:px-8 md:pr-72 pb-24 md:pb-8">
         {children}
       </main>
 

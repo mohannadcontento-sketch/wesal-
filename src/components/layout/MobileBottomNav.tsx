@@ -6,18 +6,17 @@ import { useAuth } from '@/hooks/useAuth';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
 
   if (loading || !user) return null;
 
   const links = [
-    { href: '/community', label: 'الرئيسية', icon: 'home' },
-    { href: '/community', label: 'المجتمع', icon: 'group' },
+    { href: '/', label: 'الرئيسية', icon: 'home' },
     { href: '/doctors', label: 'الأطباء', icon: 'medical_services' },
     { href: '/notifications', label: 'التنبيهات', icon: 'notifications' },
     {
       href: `/profile/${user.username || 'me'}`,
-      label: 'الملف الشخصي',
+      label: 'حسابي',
       icon: 'person',
       matchPath: '/profile',
     },
@@ -29,30 +28,35 @@ export function MobileBottomNav() {
   };
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 bg-surface/90 backdrop-blur-lg rounded-t-2xl border-t border-outline-variant/20 shadow-[0_-4px_20px_0_rgba(0,67,70,0.05)] text-[11px] font-medium">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center px-2 pb-[env(safe-area-inset-bottom)] pt-2 bg-wesal-cream/95 backdrop-blur-lg rounded-t-2xl border-t border-wesal-ice shadow-[0_-4px_20px_0_rgba(0,67,70,0.06)] text-[10px] font-medium">
       {links.map((link) => {
         const active = isActive(link);
         return (
           <Link
             key={link.href + link.label}
             href={link.href}
-            className={`flex flex-col items-center justify-center px-3 py-1.5 transition-all duration-200 ${
+            className={`flex flex-col items-center justify-center px-3 py-1.5 rounded-xl transition-all duration-200 ${
               active
-                ? 'text-primary-container bg-[#D6F3F4] dark:bg-primary-container/40 rounded-xl scale-90'
-                : 'text-outline hover:bg-[#D6F3F4]/50 dark:hover:bg-surface-container-high'
+                ? 'text-wesal-dark bg-wesal-ice'
+                : 'text-wesal-medium hover:bg-wesal-ice/30'
             }`}
           >
-            <span
-              className={`material-symbols-outlined text-[24px] mb-0.5 ${
-                active ? 'filled' : ''
-              }`}
-            >
+            <span className={`material-symbols-outlined text-[22px] mb-0.5 ${active ? 'filled' : ''}`}>
               {link.icon}
             </span>
             <span>{link.label}</span>
           </Link>
         );
       })}
+
+      {/* Logout Button */}
+      <button
+        onClick={logout}
+        className="flex flex-col items-center justify-center px-3 py-1.5 rounded-xl text-red-500 hover:bg-red-50 transition-all duration-200"
+      >
+        <span className="material-symbols-outlined text-[22px] mb-0.5">logout</span>
+        <span>خروج</span>
+      </button>
     </nav>
   );
 }
