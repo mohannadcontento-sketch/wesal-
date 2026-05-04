@@ -16,6 +16,7 @@ interface Post {
   reactionCount: number;
   createdAt: string;
   reactions: Record<string, number>;
+  userReaction?: string | null;
   isSensitive?: boolean;
   sensitiveReason?: string;
   imageUrl?: string;

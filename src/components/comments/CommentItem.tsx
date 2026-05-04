@@ -114,7 +114,6 @@ function ReplyItem({
 
   const reactionButtons = [
     { type: 'like', icon: 'thumb_up', label: 'إعجاب', points: '+1' },
-    { type: 'thanks', icon: 'favorite', label: 'شكر', points: '+3' },
     { type: 'helpful', icon: 'volunteer_activism', label: 'مفيد', points: '+5' },
   ];
 
@@ -266,7 +265,6 @@ export function CommentItem({ comment, postId, topCommentId, onNewReply }: Comme
 
   const reactionButtons = [
     { type: 'like', icon: 'thumb_up', label: 'إعجاب', points: '+1' },
-    { type: 'thanks', icon: 'favorite', label: 'شكر', points: '+3' },
     { type: 'helpful', icon: 'volunteer_activism', label: 'مفيد', points: '+5' },
   ];
 

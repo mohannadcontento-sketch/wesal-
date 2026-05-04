@@ -12,7 +12,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const body = await req.json();
     const { type } = body;
 
-    const validTypes = ['like', 'thanks', 'helpful'];
+    const validTypes = ['like', 'helpful'];
     if (!validTypes.includes(type)) {
       return NextResponse.json({ error: 'نوع تفاعل غلط' }, { status: 400 });
     }
