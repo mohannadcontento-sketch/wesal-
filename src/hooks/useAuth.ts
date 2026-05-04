@@ -21,6 +21,9 @@ export function useAuth() {
       // Don't update state if the request was aborted
       if (err instanceof DOMException && err.name === 'AbortError') return;
       setUser(null);
+    } finally {
+      // Ensure loading is always set to false, even on unexpected errors
+      setLoading(false);
     }
   }, [setUser, setLoading]);
 
