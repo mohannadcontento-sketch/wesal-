@@ -10,6 +10,7 @@ interface AuthState {
     badge: string;
     reputationScore: number;
     specialty?: string;
+    avatarUrl?: string;
   } | null;
   loading: boolean;
   setUser: (user: AuthState['user']) => void;

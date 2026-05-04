@@ -15,6 +15,7 @@ export interface AuthUser {
   badge: string;
   reputationScore: number;
   specialty?: string | null;
+  avatarUrl?: string | null;
 }
 
 function getUserBadge(role: string, reputationTier?: string): string {
@@ -39,6 +40,7 @@ export async function createSessionToken(user: AuthUser): Promise<string> {
     badge: user.badge,
     reputationScore: user.reputationScore,
     specialty: user.specialty || '',
+    avatarUrl: user.avatarUrl || '',
   })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
@@ -63,6 +65,7 @@ export async function verifySessionToken(token: string): Promise<AuthUser | null
       badge: (payload.badge as string) || '🔰',
       reputationScore: (payload.reputationScore as number) || 0,
       specialty: (payload.specialty as string) || null,
+      avatarUrl: (payload.avatarUrl as string) || null,
     };
   } catch {
     return null;
@@ -164,6 +167,7 @@ export function buildAuthUser(user: {
     reputationScore: number;
     reputationTier?: string;
     specialty?: string | null;
+    avatarUrl?: string | null;
   } | null;
 }): AuthUser {
   const badge = getUserBadge(user.role, user.profile?.reputationTier);
@@ -176,6 +180,7 @@ export function buildAuthUser(user: {
     badge,
     reputationScore: user.profile?.reputationScore || 0,
     specialty: user.profile?.specialty || null,
+    avatarUrl: user.profile?.avatarUrl || null,
   };
 }
 
