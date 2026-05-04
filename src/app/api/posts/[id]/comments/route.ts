@@ -5,7 +5,9 @@ import { getUserBadge, getDisplayName } from '@/types';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const currentUser = await getUserFromSession(req);
     const { id } = await params;
+
     const comments = await db.comment.findMany({
       where: { postId: id, parentId: null },
       orderBy: { createdAt: 'asc' },
@@ -23,6 +25,16 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       const reactionMap: Record<string, number> = {};
       reactions.forEach((r) => { reactionMap[r.type] = r._count.type; });
 
+      // Fetch current user's reactions on this comment
+      let userReactions: string[] = [];
+      if (currentUser) {
+        const userReactList = await db.reaction.findMany({
+          where: { userId: currentUser.id, targetId: c.id, targetType: 'comment' },
+          select: { type: true },
+        });
+        userReactions = userReactList.map((r) => r.type);
+      }
+
       const repliesWithReactions = await Promise.all((c.replies || []).map(async (r) => {
         const rReactions = await db.reaction.groupBy({
           by: ['type'],
@@ -31,10 +43,21 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         });
         const rMap: Record<string, number> = {};
         rReactions.forEach((rr) => { rMap[rr.type] = rr._count.type; });
-        return { ...r, reactions: rMap };
+
+        // Fetch current user's reactions on this reply
+        let rUserReactions: string[] = [];
+        if (currentUser) {
+          const rUserReactList = await db.reaction.findMany({
+            where: { userId: currentUser.id, targetId: r.id, targetType: 'comment' },
+            select: { type: true },
+          });
+          rUserReactions = rUserReactList.map((rr) => rr.type);
+        }
+
+        return { ...r, reactions: rMap, userReactions: rUserReactions };
       }));
 
-      return { ...c, reactions: reactionMap, replies: repliesWithReactions };
+      return { ...c, reactions: reactionMap, userReactions, replies: repliesWithReactions };
     }));
 
     return NextResponse.json({ comments: commentsWithReactions });

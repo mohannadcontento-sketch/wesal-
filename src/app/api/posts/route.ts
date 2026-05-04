@@ -5,6 +5,7 @@ import { getUserBadge, getDisplayName, getReputationTier } from '@/types';
 
 export async function GET(req: Request) {
   try {
+    const user = await getUserFromSession(req);
     const { searchParams } = new URL(req.url);
     const section = searchParams.get('section') || 'shares';
     const page = parseInt(searchParams.get('page') || '1');
@@ -36,7 +37,17 @@ export async function GET(req: Request) {
       const reactionMap: Record<string, number> = {};
       reactions.forEach((r) => { reactionMap[r.type] = r._count.type; });
 
-      return { ...post, reactions: reactionMap };
+      // Fetch current user's reaction on this post
+      let userReaction: string | null = null;
+      if (user) {
+        const userReact = await db.reaction.findFirst({
+          where: { userId: user.id, targetId: post.id, targetType: 'post' },
+          select: { type: true },
+        });
+        if (userReact) userReaction = userReact.type;
+      }
+
+      return { ...post, reactions: reactionMap, userReaction };
     }));
 
     return NextResponse.json({ posts: postsWithReactions });

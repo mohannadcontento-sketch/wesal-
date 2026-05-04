@@ -18,6 +18,7 @@ interface PostCardProps {
     reactionCount: number;
     createdAt: string;
     reactions: Record<string, number>;
+    userReaction?: string | null;
     isSensitive?: boolean;
     sensitiveReason?: string;
     imageUrl?: string;
@@ -30,7 +31,8 @@ export function PostCard({ post }: PostCardProps) {
   const [reactions, setReactions] = useState(post.reactions || {});
   const [commentCount, setCommentCount] = useState(post.commentCount);
   const [bookmarked, setBookmarked] = useState(false);
-  const [userReaction, setUserReaction] = useState<string | null>(null);
+  // Initialize from server data so the button shows correct state on load
+  const [userReaction, setUserReaction] = useState<string | null>(post.userReaction || null);
   const [showSensitive, setShowSensitive] = useState(!post.isSensitive);
 
   const timeAgo = (date: string) => {
@@ -49,17 +51,24 @@ export function PostCard({ post }: PostCardProps) {
       toast.error('سجل دخول الأول');
       return;
     }
+
     const wasActive = userReaction === type;
+
+    // Optimistic update
     setUserReaction(wasActive ? null : type);
     setReactions((prev) => {
       const updated = { ...prev };
       if (!wasActive) {
+        // If switching from one reaction type to another
         if (userReaction && updated[userReaction]) {
           updated[userReaction] = Math.max(0, updated[userReaction] - 1);
+          if (updated[userReaction] === 0) delete updated[userReaction];
         }
         updated[type] = (updated[type] || 0) + 1;
       } else {
+        // Removing reaction
         updated[type] = Math.max(0, (updated[type] || 0) - 1);
+        if (updated[type] === 0) delete updated[type];
       }
       return updated;
     });
@@ -72,7 +81,24 @@ export function PostCard({ post }: PostCardProps) {
       });
       if (!res.ok) throw new Error();
     } catch {
+      // Revert on failure
       setUserReaction(wasActive ? type : null);
+      setReactions((prev) => {
+        const updated = { ...prev };
+        if (!wasActive) {
+          // Undo add
+          updated[type] = Math.max(0, (updated[type] || 0) - 1);
+          if (updated[type] === 0) delete updated[type];
+          // Restore previous reaction
+          if (userReaction) {
+            updated[userReaction] = (updated[userReaction] || 0) + 1;
+          }
+        } else {
+          // Undo remove
+          updated[type] = (updated[type] || 0) + 1;
+        }
+        return updated;
+      });
       toast.error('حصل خطأ');
     }
   };
@@ -119,6 +145,7 @@ export function PostCard({ post }: PostCardProps) {
 
   const totalReactions = Object.values(reactions).reduce((a, b) => a + b, 0);
   const isDoctor = post.authorRole === 'doctor';
+  const isLiked = userReaction === 'heart' || userReaction === 'like';
 
   return (
     <article className={`bg-surface-bright rounded-xl border p-4 sm:p-5 transition-shadow duration-200 hover:shadow-[0_4px_20px_0_rgba(23,42,57,0.06)] ${
@@ -203,17 +230,17 @@ export function PostCard({ post }: PostCardProps) {
       {/* Action Bar */}
       <div className="flex items-center justify-between border-t border-outline-variant/30 pt-3 mt-3">
         <div className="flex gap-4">
-          {/* Favorite / Heart */}
+          {/* Like / Heart */}
           <button
             onClick={() => handleReaction('heart')}
-            className={`flex items-center gap-1 text-sm transition-colors ${
-              userReaction === 'heart'
-                ? 'text-primary-container'
-                : 'text-on-surface-variant hover:text-primary-container'
+            className={`flex items-center gap-1 text-sm transition-all duration-200 ${
+              isLiked
+                ? 'text-red-500 scale-105'
+                : 'text-on-surface-variant hover:text-red-400'
             }`}
           >
-            <span className={`material-symbols-outlined text-[20px] ${userReaction === 'heart' ? 'filled' : ''}`}>favorite</span>
-            {totalReactions > 0 && <span className="font-medium">{totalReactions}</span>}
+            <span className={`material-symbols-outlined text-[20px] ${isLiked ? 'filled' : ''}`}>favorite</span>
+            {totalReactions > 0 && <span className={`font-medium ${isLiked ? 'text-red-500' : ''}`}>{totalReactions}</span>}
           </button>
 
           {/* Comments */}
