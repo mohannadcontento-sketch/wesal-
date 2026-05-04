@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
@@ -11,7 +10,6 @@ export function TopNavbar() {
   const pathname = usePathname();
   const { user, loading, logout } = useAuth();
   const [showLogoutMenu, setShowLogoutMenu] = useState(false);
-  const router = useRouter();
 
   const navLinks = [
     { href: '/', label: 'الرئيسية', icon: 'home' },
@@ -22,7 +20,6 @@ export function TopNavbar() {
   const handleLogout = async () => {
     setShowLogoutMenu(false);
     await logout();
-    router.push('/');
   };
 
   return (
@@ -118,7 +115,7 @@ export function TopNavbar() {
                           </Link>
                         )}
                         <Link
-                          href="/settings"
+                          href={`/profile/${user.username || 'me'}`}
                           className="flex items-center gap-3 px-4 py-2.5 text-sm text-wesal-navy hover:bg-wesal-ice/50 transition-colors"
                           onClick={() => setShowLogoutMenu(false)}
                         >

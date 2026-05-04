@@ -64,7 +64,6 @@ export async function POST(req: Request) {
     });
 
     const authUser = buildAuthUser(user);
-    authUser.badge = authUser.badge; // Use current badge
 
     // Create session token
     const token = await createSessionToken(authUser);

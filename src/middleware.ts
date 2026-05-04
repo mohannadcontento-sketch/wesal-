@@ -48,7 +48,7 @@ export async function middleware(request: NextRequest) {
   // redirect to community
   if (user && isAuthRoute) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = '/community';
+    redirectUrl.pathname = '/';
     return NextResponse.redirect(redirectUrl);
   }
 

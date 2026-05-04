@@ -45,7 +45,7 @@ export default function VerificationRequests() {
     const notes = reviewNotes[id] || '';
     try {
       const res = await fetch(`/api/admin/verification-requests/${id}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status, reviewNotes: notes }),
       });

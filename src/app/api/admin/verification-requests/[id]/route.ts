@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getUserFromSession } from '@/lib/auth/session';
-import { getReputationTier } from '@/types';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {

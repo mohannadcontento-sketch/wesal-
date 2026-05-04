@@ -65,7 +65,6 @@ model Post {
   createdAt      DateTime @default(now())
   author         User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   comments       Comment[]
-  reactions      Reaction[]  @relation("PostReactions")
   bookmarks      Bookmark[]
 }
 
@@ -80,7 +79,6 @@ model Comment {
   createdAt     DateTime @default(now())
   post          Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   author        User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  reactions     Reaction[]  @relation("CommentReactions")
   parent        Comment? @relation("CommentReplies", fields: [parentId], references: [id])
   replies       Comment[] @relation("CommentReplies")
 }
@@ -93,9 +91,6 @@ model Reaction {
   type       String   @default("like")
   createdAt  DateTime @default(now())
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  post       Post?    @relation("PostReactions", fields: [targetId], references: [id], onDelete: Cascade, map: "ReactionPostFkey")
-  comment    Comment? @relation("CommentReactions", fields: [targetId], references: [id], onDelete: Cascade, map: "ReactionCommentFkey")
 
   @@unique([userId, targetId, targetType, type])
 }

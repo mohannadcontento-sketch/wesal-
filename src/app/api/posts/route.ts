@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getUserFromSession } from '@/lib/auth/session';
-import { getUserBadge, getDisplayName, getReputationTier } from '@/types';
+import { getUserBadge, getDisplayName } from '@/types';
 
 export async function GET(req: Request) {
   try {
