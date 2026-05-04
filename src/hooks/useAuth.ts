@@ -10,7 +10,17 @@ export function useAuth() {
   const fetchSession = useCallback(async (signal: AbortSignal) => {
     try {
       setLoading(true);
-      const res = await fetch('/api/auth/session', { signal });
+      // Add 8-second timeout to prevent infinite loading
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      // Link the external signal so component unmount also aborts
+      signal.addEventListener('abort', () => controller.abort());
+
+      const res = await fetch('/api/auth/session', {
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);

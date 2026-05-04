@@ -734,7 +734,10 @@ function LandingPage() {
 export default function HomePage() {
   const { user, loading } = useAuth();
 
-  if (loading) {
+  // Show loading screen only when we have NO user data yet.
+  // If user exists (e.g. just logged in), render content immediately
+  // even if a background session refresh is in progress.
+  if (loading && !user) {
     return (
       <div className="flex min-h-screen items-center justify-center gradient-hero">
         <div className="text-center animate-fade-in-up">

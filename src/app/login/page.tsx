@@ -54,7 +54,7 @@ export default function LoginPage() {
     }
   };
 
-  if (authLoading) {
+  if (authLoading && !user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-wesal-cream">
         <span className="material-symbols-outlined animate-spin text-[32px] text-wesal-dark">progress_activity</span>
