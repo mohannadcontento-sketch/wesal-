@@ -106,8 +106,37 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       data: { commentCount: { increment: 1 } },
     });
 
-    // Check if post should become trending
+    // Notify post author (skip if commenting on own post)
     const post = await db.post.findUnique({ where: { id } });
+    if (post && post.authorId !== user.id) {
+      await db.notification.create({
+        data: {
+          userId: post.authorId,
+          type: 'comment',
+          title: 'تعليق جديد على منشورك',
+          body: `${user.realName || 'مستخدم'} علّق: "${content.trim().substring(0, 60)}${content.trim().length > 60 ? '...' : ''}"`,
+          link: `/profile/${user.username || 'me'}`,
+        },
+      });
+    }
+
+    // Notify parent comment author (reply notification)
+    if (parentId && post) {
+      const parentComment = await db.comment.findUnique({ where: { id: parentId } });
+      if (parentComment && parentComment.authorId !== user.id && parentComment.authorId !== post.authorId) {
+        await db.notification.create({
+          data: {
+            userId: parentComment.authorId,
+            type: 'comment',
+            title: 'رد جديد على تعليقك',
+            body: `${user.realName || 'مستخدم'} ردّ على تعليقك`,
+            link: `/profile/${user.username || 'me'}`,
+          },
+        });
+      }
+    }
+
+    // Check if post should become trending
     if (post && post.section !== 'trending' && (post.commentCount >= 3 || post.reactionCount >= 5)) {
       await db.post.update({ where: { id }, data: { section: 'trending' } });
     }

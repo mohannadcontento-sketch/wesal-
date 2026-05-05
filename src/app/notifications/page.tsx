@@ -62,14 +62,27 @@ export default function NotificationsPage() {
   const handleMarkAllRead = async () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     try {
-      await fetch('/api/notifications', { method: 'PATCH' });
+      await fetch('/api/notifications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ markAll: true }),
+      });
     } catch {
       // Silently fail
     }
   };
 
-  const handleMarkRead = (id: string) => {
+  const handleMarkRead = async (id: string) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    try {
+      await fetch('/api/notifications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notificationId: id }),
+      });
+    } catch {
+      // Silently fail
+    }
   };
 
   return (

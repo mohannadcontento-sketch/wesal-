@@ -13,7 +13,9 @@ export async function GET(req: Request) {
       take: 50,
     });
 
-    return NextResponse.json({ notifications });
+    const unreadCount = notifications.filter(n => !n.read).length;
+
+    return NextResponse.json({ notifications, unreadCount });
   } catch (error) {
     console.error('Notifications GET error:', error);
     return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });
@@ -33,6 +35,39 @@ export async function PUT(req: Request) {
     return NextResponse.json({ message: 'تم تحديث الإشعارات' });
   } catch (error) {
     console.error('Notifications PUT error:', error);
+    return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const user = await getUserFromSession(req);
+    if (!user) return NextResponse.json({ error: 'سجل دخول' }, { status: 401 });
+
+    const body = await req.json();
+    const { notificationId, markAll } = body;
+
+    // Mark all as read
+    if (markAll) {
+      await db.notification.updateMany({
+        where: { userId: user.id, read: false },
+        data: { read: true },
+      });
+      return NextResponse.json({ message: 'تم تحديث الإشعارات' });
+    }
+
+    // Mark individual notification as read
+    if (notificationId) {
+      await db.notification.update({
+        where: { id: notificationId, userId: user.id },
+        data: { read: true },
+      });
+      return NextResponse.json({ message: 'تم تحديث الإشعار' });
+    }
+
+    return NextResponse.json({ error: 'بيانات غير صحيحة' }, { status: 400 });
+  } catch (error) {
+    console.error('Notifications PATCH error:', error);
     return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });
   }
 }

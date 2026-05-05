@@ -52,6 +52,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
+  // Admin route protection: only allow admins
+  if (pathname.startsWith('/admin') && user && (user as Record<string, unknown>).role !== 'admin') {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = '/';
+    return NextResponse.redirect(redirectUrl);
+  }
+
   // If user is NOT authenticated and trying to access protected routes,
   // redirect to landing page
   if (!user && !isPublicRoute) {

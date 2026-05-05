@@ -37,8 +37,21 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       db.post.update({ where: { id }, data: { reactionCount: { increment: 1 } } }),
     ]);
 
-    // Check trending
+    // Notify post author (skip if reacting to own post)
     const post = await db.post.findUnique({ where: { id } });
+    if (post && post.authorId !== user.id) {
+      await db.notification.create({
+        data: {
+          userId: post.authorId,
+          type: 'reaction',
+          title: 'تفاعل جديد على منشورك',
+          body: `${user.realName || 'مستخدم'} تفاعل بـ(${type === 'like' ? 'إعجاب' : type}) على منشورك`,
+          link: `/profile/${user.username || 'me'}`,
+        },
+      });
+    }
+
+    // Check trending
     if (post && post.section !== 'trending' && (post.reactionCount >= 5 || post.commentCount >= 3)) {
       await db.post.update({ where: { id }, data: { section: 'trending' } });
     }

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { UserAvatar } from '@/components/avatars/UserAvatar';
 import { AvatarPicker } from '@/components/avatars/AvatarPicker';
 import { useAuthStore } from '@/stores/auth-store';
@@ -14,6 +14,16 @@ export function TopNavbar() {
   const { user, loading, logout } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (user) {
+      fetch('/api/notifications')
+        .then(r => r.json())
+        .then(data => setUnreadCount(data.unreadCount || 0))
+        .catch(() => {});
+    }
+  }, [user]);
 
   const navLinks = [
     { href: '/', label: 'الرئيسية' },
@@ -118,7 +128,11 @@ export function TopNavbar() {
                       >
                         <span className="relative material-symbols-outlined text-[20px] text-wesal-medium">
                           notifications
-                          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />
+                          {unreadCount > 0 && (
+                            <span className="absolute top-0 right-0 min-w-[16px] h-4 flex items-center justify-center bg-red-500 rounded-full text-[9px] font-bold text-white px-1">
+                              {unreadCount > 9 ? '9+' : unreadCount}
+                            </span>
+                          )}
                         </span>
                         الإشعارات
                       </Link>

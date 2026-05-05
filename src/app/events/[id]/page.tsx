@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ScrollReveal } from '@/components/animations/ScrollReveal';
 
@@ -60,6 +61,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   const router = useRouter();
   const [event, setEvent] = useState<EventDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [registered, setRegistered] = useState(false);
 
   useEffect(() => {
     fetch(`/api/events/${id}`)
@@ -230,9 +232,25 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
 
             {/* Wesal Event - In-app action */}
             {event.isWesal && isUpcoming && event.status === 'upcoming' && (
-              <button className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-wesal-dark text-white rounded-xl font-medium shadow-lg shadow-wesal-dark/20 hover:bg-wesal-dark/90 hover:shadow-xl transition-all text-sm">
-                <span className="material-symbols-outlined text-xl">how_to_reg</span>
-                سجّل مشاركتك
+              <button
+                onClick={() => {
+                  if (registered) {
+                    toast.info('أنت مسجل بالفعل في الفعالية');
+                  } else {
+                    setRegistered(true);
+                    toast.success('تم تسجيل مشاركتك بنجاح! هنوصلك بتفاصيل الفعالية');
+                  }
+                }}
+                className={`flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all text-sm ${
+                  registered
+                    ? 'bg-emerald-600 text-white shadow-emerald-600/20'
+                    : 'bg-wesal-dark text-white shadow-wesal-dark/20 hover:bg-wesal-dark/90'
+                }`}
+              >
+                <span className="material-symbols-outlined text-xl">
+                  {registered ? 'check_circle' : 'how_to_reg'}
+                </span>
+                {registered ? 'تم التسجيل' : 'سجّل مشاركتك'}
               </button>
             )}
 

@@ -31,6 +31,7 @@ model User {
   reputationEarned ReputationLog[] @relation("ReputationEarned")
   reputationGiven  ReputationLog[] @relation("ReputationGiven")
   verificationRequests VerificationRequest[]
+  reportsFiled      Report[]        @relation("ReportsFiled")
 }
 
 model Profile {
@@ -182,6 +183,21 @@ model Event {
   status           String   @default("upcoming")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+
+model Report {
+  id           String   @id @default(cuid())
+  reporterId   String
+  targetId     String
+  targetType   String
+  reason       String
+  details      String?
+  status       String   @default("pending")
+  reviewedBy   String?
+  reviewNotes  String?
+  createdAt    DateTime @default(now())
+  reviewedAt   DateTime?
+  reporter     User     @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: Cascade)
 }
 
 model Notification {

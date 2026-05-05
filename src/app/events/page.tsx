@@ -208,7 +208,7 @@ export default function EventsPage() {
                       <div className="relative h-44 overflow-hidden">
                         {event.imageUrl ? (
                           <Image
-                            src={event.imageUrl.startsWith('http') ? event.imageUrl : event.imageUrl}
+                            src={event.imageUrl}
                             alt={event.title}
                             fill
                             className="object-cover group-hover:scale-105 transition-transform duration-500"
