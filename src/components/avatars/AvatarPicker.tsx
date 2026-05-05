@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -27,6 +27,11 @@ export function AvatarPicker({
   onConfirm,
 }: AvatarPickerProps) {
   const [selected, setSelected] = useState<string>(currentAvatar || '');
+
+  // Sync selected when currentAvatar changes (e.g. after avatar update from outside)
+  useEffect(() => {
+    setSelected(currentAvatar || '');
+  }, [currentAvatar]);
 
   const handleSelect = (avatarId: string) => {
     setSelected(avatarId);

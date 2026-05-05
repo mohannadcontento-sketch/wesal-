@@ -10,7 +10,7 @@ interface AvatarSetProps {
   className?: string;
 }
 
-const categories = ['nature', 'wellness', 'abstract', 'animals', 'people', 'emotions', 'space', 'music'] as const;
+const categories = ['nature', 'wellness', 'abstract', 'animals', 'people', 'emotions', 'space', 'music', 'food', 'sports', 'art'] as const;
 
 export function AvatarSet({ currentAvatar, onSelect, className = '' }: AvatarSetProps) {
   const [hoveredAvatar, setHoveredAvatar] = useState<string | null>(null);

@@ -156,7 +156,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               <div className="relative group">
                 <div className="w-[120px] h-[120px] rounded-full bg-gradient-to-br from-primary-fixed to-primary-container flex items-center justify-center border-4 border-white shadow-lg overflow-hidden">
                   {profile.avatarUrl && isBuiltInAvatar(profile.avatarUrl) ? (
-                    <div className="w-full h-full [&>svg]:w-full [&>svg]:h-full">
+                    <div className="w-full h-full [&_svg]:w-full [&_svg]:h-full">
                       {renderAvatarSvg(profile.avatarUrl)}
                     </div>
                   ) : profile.avatarUrl ? (
