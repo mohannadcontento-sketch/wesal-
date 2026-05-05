@@ -10,6 +10,7 @@ import { useState } from 'react';
 const navItems = [
   { label: 'طلبات التحقق', href: '/admin', icon: 'verified_user' },
   { label: 'إدارة المستخدمين', href: '/admin/verification', icon: 'group' },
+  { label: 'إدارة الفعاليات', href: '/admin/events', icon: 'event' },
   { label: 'البلاغات', href: '#', icon: 'report' },
   { label: 'إعدادات النظام', href: '#', icon: 'settings' },
 ];

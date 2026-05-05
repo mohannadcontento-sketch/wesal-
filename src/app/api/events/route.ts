@@ -1,0 +1,68 @@
+import { NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { getUserFromSession } from '@/lib/auth/session';
+
+// GET /api/events — list all events (public)
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const status = searchParams.get('status') || '';
+    const category = searchParams.get('category') || '';
+
+    const where: Record<string, unknown> = {};
+
+    if (status) {
+      where.status = status;
+    }
+    if (category) {
+      where.category = category;
+    }
+
+    const events = await db.event.findMany({
+      where,
+      orderBy: { eventDate: 'asc' },
+    });
+
+    return NextResponse.json({ events });
+  } catch (error) {
+    console.error('Events GET error:', error);
+    return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });
+  }
+}
+
+// POST /api/events — create event (admin only)
+export async function POST(req: Request) {
+  try {
+    const user = await getUserFromSession(req);
+    if (!user || user.role !== 'admin') {
+      return NextResponse.json({ error: 'غير مسموح' }, { status: 403 });
+    }
+
+    const body = await req.json();
+    const { title, description, imageUrl, eventDate, eventTime, location, category, isWesal, registrationUrl, status } = body;
+
+    if (!title || !description || !eventDate) {
+      return NextResponse.json({ error: 'العنوان والوصف والتاريخ مطلوبين' }, { status: 400 });
+    }
+
+    const event = await db.event.create({
+      data: {
+        title: title.trim(),
+        description: description.trim(),
+        imageUrl: imageUrl?.trim() || null,
+        eventDate: new Date(eventDate),
+        eventTime: eventTime?.trim() || null,
+        location: location?.trim() || null,
+        category: category?.trim() || 'عام',
+        isWesal: isWesal !== false,
+        registrationUrl: registrationUrl?.trim() || null,
+        status: status?.trim() || 'upcoming',
+      },
+    });
+
+    return NextResponse.json({ event }, { status: 201 });
+  } catch (error) {
+    console.error('Events POST error:', error);
+    return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });
+  }
+}

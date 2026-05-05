@@ -13,6 +13,7 @@ export function MobileBottomNav() {
   const links = [
     { href: '/', label: 'الرئيسية', icon: 'home' },
     { href: '/doctors', label: 'الأطباء', icon: 'medical_services' },
+    { href: '/events', label: 'الفعاليات', icon: 'event' },
     { href: '/bookmarks', label: 'المحفوظات', icon: 'bookmark' },
   ];
 
