@@ -12,7 +12,6 @@ import { ScrollReveal } from '@/components/animations/ScrollReveal';
 import { PageTransition } from '@/components/animations/PageTransition';
 import { StaggeredList } from '@/components/animations/StaggeredList';
 import { ParticleField } from '@/components/3d/ParticleField';
-import { renderAvatarSvg, isBuiltInAvatar } from '@/lib/avatars';
 
 /* ═══════════════════════════════════════════════════════════════════
    Intersection Observer hook — adds "animate-fade-in-up" when visible
@@ -94,24 +93,11 @@ function CommunityFeed({ user }: { user: NonNullable<ReturnType<typeof useAuth>[
       {/* ── Main Feed Column ── */}
       <div className="flex-1 min-w-0 max-w-2xl mx-auto lg:mx-0">
         {/* Greeting */}
-        <div className="mt-6 mb-6 flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-wesal-ice to-wesal-sky/30 flex items-center justify-center shadow-sm border-2 border-white overflow-hidden">
-            {user.avatarUrl && isBuiltInAvatar(user.avatarUrl) ? (
-              <div className="w-full h-full [&_svg]:w-full [&_svg]:h-full">
-                {renderAvatarSvg(user.avatarUrl)}
-              </div>
-            ) : user.avatarUrl ? (
-              <Image src={user.avatarUrl} alt={user.badge} width={48} height={48} className="object-cover w-full h-full" />
-            ) : (
-              <span className="text-lg font-bold text-wesal-dark">{user.badge}</span>
-            )}
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-wesal-navy">المجتمع</h1>
-            <p className="text-sm text-wesal-medium">
-              {greeting()}، {user.badge}
-            </p>
-          </div>
+        <div className="mt-6 mb-6">
+          <h1 className="text-2xl font-bold text-wesal-navy">المجتمع</h1>
+          <p className="text-sm text-wesal-medium mt-0.5">
+            {greeting()}، {user.badge}
+          </p>
         </div>
 
         {/* Post Creation Form */}

@@ -13,7 +13,29 @@ export async function GET(req: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json({ bookmarks });
+    // Batch fetch author avatars for bookmarked posts
+    const authorIds = [...new Set(bookmarks.map(b => b.post.authorId).filter(Boolean))];
+    let avatarMap: Record<string, string | null> = {};
+    if (authorIds.length > 0) {
+      const authorProfiles = await db.profile.findMany({
+        where: { userId: { in: authorIds } },
+        select: { userId: true, avatarUrl: true },
+      });
+      for (const ap of authorProfiles) {
+        avatarMap[ap.userId] = ap.avatarUrl;
+      }
+    }
+
+    // Inject avatar URLs into posts
+    const enrichedBookmarks = bookmarks.map(b => ({
+      ...b,
+      post: {
+        ...b.post,
+        authorAvatarUrl: avatarMap[b.post.authorId] || null,
+      },
+    }));
+
+    return NextResponse.json({ bookmarks: enrichedBookmarks });
   } catch (error) {
     console.error('Bookmarks GET error:', error);
     return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });

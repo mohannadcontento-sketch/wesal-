@@ -5,12 +5,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { CommentList } from '@/components/comments/CommentList';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { UserAvatar } from '@/components/avatars/UserAvatar';
 
 interface PostCardProps {
   post: {
     id: string;
     authorDisplay: string;
     authorBadge: string;
+    authorAvatarUrl?: string | null;
     authorRole: string;
     content: string;
     moods: string;
@@ -155,15 +157,11 @@ export function PostCard({ post }: PostCardProps) {
       <div className="flex justify-between items-start mb-3">
         <div className="flex gap-3 items-center">
           {/* Avatar */}
-          <div className={`w-10 h-10 rounded-full overflow-hidden shrink-0 flex items-center justify-center ${
-            isDoctor ? 'border-2 border-primary-container' : ''
-          } ${!post.authorBadge ? 'bg-primary-container/10' : ''}`}>
-            {post.authorBadge ? (
-              <span className="text-sm font-semibold text-primary-container">{post.authorBadge}</span>
-            ) : (
-              <span className="material-symbols-outlined text-xl text-primary-container">person</span>
-            )}
-          </div>
+          <UserAvatar
+            avatarUrl={post.authorAvatarUrl}
+            username={post.authorDisplay}
+            size="md"
+          />
           <div>
             <div className="flex items-center gap-1.5">
               {isDoctor ? (

@@ -27,8 +27,20 @@ export async function GET(req: Request) {
       take: limit,
     });
 
-    const postsWithReactions = await Promise.all(posts.map(async (post) => {
-      return { ...post };
+    // Batch fetch author avatars
+    const authorIds = [...new Set(posts.map(p => p.authorId))];
+    const authorProfiles = await db.profile.findMany({
+      where: { userId: { in: authorIds } },
+      select: { userId: true, avatarUrl: true },
+    });
+    const avatarMap: Record<string, string | null> = {};
+    for (const ap of authorProfiles) {
+      avatarMap[ap.userId] = ap.avatarUrl;
+    }
+
+    const postsWithReactions = posts.map(post => ({
+      ...post,
+      authorAvatarUrl: avatarMap[post.authorId] || null,
     }));
 
     // Batch reaction queries: fetch all reactions for these posts in one query

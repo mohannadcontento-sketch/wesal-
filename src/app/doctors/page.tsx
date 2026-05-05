@@ -61,14 +61,9 @@ export default function DoctorsPage() {
       <ScrollReveal direction="up">
       <header className="mt-6 mb-12 flex flex-col gap-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-wesal-ice to-wesal-sky/30 flex items-center justify-center shadow-sm">
-              <span className="material-symbols-outlined filled text-wesal-dark text-xl">medical_services</span>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-wesal-navy leading-tight">الأطباء</h1>
-              <p className="text-sm text-wesal-medium mt-0.5">اكتشف نخبة من المتخصصين في الصحة النفسية</p>
-            </div>
+          <div>
+            <h1 className="text-2xl font-bold text-wesal-navy leading-tight">الأطباء</h1>
+            <p className="text-sm text-wesal-medium mt-0.5">اكتشف نخبة من المتخصصين في الصحة النفسية</p>
           </div>
 
           {/* Search Bar */}

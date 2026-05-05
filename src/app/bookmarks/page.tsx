@@ -5,11 +5,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { UserAvatar } from '@/components/avatars/UserAvatar';
 
 interface Post {
   id: string;
   authorDisplay: string;
   authorBadge: string;
+  authorAvatarUrl?: string | null;
   authorRole: string;
   content: string;
   moods: string;
@@ -92,16 +94,11 @@ export default function BookmarksPage() {
     <MainLayout>
       <div className="px-5 py-4 space-y-5">
         {/* Page Header */}
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-surface-container-low text-primary-container">
-            <span className="material-symbols-outlined text-xl filled">bookmark</span>
-          </div>
-          <div>
-            <h1 className="font-bold text-on-surface text-sm">المحفوظات</h1>
-            <p className="text-sm text-on-surface-variant">
-              {showLoading ? 'جاري التحميل...' : `${posts.length} مشاركة محفوظة`}
-            </p>
-          </div>
+        <div>
+          <h1 className="font-bold text-on-surface text-lg">المحفوظات</h1>
+          <p className="text-sm text-on-surface-variant mt-0.5">
+            {showLoading ? 'جاري التحميل...' : `${posts.length} مشاركة محفوظة`}
+          </p>
         </div>
 
         {/* Auth check */}
@@ -149,9 +146,11 @@ export default function BookmarksPage() {
               >
                 {/* Author */}
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="h-10 w-10 rounded-full bg-surface-container-low flex items-center justify-center text-sm">
-                    {post.authorBadge}
-                  </div>
+                  <UserAvatar
+                    avatarUrl={post.authorAvatarUrl}
+                    username={post.authorDisplay}
+                    size="sm"
+                  />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {post.authorRole === 'doctor' ? (
