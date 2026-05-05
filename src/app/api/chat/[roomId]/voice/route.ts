@@ -28,9 +28,21 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
         voiceUrl: voiceData, // Store base64 for now
         voiceDuration: duration || 0,
       },
+      include: {
+        sender: { include: { profile: true } },
+      },
     });
 
-    return NextResponse.json({ message }, { status: 201 });
+    return NextResponse.json({
+      message: {
+        ...message,
+        createdAt: message.createdAt.toISOString(),
+        sender: {
+          name: message.sender.profile?.realName || message.sender.profile?.username || 'مستخدم',
+          avatarUrl: message.sender.profile?.avatarUrl,
+        },
+      },
+    }, { status: 201 });
   } catch (error) {
     console.error('Voice POST error:', error);
     return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });

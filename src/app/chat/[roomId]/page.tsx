@@ -5,6 +5,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { PageTransition } from '@/components/animations/PageTransition';
+import { UserAvatar } from '@/components/avatars/UserAvatar';
+
+interface SenderInfo {
+  name: string;
+  avatarUrl?: string | null;
+}
 
 interface Message {
   id: string;
@@ -14,36 +20,65 @@ interface Message {
   voiceUrl?: string;
   voiceDuration?: number;
   createdAt: string;
+  sender?: SenderInfo;
+}
+
+interface RoomInfo {
+  id: string;
+  status: string;
+  patientName: string;
+  patientAvatar?: string | null;
+  doctorName: string;
+  doctorAvatar?: string | null;
 }
 
 export default function ChatPage({ params }: { params: Promise<{ roomId: string }> }) {
   const { user } = useAuth();
   const { roomId } = use(params);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [roomInfo, setRoomInfo] = useState<RoomInfo | null>(null);
   const [text, setText] = useState('');
   const [recording, setRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [sending, setSending] = useState(false);
+  const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Determine the other person's info (the one we're chatting with)
+  const otherPerson = (() => {
+    if (!roomInfo || !user) return { name: 'الدكتور', avatarUrl: null };
+    if (user.role === 'doctor') {
+      return { name: roomInfo.patientName, avatarUrl: roomInfo.patientAvatar };
+    }
+    return { name: roomInfo.doctorName, avatarUrl: roomInfo.doctorAvatar };
+  })();
+
+  const fetchMessages = async () => {
+    try {
+      const res = await fetch(`/api/chat/${roomId}/messages`);
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(data.messages || []);
+        if (data.room) setRoomInfo(data.room);
+        setLoading(false);
+      }
+    } catch {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (roomId) {
-      fetch(`/api/chat/${roomId}/messages`).then(r => r.json()).then(data => {
-        setMessages(data.messages || []);
-      });
+      fetchMessages();
+      // Poll every 3 seconds for new messages
+      pollingRef.current = setInterval(fetchMessages, 3000);
     }
-  }, [roomId]);
-
-  useEffect(() => {
-    if (!roomId) return;
-    const interval = setInterval(() => {
-      fetch(`/api/chat/${roomId}/messages`).then(r => r.json()).then(data => {
-        setMessages(data.messages || []);
-      });
-    }, 5000);
-    return () => clearInterval(interval);
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
   }, [roomId]);
 
   useEffect(() => {
@@ -59,6 +94,10 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
       messageType: 'text',
       content: text,
       createdAt: new Date().toISOString(),
+      sender: {
+        name: user?.realName || 'أنت',
+        avatarUrl: user?.avatarUrl || null,
+      },
     };
     setMessages(prev => [...prev, optimisticMsg]);
     const sentText = text;
@@ -165,106 +204,130 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
     return bars;
   };
 
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-wesal-cream">
+        <div className="flex flex-col items-center gap-3">
+          <span className="material-symbols-outlined animate-spin text-[32px] text-wesal-dark">progress_activity</span>
+          <span className="text-sm text-wesal-medium">جاري تحميل المحادثة...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <PageTransition>
-    <div className="flex flex-col h-screen bg-background">
-      {/* Chat Header - Glassmorphism */}
-      <header className="glass-panel sticky top-0 z-50 flex items-center justify-between px-6 py-3 border-b border-surface-dim shadow-[0_4px_24px_0_rgba(0,43,45,0.05)]">
+    <div className="flex flex-col h-screen bg-wesal-cream">
+      {/* Chat Header */}
+      <header className="sticky top-14 z-40 flex items-center justify-between px-4 md:px-6 py-3 bg-white/80 backdrop-blur-xl border-b border-wesal-ice shadow-sm">
         <div className="flex items-center gap-3">
           <Link
             href="/doctors"
             aria-label="العودة"
-            className="p-1 rounded-full hover:bg-surface-container transition-colors text-primary"
+            className="p-1 rounded-full hover:bg-wesal-ice transition-colors text-wesal-dark"
           >
             <span className="material-symbols-outlined text-2xl">arrow_forward</span>
           </Link>
           <div className="relative">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-fixed to-primary-container flex items-center justify-center border-2 border-surface shadow-sm">
-              <span className="material-symbols-outlined text-xl text-on-primary-fixed">medical_services</span>
-            </div>
-            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-surface rounded-full" />
+            <UserAvatar
+              avatarUrl={otherPerson.avatarUrl}
+              username={otherPerson.name}
+              size="md"
+              className="!w-11 !h-11"
+            />
+            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
           </div>
           <div className="flex flex-col">
-            <h2 className="text-xl font-semibold text-on-surface">الدكتور</h2>
-            <span className="text-xs text-on-surface-variant flex items-center gap-1">
+            <h2 className="text-base font-bold text-wesal-navy leading-tight">{otherPerson.name}</h2>
+            <span className="text-xs text-wesal-medium flex items-center gap-1">
               <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block" />
               متصل الآن
             </span>
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <button aria-label="مكالمة فيديو" className="p-1 rounded-full hover:bg-surface-container transition-colors text-primary">
-            <span className="material-symbols-outlined text-2xl">videocam</span>
+          <button aria-label="مكالمة صوتية" className="p-2 rounded-full hover:bg-wesal-ice transition-colors text-wesal-dark">
+            <span className="material-symbols-outlined text-xl">call</span>
           </button>
-          <button aria-label="مكالمة صوتية" className="p-1 rounded-full hover:bg-surface-container transition-colors text-primary">
-            <span className="material-symbols-outlined text-2xl">call</span>
-          </button>
-          <button aria-label="خيارات إضافية" className="p-1 rounded-full hover:bg-surface-container transition-colors text-primary">
-            <span className="material-symbols-outlined text-2xl">more_vert</span>
+          <button aria-label="خيارات إضافية" className="p-2 rounded-full hover:bg-wesal-ice transition-colors text-wesal-dark">
+            <span className="material-symbols-outlined text-xl">more_vert</span>
           </button>
         </div>
       </header>
 
       {/* Main Chat Area */}
-      <main className="flex-1 overflow-y-auto p-6 flex flex-col gap-3 pb-32">
+      <main className="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col gap-3 pb-36">
         {/* Date Divider */}
         <div className="flex justify-center my-1">
-          <span className="bg-surface-container-low text-xs text-on-surface-variant px-3 py-1 rounded-full border border-surface-dim font-medium">
+          <span className="bg-wesal-ice/70 text-xs text-wesal-medium px-3 py-1 rounded-full font-medium">
             اليوم
           </span>
         </div>
 
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full py-16 text-center">
-            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container-high">
-              <span className="material-symbols-outlined text-3xl text-primary-container">chat</span>
+            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-wesal-ice">
+              <span className="material-symbols-outlined text-3xl text-wesal-dark">chat</span>
             </div>
-            <p className="text-base font-medium text-on-surface">ابدأ المحادثة مع الدكتور</p>
-            <p className="text-sm text-on-surface-variant mt-1">رسائلك خاصة ومشفرة</p>
+            <p className="text-base font-medium text-wesal-navy">ابدأ المحادثة مع {otherPerson.name}</p>
+            <p className="text-sm text-wesal-medium mt-1">رسائلك خاصة ومشفرة</p>
           </div>
         )}
 
         {messages.map((msg) => {
           const isMe = msg.senderId === user?.userId;
+          const senderName = msg.sender?.name || (isMe ? 'أنت' : otherPerson.name);
+          const senderAvatar = msg.sender?.avatarUrl || (isMe ? user?.avatarUrl : otherPerson.avatarUrl);
+
           return (
             <div
               key={msg.id}
-              className={`flex gap-3 max-w-[85%] ${isMe ? 'self-end' : 'self-start'}`}
+              className={`flex gap-2.5 max-w-[85%] ${isMe ? 'self-end' : 'self-start'}`}
             >
               {/* Received message shows avatar */}
               {!isMe && (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-fixed to-primary-container flex items-center justify-center shrink-0 mt-auto hidden sm:flex">
-                  <span className="material-symbols-outlined text-sm text-on-primary-fixed">medical_services</span>
+                <div className="shrink-0 mt-auto">
+                  <UserAvatar
+                    avatarUrl={senderAvatar}
+                    username={senderName}
+                    size="sm"
+                    className="!w-8 !h-8"
+                  />
                 </div>
               )}
 
-              <div className={`flex flex-col gap-1 ${isMe ? 'items-end' : 'items-start'}`}>
+              <div className={`flex flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}>
+                {/* Show sender name for received messages */}
+                {!isMe && (
+                  <span className="text-[11px] text-wesal-medium font-medium px-1">{senderName}</span>
+                )}
+
                 {msg.messageType === 'text' && (
-                  <div className={`${isMe ? 'chat-bubble-sent' : 'chat-bubble-received'} p-3 rounded-2xl ${isMe ? 'rounded-bl-sm shadow-md' : 'rounded-br-sm shadow-sm'}`}>
-                    <p className="text-base leading-relaxed">{msg.content}</p>
+                  <div className={`p-3 rounded-2xl ${isMe ? 'bg-wesal-dark text-white rounded-bl-sm shadow-md' : 'bg-white text-wesal-navy border border-wesal-ice rounded-br-sm shadow-sm'}`}>
+                    <p className="text-[15px] leading-relaxed">{msg.content}</p>
                   </div>
                 )}
 
                 {msg.messageType === 'voice' && (
-                  <div className={`${isMe ? 'chat-bubble-sent' : 'chat-bubble-received'} p-3 rounded-2xl ${isMe ? 'rounded-bl-sm shadow-md' : 'rounded-br-sm shadow-sm'} flex items-center gap-3 min-w-[180px]`}>
-                    <button className="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed hover:bg-inverse-primary transition-colors shrink-0">
+                  <div className={`p-3 rounded-2xl ${isMe ? 'bg-wesal-dark text-white rounded-bl-sm shadow-md' : 'bg-white text-wesal-navy border border-wesal-ice rounded-br-sm shadow-sm'} flex items-center gap-3 min-w-[180px]`}>
+                    <button className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isMe ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-wesal-ice text-wesal-dark hover:bg-wesal-ice/70'} transition-colors`}>
                       <span className="material-symbols-outlined filled">play_arrow</span>
                     </button>
                     {/* Waveform */}
                     <div className="flex-1 flex items-center gap-[2px] h-8 px-2 overflow-hidden">
                       {getWaveformBars(msg.id, isMe)}
                     </div>
-                    <span className="text-xs text-on-surface-variant shrink-0">
+                    <span className={`text-xs shrink-0 ${isMe ? 'text-white/70' : 'text-wesal-medium'}`}>
                       {msg.voiceDuration ? `${msg.voiceDuration}:${(msg.voiceDuration % 60).toString().padStart(2, '0')}` : '0:00'}
                     </span>
                   </div>
                 )}
 
                 {/* Timestamp */}
-                <div className={`flex items-center gap-1 ${isMe ? '' : 'mr-1'}`}>
-                  <span className="text-xs text-on-surface-variant">{formatTime(msg.createdAt)}</span>
+                <div className={`flex items-center gap-1 px-1 ${isMe ? '' : 'mr-1'}`}>
+                  <span className="text-[11px] text-wesal-medium">{formatTime(msg.createdAt)}</span>
                   {isMe && (
-                    <span className="material-symbols-outlined text-sm text-surface-dim">done_all</span>
+                    <span className={`material-symbols-outlined text-sm ${msg.id.startsWith('temp-') ? 'text-wesal-medium' : 'text-wesal-dark'}`}>done_all</span>
                   )}
                 </div>
               </div>
@@ -274,14 +337,19 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
 
         {/* Typing Indicator */}
         {sending && (
-          <div className="flex gap-3 max-w-[85%] self-start">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-fixed to-primary-container flex items-center justify-center shrink-0 mt-auto hidden sm:flex">
-              <span className="material-symbols-outlined text-sm text-on-primary-fixed">medical_services</span>
+          <div className="flex gap-2.5 max-w-[85%] self-start">
+            <div className="shrink-0 mt-auto">
+              <UserAvatar
+                avatarUrl={otherPerson.avatarUrl}
+                username={otherPerson.name}
+                size="sm"
+                className="!w-8 !h-8"
+              />
             </div>
-            <div className="chat-bubble-received p-4 rounded-2xl rounded-br-sm flex items-center gap-1.5 h-12">
-              <div className="w-2 h-2 bg-on-surface-variant rounded-full opacity-40 animate-bounce" style={{ animationDelay: '0ms' }} />
-              <div className="w-2 h-2 bg-on-surface-variant rounded-full opacity-60 animate-bounce" style={{ animationDelay: '150ms' }} />
-              <div className="w-2 h-2 bg-on-surface-variant rounded-full opacity-80 animate-bounce" style={{ animationDelay: '300ms' }} />
+            <div className="bg-white border border-wesal-ice p-4 rounded-2xl rounded-br-sm flex items-center gap-1.5 h-12">
+              <div className="w-2 h-2 bg-wesal-medium rounded-full opacity-40 animate-bounce" style={{ animationDelay: '0ms' }} />
+              <div className="w-2 h-2 bg-wesal-medium rounded-full opacity-60 animate-bounce" style={{ animationDelay: '150ms' }} />
+              <div className="w-2 h-2 bg-wesal-medium rounded-full opacity-80 animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
           </div>
         )}
@@ -291,13 +359,13 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
 
       {/* Recording Indicator */}
       {recording && (
-        <div className="flex items-center gap-2 px-6 py-2 bg-error-container/50 border-t border-error/20">
-          <div className="h-2.5 w-2.5 rounded-full bg-error animate-pulse" />
-          <span className="text-sm text-error font-medium">جاري التسجيل...</span>
+        <div className="flex items-center gap-2 px-4 md:px-6 py-2 bg-red-50 border-t border-red-200">
+          <div className="h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse" />
+          <span className="text-sm text-red-600 font-medium">جاري التسجيل...</span>
           <div className="flex-1" />
           <button
             onClick={stopRecording}
-            className="flex items-center gap-1 px-3 py-1.5 bg-error text-on-error rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+            className="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
           >
             <span className="material-symbols-outlined text-lg">mic_off</span>
             <span>إيقاف</span>
@@ -306,18 +374,18 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
       )}
 
       {/* Input Area */}
-      <div className="fixed bottom-0 w-full glass-panel p-3 border-t border-surface-dim shadow-[0_-4px_24px_0_rgba(0,43,45,0.05)]">
+      <div className="fixed bottom-0 w-full bg-white/90 backdrop-blur-xl p-3 border-t border-wesal-ice shadow-[0_-2px_16px_0_rgba(0,43,45,0.04)] md:bottom-0">
         <div className="max-w-4xl mx-auto flex items-end gap-3">
           {/* Attach Button */}
-          <button aria-label="إرفاق ملف" className="p-1 text-primary hover:bg-surface-container rounded-full transition-colors mb-1">
-            <span className="material-symbols-outlined text-2xl">attach_file</span>
+          <button aria-label="إرفاق ملف" className="p-1.5 text-wesal-dark hover:bg-wesal-ice rounded-full transition-colors mb-1">
+            <span className="material-symbols-outlined text-xl">attach_file</span>
           </button>
 
           {/* Text Input */}
-          <div className="flex-1 bg-surface-container-low border border-surface-dim rounded-2xl flex items-end focus-within:border-primary-fixed focus-within:ring-1 focus-within:ring-primary-fixed transition-all shadow-inner overflow-hidden">
+          <div className="flex-1 bg-wesal-cream border border-wesal-ice rounded-2xl flex items-end focus-within:border-wesal-dark focus-within:ring-1 focus-within:ring-wesal-dark/20 transition-all overflow-hidden">
             <textarea
               ref={textareaRef}
-              className="w-full bg-transparent border-none focus:ring-0 resize-none text-base p-3 text-on-surface placeholder:text-on-surface-variant/50 max-h-32"
+              className="w-full bg-transparent border-none focus:ring-0 resize-none text-[15px] p-3 text-wesal-navy placeholder:text-wesal-medium/50 max-h-32"
               placeholder="اكتب رسالة..."
               rows={1}
               value={text}
@@ -326,27 +394,27 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
               onInput={handleTextareaInput}
               disabled={recording}
             />
-            <button aria-label="إضافة رموز تعبيرية" className="p-3 text-on-surface-variant hover:text-primary transition-colors">
-              <span className="material-symbols-outlined text-2xl">mood</span>
+            <button aria-label="إضافة رموز تعبيرية" className="p-2.5 text-wesal-medium hover:text-wesal-dark transition-colors">
+              <span className="material-symbols-outlined text-xl">mood</span>
             </button>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-1 mb-1">
+          <div className="flex gap-1.5 mb-1">
             <button
               aria-label="تسجيل صوتي"
               onClick={recording ? stopRecording : startRecording}
-              className={`p-2 rounded-full transition-colors ${recording ? 'bg-error text-on-error' : 'bg-surface-container-high text-primary hover:bg-surface-dim'}`}
+              className={`p-2 rounded-full transition-colors ${recording ? 'bg-red-500 text-white' : 'bg-wesal-ice text-wesal-dark hover:bg-wesal-ice/70'}`}
             >
-              <span className="material-symbols-outlined text-2xl">{recording ? 'mic_off' : 'mic'}</span>
+              <span className="material-symbols-outlined text-xl">{recording ? 'mic_off' : 'mic'}</span>
             </button>
             <button
               aria-label="إرسال"
               onClick={sendText}
               disabled={!text.trim() || sending || recording}
-              className="p-2 rounded-full bg-primary text-on-primary hover:bg-surface-tint shadow-md transition-colors disabled:opacity-40"
+              className="p-2 rounded-full bg-wesal-dark text-white hover:bg-wesal-navy shadow-md transition-colors disabled:opacity-40"
             >
-              <span className="material-symbols-outlined text-2xl rotate-180 filled">send</span>
+              <span className="material-symbols-outlined text-xl rotate-180 filled">send</span>
             </button>
           </div>
         </div>
