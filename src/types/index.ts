@@ -53,26 +53,26 @@ export const REPUTATION_POINTS: ReputationPoints = {
 };
 
 export const REPUTATION_TIERS = {
-  beginner: { min: 0, max: 49, label: 'مبتدئ', badge: '🌱' },
-  active: { min: 50, max: 149, label: 'نشط', badge: '📚' },
-  notable: { min: 150, max: 299, label: 'مميز', badge: '⭐' },
-  eligible: { min: 300, max: Infinity, label: 'مؤهل للتوثيق', badge: '🌟' },
+  beginner: { min: 0, max: 49, label: 'مبتدئ', badge: 'eco' },
+  active: { min: 50, max: 149, label: 'نشط', badge: 'menu_book' },
+  notable: { min: 150, max: 299, label: 'مميز', badge: 'stars' },
+  eligible: { min: 300, max: Infinity, label: 'مؤهل للتوثيق', badge: 'workspace_premium' },
 } as const;
 
 export function getReputationTier(score: number): { tier: string; label: string; badge: string } {
-  if (score >= 300) return { tier: 'eligible', label: 'مؤهل للتوثيق', badge: '🌟' };
-  if (score >= 150) return { tier: 'notable', label: 'مميز', badge: '⭐' };
-  if (score >= 50) return { tier: 'active', label: 'نشط', badge: '📚' };
-  return { tier: 'beginner', label: 'مبتدئ', badge: '🌱' };
+  if (score >= 300) return { tier: 'eligible', label: 'مؤهل للتوثيق', badge: 'workspace_premium' };
+  if (score >= 150) return { tier: 'notable', label: 'مميز', badge: 'stars' };
+  if (score >= 50) return { tier: 'active', label: 'نشط', badge: 'menu_book' };
+  return { tier: 'beginner', label: 'مبتدئ', badge: 'eco' };
 }
 
 export function getUserBadge(role: string, reputationTier?: string): string {
-  if (role === 'doctor') return '🏥';
-  if (role === 'trusted') return '🌟';
-  if (role === 'admin') return '🛡️';
-  if (reputationTier === 'notable') return '⭐';
-  if (reputationTier === 'active') return '📚';
-  return '🌱';
+  if (role === 'doctor') return 'local_hospital';
+  if (role === 'trusted') return 'workspace_premium';
+  if (role === 'admin') return 'shield';
+  if (reputationTier === 'notable') return 'stars';
+  if (reputationTier === 'active') return 'menu_book';
+  return 'eco';
 }
 
 export function getDisplayName(data: { realName: string; username?: string | null; role?: string }): string {

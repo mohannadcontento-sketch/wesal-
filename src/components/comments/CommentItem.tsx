@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { CommentForm } from './CommentForm';
+import { BadgeIcon } from '@/components/shared/BadgeIcon';
 
 interface ReplyData {
   id: string;
@@ -122,7 +123,7 @@ function ReplyItem({
       <div className="flex gap-2">
         {/* Avatar */}
         <div className="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center shrink-0">
-          <span className="text-[8px] font-semibold text-on-surface">{reply.authorBadge}</span>
+          <BadgeIcon badge={reply.authorBadge} className="text-[8px]" />
         </div>
         <div className="flex-1 min-w-0">
           {/* Name & Time */}
@@ -274,7 +275,7 @@ export function CommentItem({ comment, postId, topCommentId, onNewReply }: Comme
       <div className="flex gap-3">
         {/* Avatar */}
         <div className="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center shrink-0">
-          <span className="text-[10px] font-semibold text-primary-container">{comment.authorBadge}</span>
+          <BadgeIcon badge={comment.authorBadge} className="text-[10px]" />
         </div>
         <div className="flex-1 min-w-0">
           {/* Name & Time */}

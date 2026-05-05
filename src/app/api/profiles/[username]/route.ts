@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { getUserFromSession } from '@/lib/auth/session';
 
 export async function GET(req: Request, { params }: { params: Promise<{ username: string }> }) {
   try {
@@ -13,14 +14,18 @@ export async function GET(req: Request, { params }: { params: Promise<{ username
 
     const isPublic = user.role === 'doctor' || user.role === 'trusted' || profile.isVerified;
 
+    // Check if the requesting user is the profile owner
+    const sessionUser = await getUserFromSession(req);
+    const isOwner = sessionUser?.id === profile.userId;
+
     const result: Record<string, unknown> = {
       username: profile.username,
-      badge: user.role === 'doctor' ? '🏥' : user.role === 'trusted' ? '🌟' : '🌱',
+      badge: user.role === 'doctor' ? 'local_hospital' : user.role === 'trusted' ? 'workspace_premium' : 'eco',
       reputationScore: profile.reputationScore,
       reputationTier: profile.reputationTier,
     };
 
-    if (isPublic) {
+    if (isPublic || isOwner) {
       result.realName = profile.realName;
       result.bio = profile.bio;
       result.avatarUrl = profile.avatarUrl;

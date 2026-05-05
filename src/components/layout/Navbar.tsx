@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { LogOut, Bell, Menu, X } from 'lucide-react';
+import { BadgeIcon } from '@/components/shared/BadgeIcon';
 import { useState } from 'react';
 
 export function Navbar() {
@@ -118,7 +119,7 @@ export function Navbar() {
                 <div>
                   <div className="text-sm font-semibold">{user.realName}</div>
                   <div className="text-xs text-muted-foreground">
-                    {user.badge} {user.role === 'doctor' ? 'طبيب' : 'عضو'}
+                    <BadgeIcon badge={user.badge} className="text-sm align-middle" /> {user.role === 'doctor' ? 'طبيب' : 'عضو'}
                   </div>
                 </div>
               </Link>

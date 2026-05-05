@@ -19,12 +19,12 @@ export interface AuthUser {
 }
 
 function getUserBadge(role: string, reputationTier?: string): string {
-  if (role === 'doctor') return '🏥';
-  if (role === 'trusted') return '🌟';
-  if (role === 'admin') return '🛡️';
-  if (reputationTier === 'notable') return '⭐';
-  if (reputationTier === 'active') return '📚';
-  return '🌱';
+  if (role === 'doctor') return 'local_hospital';
+  if (role === 'trusted') return 'workspace_premium';
+  if (role === 'admin') return 'shield';
+  if (reputationTier === 'notable') return 'stars';
+  if (reputationTier === 'active') return 'menu_book';
+  return 'eco';
 }
 
 /**
@@ -62,7 +62,7 @@ export async function verifySessionToken(token: string): Promise<AuthUser | null
       role: payload.role as string,
       username: (payload.username as string) || null,
       realName: (payload.realName as string) || '',
-      badge: (payload.badge as string) || '🌱',
+      badge: (payload.badge as string) || 'eco',
       reputationScore: (payload.reputationScore as number) || 0,
       specialty: (payload.specialty as string) || null,
       avatarUrl: (payload.avatarUrl as string) || null,

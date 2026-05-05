@@ -80,6 +80,7 @@ const trendingTopics = [
 
 function CommunityFeed({ user }: { user: NonNullable<ReturnType<typeof useAuth>['user']> }) {
   const [section, setSection] = useState('shares');
+  const [showReputation, setShowReputation] = useState(false);
 
   return (
     <div className="flex gap-6 max-w-[1280px] mx-auto">
@@ -121,7 +122,10 @@ function CommunityFeed({ user }: { user: NonNullable<ReturnType<typeof useAuth>[
       {/* ── Right Sidebar (Desktop Only) ── */}
       <aside className="hidden lg:flex flex-col gap-5 w-80 shrink-0 sticky top-20 self-start">
         {/* Reputation Points Card */}
-        <div className="bg-gradient-to-bl from-wesal-ice/50 via-wesal-ice/15 to-transparent rounded-2xl border border-wesal-ice p-5 shadow-sm relative overflow-hidden">
+        <div
+          onClick={() => setShowReputation(true)}
+          className="bg-gradient-to-bl from-wesal-ice/50 via-wesal-ice/15 to-transparent rounded-2xl border border-wesal-ice p-5 shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md hover:border-wesal-sky/40 transition-all duration-300"
+        >
           <div className="absolute top-0 left-0 w-24 h-24 bg-wesal-sky/15 rounded-full blur-3xl -ml-10 -mt-10 pointer-events-none" />
           <div className="flex items-center gap-3 mb-4 relative z-10">
             <div className="w-11 h-11 rounded-xl bg-wesal-ice flex items-center justify-center">
@@ -169,6 +173,91 @@ function CommunityFeed({ user }: { user: NonNullable<ReturnType<typeof useAuth>[
           </div>
         </div>
       </aside>
+
+      {/* ── Reputation Explanation Dialog ── */}
+      {showReputation && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          onClick={() => setShowReputation(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-[90vw] max-w-md p-6 sm:p-8 relative animate-fade-in-up"
+            onClick={(e) => e.stopPropagation()}
+            dir="rtl"
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setShowReputation(false)}
+              className="absolute top-4 left-4 w-8 h-8 rounded-full bg-wesal-cream flex items-center justify-center hover:bg-wesal-ice transition-colors"
+              aria-label="إغلاق"
+            >
+              <span className="material-symbols-outlined text-wesal-navy text-lg">close</span>
+            </button>
+
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-wesal-ice to-wesal-sky/30 flex items-center justify-center">
+                <span className="material-symbols-outlined filled text-wesal-dark text-2xl">shield_person</span>
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-wesal-navy">نظام السمعة</h2>
+                <p className="text-xs text-wesal-medium">اعرف أكتر عن مستوياتك</p>
+              </div>
+            </div>
+
+            {/* Description */}
+            <p className="text-sm text-wesal-navy leading-relaxed mb-6">
+              نظام السمعة في وصال يكافئك على مشاركتك الفعّالة ومساعدتك للآخرين في المجتمع. كلما زادت نقاطك، ارتقيت في المستويات واكتسبت لقب جديد.
+            </p>
+
+            {/* Levels */}
+            <div className="flex flex-col gap-3 mb-6">
+              {[
+                { icon: 'eco', label: 'مبتدئ', range: '0-49 نقطة', desc: 'بداية رحلتك في المجتمع', color: 'text-green-600 bg-green-50' },
+                { icon: 'menu_book', label: 'نشط', range: '50-149 نقطة', desc: 'مشاركة منتظمة ومفيدة', color: 'text-blue-600 bg-blue-50' },
+                { icon: 'stars', label: 'مميز', range: '150-299 نقطة', desc: 'محتوى مميز يساعد الكثيرين', color: 'text-amber-600 bg-amber-50' },
+                { icon: 'workspace_premium', label: 'مؤهل للتوثيق', range: '300+ نقطة', desc: 'ثقة المجتمع وتواصل مستمر', color: 'text-purple-600 bg-purple-50' },
+              ].map((level) => (
+                <div
+                  key={level.label}
+                  className="flex items-center gap-3 p-3 rounded-xl bg-wesal-cream/60 border border-wesal-ice/50 hover:border-wesal-sky/30 transition-colors"
+                >
+                  <div className={`w-10 h-10 rounded-lg ${level.color} flex items-center justify-center shrink-0`}>
+                    <span className={`material-symbols-outlined filled text-lg`}>{level.icon}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-sm font-bold text-wesal-navy">{level.label}</span>
+                      <span className="text-[11px] text-wesal-medium font-medium">({level.range})</span>
+                    </div>
+                    <p className="text-xs text-wesal-medium">{level.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Tips */}
+            <div className="bg-gradient-to-bl from-wesal-ice/50 to-transparent rounded-xl p-4 border border-wesal-ice/50">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="material-symbols-outlined filled text-wesal-dark text-base">tips_and_updates</span>
+                <span className="text-sm font-bold text-wesal-navy">نصائح لزيادة نقاطك</span>
+              </div>
+              <ul className="flex flex-col gap-1.5">
+                {[
+                  'الحصول على تفاعل من المجتمع',
+                  'المشاركة في النقاشات والتعليقات',
+                  'مساعدة الآخرين ومحتوى مفيد',
+                ].map((tip) => (
+                  <li key={tip} className="flex items-center gap-2 text-xs text-wesal-navy">
+                    <span className="material-symbols-outlined text-wesal-sky text-sm filled">check_circle</span>
+                    {tip}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

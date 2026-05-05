@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { BadgeIcon } from '@/components/shared/BadgeIcon';
 import { toast } from 'sonner';
 
 interface CommentFormProps {
@@ -53,7 +54,7 @@ export function CommentForm({ postId, parentId, onCommentAdded }: CommentFormPro
     <div className="flex gap-2.5 items-start">
       {/* Avatar */}
       <div className="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center shrink-0">
-        <span className="text-[10px] font-semibold text-primary-container">{user.badge}</span>
+        <BadgeIcon badge={user.badge} className="text-[10px]" />
       </div>
       <div className="flex-1 flex items-center gap-2">
         <input

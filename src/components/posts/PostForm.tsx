@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { MoodSelector } from './MoodSelector';
+import { BadgeIcon } from '@/components/shared/BadgeIcon';
 import { toast } from 'sonner';
 
 interface PostFormProps {
@@ -63,7 +64,7 @@ export function PostForm({ onPostCreated }: PostFormProps) {
       <div className="flex gap-4 items-start">
         {/* Avatar */}
         <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 mt-1 bg-primary-container/10 flex items-center justify-center">
-          <span className="text-sm font-semibold text-primary-container">{user.badge}</span>
+          <BadgeIcon badge={user.badge} className="text-sm" />
         </div>
 
         <div className="flex-1 min-w-0">
