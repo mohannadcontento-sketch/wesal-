@@ -18,7 +18,7 @@ export default function ProfileRedirectPage() {
     if (username) {
       router.replace(`/profile/${username}`);
     } else {
-      router.replace('/community');
+      router.replace('/');
     }
   }, [user, loading, router]);
 

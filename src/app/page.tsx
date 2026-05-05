@@ -65,9 +65,9 @@ function FadeInSection({
    Community Feed (shown for logged-in users)
    ═══════════════════════════════════════════════════════════════════ */
 const tabs = [
-  { value: 'shares', label: 'مشاركاتي', icon: 'edit_note' },
+  { value: 'shares', label: 'مشاركات', icon: 'forum' },
   { value: 'trending', label: 'رائج', icon: 'trending_up' },
-  { value: 'doctors', label: 'أطباء', icon: 'verified' },
+  { value: 'doctors', label: 'أطباء', icon: 'stethoscope' },
 ] as const;
 
 const trendingTopics = [
@@ -128,7 +128,7 @@ function CommunityFeed({ user }: { user: NonNullable<ReturnType<typeof useAuth>[
               <span className="material-symbols-outlined filled text-xl text-wesal-dark">shield_person</span>
             </div>
             <div>
-              <h3 className="font-bold text-wesal-navy text-sm">نقاط السمعة</h3>
+              <h3 className="font-bold text-wesal-navy text-sm">نظام السمعة</h3>
               <p className="text-xs text-wesal-medium">مجتمعك يدعمك</p>
             </div>
           </div>

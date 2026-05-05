@@ -8,17 +8,25 @@ export async function GET(req: Request) {
     const user = await getUserFromSession(req);
     const { searchParams } = new URL(req.url);
     const section = searchParams.get('section') || 'shares';
+    const authorUsername = searchParams.get('author') || '';
     const page = Math.max(1, parseInt(searchParams.get('page') || '1') || 1);
-    const limit = 20;
+    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20;
 
     let where = {};
-    if (section === 'shares') {
-      // Show only the current user's own posts
-      if (user) {
-        where = { authorId: user.id };
+
+    // If author param provided, filter by that user's posts
+    if (authorUsername) {
+      const authorProfile = await db.profile.findUnique({
+        where: { username: authorUsername },
+        select: { userId: true },
+      });
+      if (authorProfile) {
+        where = { authorId: authorProfile.userId };
       } else {
-        where = { authorRole: { in: ['user', 'trusted'] } };
+        return NextResponse.json({ posts: [] });
       }
+    } else if (section === 'shares') {
+      where = { authorRole: { in: ['user', 'trusted'] } };
     } else if (section === 'doctors') {
       where = { authorRole: 'doctor' };
     } else if (section === 'trending') {
