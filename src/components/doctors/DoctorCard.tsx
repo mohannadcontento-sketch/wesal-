@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { Profile, User } from '@/types';
 import { UserAvatar } from '@/components/avatars/UserAvatar';
 import { toast } from 'sonner';
@@ -11,6 +12,7 @@ interface DoctorCardProps {
 }
 
 export default function DoctorCard({ doctor }: DoctorCardProps) {
+  const router = useRouter();
   const profile = doctor.profile;
   const displayName = profile?.realName || 'طبيب';
   const specialty = profile?.specialty || 'طب نفسي';
@@ -95,12 +97,12 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
               });
               if (res.ok) {
                 const data = await res.json();
-                window.location.href = `/chat/${data.roomId}`;
+                router.push(`/chat/${data.roomId}`);
               } else {
                 const data = await res.json();
                 // If user is not logged in, redirect to login
                 if (res.status === 401) {
-                  window.location.href = '/login';
+                  router.push('/login');
                   return;
                 }
                 toast.error(data.error || 'حصل خطأ في فتح المحادثة');

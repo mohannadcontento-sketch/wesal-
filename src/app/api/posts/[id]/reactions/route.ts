@@ -21,15 +21,21 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     });
 
     if (existing) {
-      await db.reaction.delete({ where: { id: existing.id } });
-      await db.post.update({ where: { id }, data: { reactionCount: { decrement: 1 } } });
+      // Use transaction to atomically delete reaction and decrement counter
+      await db.$transaction([
+        db.reaction.delete({ where: { id: existing.id } }),
+        db.post.update({ where: { id }, data: { reactionCount: { decrement: 1 } } }),
+      ]);
       return NextResponse.json({ action: 'removed' });
     }
 
-    await db.reaction.create({
-      data: { userId: user.id, targetId: id, targetType: 'post', type },
-    });
-    await db.post.update({ where: { id }, data: { reactionCount: { increment: 1 } } });
+    // Use transaction to atomically create reaction and increment counter
+    await db.$transaction([
+      db.reaction.create({
+        data: { userId: user.id, targetId: id, targetType: 'post', type },
+      }),
+      db.post.update({ where: { id }, data: { reactionCount: { increment: 1 } } }),
+    ]);
 
     // Check trending
     const post = await db.post.findUnique({ where: { id } });

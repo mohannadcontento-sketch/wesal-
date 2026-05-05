@@ -115,10 +115,12 @@ export async function POST(req: Request) {
     const emailResult = await sendOtpEmail(email, otpCode);
 
     if (!emailResult.success) {
-      console.error(`[AUTH] Failed to send registration OTP to ${email} via ${emailResult.method}: ${emailResult.error}`);
+      console.error(`[AUTH] Failed to send registration OTP to ${email}: ${emailResult.error}`);
     }
 
-    console.log(`[AUTH] Registration OTP for ${email}: ${otpCode} (sent via: ${emailResult.method})`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[AUTH] Registration OTP for ${email}: ${otpCode}`);
+    }
 
     // Include delivery method info in response
     response.headers.set('X-Email-Method', emailResult.method);

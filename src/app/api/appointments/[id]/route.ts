@@ -17,6 +17,12 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ error: 'حالة غلط' }, { status: 400 });
     }
 
+    // Verify this doctor owns this appointment
+    const existing = await db.appointment.findUnique({ where: { id } });
+    if (!existing || existing.doctorId !== user.id) {
+      return NextResponse.json({ error: 'مش مسموح تعدل الموعد ده' }, { status: 403 });
+    }
+
     const appointment = await db.appointment.update({
       where: { id },
       data: { status },

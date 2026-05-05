@@ -134,14 +134,12 @@ export async function PUT(req: Request) {
     const emailResult = await sendOtpEmail(email, otpCode);
 
     if (!emailResult.success) {
-      console.error(`[AUTH] Failed to resend OTP to ${email} via ${emailResult.method}: ${emailResult.error}`);
+      console.error(`[AUTH] Failed to resend OTP to ${email}: ${emailResult.error}`);
     }
-
-    console.log(`[AUTH] Resend OTP for ${email}: ${otpCode} (sent via: ${emailResult.method})`);
 
     return NextResponse.json({
       message: 'تم إرسال رمز جديد لإيميلك',
-      ...(emailResult.method === 'console-fallback' && { devOtp: otpCode }),
+      ...(process.env.NODE_ENV !== 'production' && { devOtp: otpCode }),
       deliveryMethod: emailResult.method,
     });
   } catch (error) {

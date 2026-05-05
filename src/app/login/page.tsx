@@ -178,12 +178,13 @@ export default function LoginPage() {
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-medium text-wesal-medium">كلمة المرور</label>
-                <Link
-                  href="/forgot-password"
+                <button
+                  type="button"
+                  onClick={() => toast.info('خاصية استعادة كلمة المرور قيد التطوير')}
                   className="text-xs text-wesal-dark hover:text-wesal-medium transition-colors font-medium"
                 >
                   نسيت كلمة المرور؟
-                </Link>
+                </button>
               </div>
               <div className="relative">
                 <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">lock</span>

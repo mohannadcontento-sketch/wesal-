@@ -52,6 +52,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   // Determine the other person's info (the one we're chatting with)
   const otherPerson = (() => {
@@ -97,7 +98,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Cleanup audio on unmount
+  // Cleanup audio + microphone on unmount
   useEffect(() => {
     return () => {
       if (audioRef.current) {
@@ -106,6 +107,12 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
       }
       if (recordTimerRef.current) {
         clearInterval(recordTimerRef.current);
+      }
+      // Stop active MediaRecorder and close microphone
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stream.getTracks().forEach((t) => t.stop());
+        mediaRecorderRef.current.stop();
+        mediaRecorderRef.current = null;
       }
     };
   }, []);
@@ -222,6 +229,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
 
       recorder.start(250); // Collect data every 250ms for better reliability
       setMediaRecorder(recorder);
+      mediaRecorderRef.current = recorder;
       setRecording(true);
       setRecordingDuration(0);
       recordStartTimeRef.current = Date.now();

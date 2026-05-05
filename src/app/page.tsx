@@ -286,8 +286,8 @@ function LandingPage() {
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
-            {['الرئيسية', 'المجتمع', 'الأطباء', 'المقالات'].map((item, i) => (
-              <a key={item} href="#" className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${i === 0 ? (scrolled ? 'text-wesal-dark bg-wesal-ice/60' : 'text-white bg-white/15') : (scrolled ? 'text-wesal-medium hover:text-wesal-dark hover:bg-wesal-ice/40' : 'text-white/70 hover:text-white hover:bg-white/10')}`}>{item}</a>
+            {['الرئيسية', 'المجتمع', 'الأطباء'].map((item, i) => (
+              <a key={item} href={i === 0 ? '/' : i === 1 ? '/community' : '/doctors'} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${i === 0 ? (scrolled ? 'text-wesal-dark bg-wesal-ice/60' : 'text-white bg-white/15') : (scrolled ? 'text-wesal-medium hover:text-wesal-dark hover:bg-wesal-ice/40' : 'text-white/70 hover:text-white hover:bg-white/10')}`}>{item}</a>
             ))}
           </div>
 
@@ -303,8 +303,8 @@ function LandingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden glass-panel border-t border-wesal-ice/50 animate-fade-in-up">
             <div className="px-4 py-4 space-y-1">
-              {['الرئيسية', 'المجتمع', 'الأطباء', 'المقالات'].map((item, i) => (
-                <a key={item} href="#" className={`block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${i === 0 ? 'text-wesal-dark bg-wesal-ice/60' : 'text-wesal-medium hover:text-wesal-dark hover:bg-wesal-ice/40'}`} onClick={() => setMobileMenuOpen(false)}>{item}</a>
+              {['الرئيسية', 'المجتمع', 'الأطباء'].map((item, i) => (
+                <a key={item} href={i === 0 ? '/' : i === 1 ? '/community' : '/doctors'} className={`block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${i === 0 ? 'text-wesal-dark bg-wesal-ice/60' : 'text-wesal-medium hover:text-wesal-dark hover:bg-wesal-ice/40'}`} onClick={() => setMobileMenuOpen(false)}>{item}</a>
               ))}
               <div className="pt-2 border-t border-wesal-ice/50 mt-2">
                 <Link href="/login" className="block px-4 py-3 rounded-xl text-sm font-semibold text-wesal-dark hover:bg-wesal-ice/40 transition-colors" onClick={() => setMobileMenuOpen(false)}>تسجيل الدخول</Link>
@@ -680,17 +680,18 @@ function LandingPage() {
             <div>
               <h4 className="text-sm font-bold text-white mb-5">روابط سريعة</h4>
               <ul className="space-y-3">
-                {['عن المنصة', 'كيف نعمل', 'الأطباء', 'الأسئلة الشائعة'].map((item) => (
-                  <li key={item}><a href="#" className="text-sm text-white/50 hover:text-white transition-colors duration-300">{item}</a></li>
-                ))}
+                <li><a href="/community" className="text-sm text-white/50 hover:text-white transition-colors duration-300">عن المنصة</a></li>
+                <li><a href="/community" className="text-sm text-white/50 hover:text-white transition-colors duration-300">كيف نعمل</a></li>
+                <li><a href="/doctors" className="text-sm text-white/50 hover:text-white transition-colors duration-300">الأطباء</a></li>
+                <li><a href="#" onClick={(e) => e.preventDefault()} className="text-sm text-white/50 hover:text-white transition-colors duration-300">الأسئلة الشائعة</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-sm font-bold text-white mb-5">قانوني</h4>
               <ul className="space-y-3">
-                {['سياسة الخصوصية', 'شروط الاستخدام', 'اتفاقية السرية'].map((item) => (
-                  <li key={item}><a href="#" className="text-sm text-white/50 hover:text-white transition-colors duration-300">{item}</a></li>
-                ))}
+                <li><a href="#" onClick={(e) => e.preventDefault()} className="text-sm text-white/50 hover:text-white transition-colors duration-300">سياسة الخصوصية</a></li>
+                <li><a href="#" onClick={(e) => e.preventDefault()} className="text-sm text-white/50 hover:text-white transition-colors duration-300">شروط الاستخدام</a></li>
+                <li><a href="#" onClick={(e) => e.preventDefault()} className="text-sm text-white/50 hover:text-white transition-colors duration-300">اتفاقية السرية</a></li>
               </ul>
             </div>
             <div>

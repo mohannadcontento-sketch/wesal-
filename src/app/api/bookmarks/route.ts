@@ -39,9 +39,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ action: 'removed' });
     }
 
-    await db.bookmark.create({
-      data: { userId: user.id, postId },
-    });
+    try {
+      await db.bookmark.create({
+        data: { userId: user.id, postId },
+      });
+    } catch (error: unknown) {
+      // Handle race condition: if unique constraint fails, bookmark was already added
+      const prismaError = error as { code?: string };
+      if (prismaError.code === 'P2002') {
+        return NextResponse.json({ action: 'added' });
+      }
+      throw error;
+    }
 
     return NextResponse.json({ action: 'added' });
   } catch (error) {

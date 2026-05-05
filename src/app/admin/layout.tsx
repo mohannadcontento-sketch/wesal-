@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -18,8 +19,9 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (user && user.role !== 'admin') {
@@ -164,9 +166,9 @@ export default function AdminLayout({
           >
             <span className="material-symbols-outlined">menu</span>
           </button>
-          <Link href="/community" className="text-sm font-medium text-primary-container hover:opacity-80 transition-all">
+          <button onClick={() => { logout(); router.push('/'); }} className="text-sm font-medium text-primary-container hover:opacity-80 transition-all">
             تسجيل الخروج
-          </Link>
+          </button>
         </div>
       </nav>
 

@@ -44,17 +44,12 @@ export async function POST(req: Request) {
     const emailResult = await sendOtpEmail(email, otpCode);
 
     if (!emailResult.success) {
-      console.error(`[AUTH] Failed to send OTP email to ${email} via ${emailResult.method}: ${emailResult.error}`);
-      // Still return success — the OTP is stored in DB and logged
-      // This prevents locking users out if email service is temporarily down
+      console.error(`[AUTH] Failed to send OTP email to ${email}: ${emailResult.error}`);
     }
-
-    console.log(`[AUTH] OTP for ${email}: ${otpCode} (sent via: ${emailResult.method})`);
 
     return NextResponse.json({
       message: 'تم إرسال رمز جديد لإيميلك',
-      // In development or console-fallback mode, return OTP for testing
-      ...(emailResult.method === 'console-fallback' && { devOtp: otpCode }),
+      ...(process.env.NODE_ENV !== 'production' && { devOtp: otpCode }),
       deliveryMethod: emailResult.method,
     });
   } catch (error) {

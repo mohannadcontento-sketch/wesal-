@@ -8,7 +8,7 @@ export async function GET(req: Request) {
     const user = await getUserFromSession(req);
     const { searchParams } = new URL(req.url);
     const section = searchParams.get('section') || 'shares';
-    const page = parseInt(searchParams.get('page') || '1');
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1') || 1);
     const limit = 20;
 
     let where = {};
@@ -28,29 +28,44 @@ export async function GET(req: Request) {
     });
 
     const postsWithReactions = await Promise.all(posts.map(async (post) => {
-      const reactions = await db.reaction.groupBy({
-        by: ['type'],
-        where: { targetId: post.id, targetType: 'post' },
-        _count: { type: true },
-      });
-
-      const reactionMap: Record<string, number> = {};
-      reactions.forEach((r) => { reactionMap[r.type] = r._count.type; });
-
-      // Fetch current user's reaction on this post
-      let userReaction: string | null = null;
-      if (user) {
-        const userReact = await db.reaction.findFirst({
-          where: { userId: user.id, targetId: post.id, targetType: 'post' },
-          select: { type: true },
-        });
-        if (userReact) userReaction = userReact.type;
-      }
-
-      return { ...post, reactions: reactionMap, userReaction };
+      return { ...post };
     }));
 
-    return NextResponse.json({ posts: postsWithReactions });
+    // Batch reaction queries: fetch all reactions for these posts in one query
+    const postIds = postsWithReactions.map(p => p.id);
+    const allReactions = await db.reaction.groupBy({
+      by: ['type', 'targetId'],
+      where: { targetId: { in: postIds }, targetType: 'post' },
+      _count: { type: true },
+    });
+
+    // Build a map: targetId -> { type -> count }
+    const reactionsByPost: Record<string, Record<string, number>> = {};
+    for (const r of allReactions) {
+      if (!reactionsByPost[r.targetId]) reactionsByPost[r.targetId] = {};
+      reactionsByPost[r.targetId][r.type] = r._count.type;
+    }
+
+    // Batch user reactions: fetch all reactions by current user for these posts
+    let userReactionsMap: Record<string, string> = {};
+    if (user) {
+      const userReactions = await db.reaction.findMany({
+        where: { userId: user.id, targetId: { in: postIds }, targetType: 'post' },
+        select: { targetId: true, type: true },
+      });
+      for (const r of userReactions) {
+        userReactionsMap[r.targetId] = r.type;
+      }
+    }
+
+    // Merge into posts
+    const finalPosts = postsWithReactions.map(post => ({
+      ...post,
+      reactions: reactionsByPost[post.id] || {},
+      userReaction: userReactionsMap[post.id] || null,
+    }));
+
+    return NextResponse.json({ posts: finalPosts });
   } catch (error) {
     console.error('Posts GET error:', error);
     return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });
@@ -69,6 +84,10 @@ export async function POST(req: Request) {
 
     if (!content || content.trim().length === 0) {
       return NextResponse.json({ error: 'اكتب شي' }, { status: 400 });
+    }
+
+    if (content.trim().length > 10000) {
+      return NextResponse.json({ error: 'المنشور طويل أوف، الحد الأقصى 10000 حرف' }, { status: 400 });
     }
 
     const displayName = getDisplayName({ ...user.profile, role: user.role });

@@ -9,11 +9,9 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
     });
 
-    // Return in the format the frontend expects: (User & { profile?: Profile })[]
+    // Return in the format the frontend expects — exclude PII (email, phone)
     const result = doctors.map((d) => ({
       id: d.id,
-      email: d.email,
-      phone: d.phone,
       role: d.role,
       disabled: d.disabled,
       emailVerified: d.emailVerified,

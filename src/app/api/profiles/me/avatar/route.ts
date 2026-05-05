@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getUserFromSession } from '@/lib/auth/session';
-import { AVATARS } from '@/lib/avatars';
+import { isValidAvatarId } from '@/lib/avatar-ids';
+import { buildAuthUser, createSessionToken } from '@/lib/auth/session';
 
 export async function PUT(req: Request) {
   try {
@@ -18,31 +19,48 @@ export async function PUT(req: Request) {
     }
 
     // Validate avatarUrl: must be either a built-in avatar or a valid URL
-    const isBuiltIn = avatarUrl.startsWith('avatar:') && AVATARS.some((a) => a.id === avatarUrl);
+    const isBuiltIn = avatarUrl.startsWith('avatar:') && isValidAvatarId(avatarUrl);
     const isUrl = avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://');
 
     if (!isBuiltIn && !isUrl) {
       return NextResponse.json({ error: 'صورة غير صالحة' }, { status: 400 });
     }
 
-    // Ensure profile exists
-    const existingProfile = await db.profile.findUnique({
+    // Use upsert: create profile if missing, update if exists
+    const profile = await db.profile.upsert({
       where: { userId: user.id },
+      update: { avatarUrl },
+      create: { userId: user.id, realName: user.profile?.realName || user.email.split('@')[0] },
     });
 
-    if (!existingProfile) {
-      return NextResponse.json({ error: 'الملف الشخصي غير موجود' }, { status: 404 });
+    // Build fresh auth user data with updated avatar
+    const freshUser = await db.user.findUnique({
+      where: { id: user.id },
+      include: { profile: true },
+    });
+    const authUser = freshUser ? buildAuthUser(freshUser) : null;
+
+    // Create a new session token with updated avatarUrl
+    const response = NextResponse.json({
+      avatarUrl: profile.avatarUrl,
+      user: authUser,
+    });
+
+    // Update the session cookie so avatar is immediately fresh on reload
+    if (authUser) {
+      const token = await createSessionToken(authUser);
+      response.cookies.set('wesal-session', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/',
+      });
     }
 
-    // Update avatar
-    const profile = await db.profile.update({
-      where: { userId: user.id },
-      data: { avatarUrl },
-    });
-
-    return NextResponse.json({ avatarUrl: profile.avatarUrl });
+    return response;
   } catch (error) {
     console.error('Avatar PUT error:', error);
-    return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });
+    return NextResponse.json({ error: 'حصل خطأ في تحديث الصورة' }, { status: 500 });
   }
 }

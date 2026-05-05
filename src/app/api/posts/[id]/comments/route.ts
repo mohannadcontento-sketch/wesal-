@@ -17,50 +17,51 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     });
 
     const commentsWithReactions = await Promise.all(comments.map(async (c) => {
-      const reactions = await db.reaction.groupBy({
-        by: ['type'],
-        where: { targetId: c.id, targetType: 'comment' },
-        _count: { type: true },
-      });
-      const reactionMap: Record<string, number> = {};
-      reactions.forEach((r) => { reactionMap[r.type] = r._count.type; });
-
-      // Fetch current user's reactions on this comment
-      let userReactions: string[] = [];
-      if (currentUser) {
-        const userReactList = await db.reaction.findMany({
-          where: { userId: currentUser.id, targetId: c.id, targetType: 'comment' },
-          select: { type: true },
-        });
-        userReactions = userReactList.map((r) => r.type);
-      }
-
-      const repliesWithReactions = await Promise.all((c.replies || []).map(async (r) => {
-        const rReactions = await db.reaction.groupBy({
-          by: ['type'],
-          where: { targetId: r.id, targetType: 'comment' },
-          _count: { type: true },
-        });
-        const rMap: Record<string, number> = {};
-        rReactions.forEach((rr) => { rMap[rr.type] = rr._count.type; });
-
-        // Fetch current user's reactions on this reply
-        let rUserReactions: string[] = [];
-        if (currentUser) {
-          const rUserReactList = await db.reaction.findMany({
-            where: { userId: currentUser.id, targetId: r.id, targetType: 'comment' },
-            select: { type: true },
-          });
-          rUserReactions = rUserReactList.map((rr) => rr.type);
-        }
-
-        return { ...r, reactions: rMap, userReactions: rUserReactions };
-      }));
-
-      return { ...c, reactions: reactionMap, userReactions, replies: repliesWithReactions };
+      return { ...c };
     }));
 
-    return NextResponse.json({ comments: commentsWithReactions });
+    // Batch reaction queries for all comments and replies
+    const commentIds = commentsWithReactions.flatMap(c => [c.id, ...(c.replies || []).map(r => r.id)]);
+
+    const allReactions = await db.reaction.groupBy({
+      by: ['type', 'targetId'],
+      where: { targetId: { in: commentIds }, targetType: 'comment' },
+      _count: { type: true },
+    });
+
+    const reactionsByTarget: Record<string, Record<string, number>> = {};
+    for (const r of allReactions) {
+      if (!reactionsByTarget[r.targetId]) reactionsByTarget[r.targetId] = {};
+      reactionsByTarget[r.targetId][r.type] = r._count.type;
+    }
+
+    let userReactionsByTarget: Record<string, string[]> = {};
+    if (currentUser) {
+      const userReactions = await db.reaction.findMany({
+        where: { userId: currentUser.id, targetId: { in: commentIds }, targetType: 'comment' },
+        select: { targetId: true, type: true },
+      });
+      for (const r of userReactions) {
+        if (!userReactionsByTarget[r.targetId]) userReactionsByTarget[r.targetId] = [];
+        userReactionsByTarget[r.targetId].push(r.type);
+      }
+    }
+
+    const finalComments = commentsWithReactions.map(c => {
+      const repliesWithReactions = (c.replies || []).map(r => ({
+        ...r,
+        reactions: reactionsByTarget[r.id] || {},
+        userReactions: userReactionsByTarget[r.id] || [],
+      }));
+      return {
+        ...c,
+        reactions: reactionsByTarget[c.id] || {},
+        userReactions: userReactionsByTarget[c.id] || [],
+        replies: repliesWithReactions,
+      };
+    });
+
+    return NextResponse.json({ comments: finalComments });
   } catch (error) {
     console.error('Comments GET error:', error);
     return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });
@@ -80,6 +81,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     if (!content || content.trim().length === 0) {
       return NextResponse.json({ error: 'اكتب تعليق' }, { status: 400 });
+    }
+
+    if (content.trim().length > 2000) {
+      return NextResponse.json({ error: 'التعليق طويل أوف، الحد الأقصى 2000 حرف' }, { status: 400 });
     }
 
     const displayName = getDisplayName({ ...user.profile, role: user.role });

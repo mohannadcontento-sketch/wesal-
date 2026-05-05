@@ -71,8 +71,10 @@ export function ScrollReveal({
     });
 
     return () => {
+      if (anim.scrollTrigger) {
+        anim.scrollTrigger.kill();
+      }
       anim.kill();
-      ScrollTrigger.getAll().forEach((t) => t.kill());
     };
   }, [direction, delay, duration, once]);
 

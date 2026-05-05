@@ -62,7 +62,9 @@ export default function BookDoctorPage({ params }: { params: Promise<{ doctorId:
         setSuccess(true);
         toast.success('تم الحجز بنجاح!');
         setTimeout(() => {
-          router.push(`/chat/${data.chatRoom.id}`);
+          if (data.chatRoom?.id) {
+            router.push(`/chat/${data.chatRoom.id}`);
+          }
         }, 2000);
       } else {
         toast.error(data.error || 'حصل خطأ في الحجز');
