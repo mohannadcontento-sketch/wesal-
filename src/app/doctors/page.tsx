@@ -59,28 +59,28 @@ export default function DoctorsPage() {
     <MainLayout>
       {/* Header Section */}
       <ScrollReveal direction="up">
-      <header className="mb-12 flex flex-col gap-6">
+      <header className="mt-6 mb-12 flex flex-col gap-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-tertiary-fixed to-primary-container flex items-center justify-center shadow-lg shadow-primary-container/20">
-              <span className="material-symbols-outlined text-4xl text-on-primary">stethoscope</span>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-wesal-ice to-wesal-sky/30 flex items-center justify-center shadow-sm">
+              <span className="material-symbols-outlined filled text-wesal-dark text-xl">medical_services</span>
             </div>
             <div>
-              <h1 className="text-[40px] font-bold text-on-background leading-tight">الأطباء</h1>
-              <p className="text-lg text-on-surface-variant mt-1">اكتشف نخبة من المتخصصين في الصحة النفسية</p>
+              <h1 className="text-2xl font-bold text-wesal-navy leading-tight">الأطباء</h1>
+              <p className="text-sm text-wesal-medium mt-0.5">اكتشف نخبة من المتخصصين في الصحة النفسية</p>
             </div>
           </div>
 
           {/* Search Bar */}
           <div className="relative w-full md:w-96">
             <input
-              className="w-full bg-surface-container-high border border-outline-variant/50 focus:border-tertiary-fixed focus:ring-1 focus:ring-tertiary-fixed rounded-xl py-3 pl-4 pr-12 text-base text-on-surface transition-all shadow-sm"
+              className="w-full bg-white border border-wesal-ice focus:border-wesal-sky focus:ring-1 focus:ring-wesal-sky/30 rounded-xl py-3 pl-4 pr-12 text-base text-wesal-navy placeholder:text-wesal-medium/60 transition-all shadow-sm"
               placeholder="ابحث بالاسم أو التخصص..."
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+            <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-wesal-medium">search</span>
           </div>
         </div>
 
@@ -89,10 +89,10 @@ export default function DoctorsPage() {
           {filters.map((f) => (
             <button
               key={f.value}
-              className={`whitespace-nowrap px-6 py-2 rounded-full text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap px-6 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer ${
                 activeFilter === f.value
-                  ? 'bg-primary text-on-primary shadow-md'
-                  : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant border border-outline-variant/30'
+                  ? 'bg-wesal-dark text-white shadow-md'
+                  : 'bg-white hover:bg-wesal-ice text-wesal-medium border border-wesal-ice'
               }`}
               onClick={() => setActiveFilter(f.value)}
             >
@@ -107,30 +107,30 @@ export default function DoctorsPage() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6 animate-pulse">
+            <div key={i} className="bg-white/70 backdrop-blur-xl border border-wesal-ice rounded-2xl p-6 animate-pulse">
               <div className="flex items-start gap-4 mb-6">
-                <div className="w-20 h-20 rounded-full bg-surface-container-high shrink-0" />
+                <div className="w-20 h-20 rounded-full bg-wesal-ice/60 shrink-0" />
                 <div className="flex-1 space-y-3">
-                  <div className="h-5 w-32 rounded-lg bg-surface-container-high" />
-                  <div className="h-4 w-24 rounded-lg bg-surface-container-high" />
-                  <div className="h-4 w-20 rounded-lg bg-surface-container-high" />
+                  <div className="h-5 w-32 rounded-lg bg-wesal-ice/60" />
+                  <div className="h-4 w-24 rounded-lg bg-wesal-ice/60" />
+                  <div className="h-4 w-20 rounded-lg bg-wesal-ice/60" />
                 </div>
               </div>
               <div className="flex gap-2 mb-6">
-                <div className="h-6 w-16 rounded-full bg-surface-container-high" />
-                <div className="h-6 w-20 rounded-full bg-surface-container-high" />
+                <div className="h-6 w-16 rounded-full bg-wesal-ice/60" />
+                <div className="h-6 w-20 rounded-full bg-wesal-ice/60" />
               </div>
-              <div className="h-12 rounded-xl bg-surface-container-high" />
+              <div className="h-12 rounded-xl bg-wesal-ice/60" />
             </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
         <div className="py-16 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-container-high">
-            <span className="material-symbols-outlined text-3xl text-primary-container">stethoscope</span>
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-wesal-ice">
+            <span className="material-symbols-outlined text-3xl text-wesal-medium">stethoscope</span>
           </div>
-          <p className="text-lg font-bold text-on-surface">لا يوجد أطباء حالياً</p>
-          <p className="text-sm text-on-surface-variant mt-1.5">
+          <p className="text-lg font-bold text-wesal-navy">لا يوجد أطباء حالياً</p>
+          <p className="text-sm text-wesal-medium mt-1.5">
             سيظهرون هنا بمجرد تسجيلهم في المنصة
           </p>
         </div>

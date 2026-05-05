@@ -93,12 +93,12 @@ function CommunityFeed({ user }: { user: NonNullable<ReturnType<typeof useAuth>[
       {/* ── Main Feed Column ── */}
       <div className="flex-1 min-w-0 max-w-2xl mx-auto lg:mx-0">
         {/* Greeting */}
-        <div className="mb-6 flex items-center gap-3">
+        <div className="mt-6 mb-6 flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-wesal-ice to-wesal-sky/30 flex items-center justify-center shadow-sm">
-            <span className="material-symbols-outlined filled text-wesal-dark text-xl">auto_awesome</span>
+            <span className="material-symbols-outlined filled text-wesal-dark text-xl">forum</span>
           </div>
           <div>
-            <h1 className="text-xl font-bold text-wesal-navy">المجتمع</h1>
+            <h1 className="text-2xl font-bold text-wesal-navy">المجتمع</h1>
             <p className="text-sm text-wesal-medium">
               {greeting()}، {user.badge}
             </p>
