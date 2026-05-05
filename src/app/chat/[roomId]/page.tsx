@@ -59,23 +59,29 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
   const fetchMessages = async () => {
     try {
       const res = await fetch(`/api/chat/${roomId}/messages`);
+      const data = await res.json();
       if (res.ok) {
-        const data = await res.json();
         setMessages(data.messages || []);
         if (data.room) setRoomInfo(data.room);
-        setLoading(false);
       }
     } catch {
+      // ignore network errors during polling
+    } finally {
       setLoading(false);
     }
   };
 
+  // Safety timeout to prevent infinite loading
   useEffect(() => {
-    if (roomId) {
-      fetchMessages();
-      // Poll every 3 seconds for new messages
-      pollingRef.current = setInterval(fetchMessages, 3000);
-    }
+    const timer = setTimeout(() => setLoading(false), 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!roomId) return;
+    fetchMessages();
+    // Poll every 3 seconds for new messages
+    pollingRef.current = setInterval(fetchMessages, 3000);
     return () => {
       if (pollingRef.current) clearInterval(pollingRef.current);
     };
@@ -210,6 +216,18 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
         <div className="flex flex-col items-center gap-3">
           <span className="material-symbols-outlined animate-spin text-[32px] text-wesal-dark">progress_activity</span>
           <span className="text-sm text-wesal-medium">جاري تحميل المحادثة...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-wesal-cream">
+        <div className="flex flex-col items-center gap-3">
+          <span className="material-symbols-outlined text-4xl text-wesal-medium">lock</span>
+          <p className="text-sm text-wesal-medium">سجل دخول الأول عشان توصل للشات</p>
+          <Link href="/login" className="px-6 py-2 bg-wesal-dark text-white rounded-xl text-sm font-bold">سجل دخول</Link>
         </div>
       </div>
     );
