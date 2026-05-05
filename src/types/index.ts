@@ -53,7 +53,7 @@ export const REPUTATION_POINTS: ReputationPoints = {
 };
 
 export const REPUTATION_TIERS = {
-  beginner: { min: 0, max: 49, label: 'مبتدئ', badge: '🔰' },
+  beginner: { min: 0, max: 49, label: 'مبتدئ', badge: '🌱' },
   active: { min: 50, max: 149, label: 'نشط', badge: '📚' },
   notable: { min: 150, max: 299, label: 'مميز', badge: '⭐' },
   eligible: { min: 300, max: Infinity, label: 'مؤهل للتوثيق', badge: '🌟' },
@@ -63,7 +63,7 @@ export function getReputationTier(score: number): { tier: string; label: string;
   if (score >= 300) return { tier: 'eligible', label: 'مؤهل للتوثيق', badge: '🌟' };
   if (score >= 150) return { tier: 'notable', label: 'مميز', badge: '⭐' };
   if (score >= 50) return { tier: 'active', label: 'نشط', badge: '📚' };
-  return { tier: 'beginner', label: 'مبتدئ', badge: '🔰' };
+  return { tier: 'beginner', label: 'مبتدئ', badge: '🌱' };
 }
 
 export function getUserBadge(role: string, reputationTier?: string): string {
@@ -72,7 +72,7 @@ export function getUserBadge(role: string, reputationTier?: string): string {
   if (role === 'admin') return '🛡️';
   if (reputationTier === 'notable') return '⭐';
   if (reputationTier === 'active') return '📚';
-  return '🔰';
+  return '🌱';
 }
 
 export function getDisplayName(data: { realName: string; username?: string | null; role?: string }): string {

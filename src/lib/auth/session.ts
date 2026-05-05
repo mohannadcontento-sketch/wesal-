@@ -24,7 +24,7 @@ function getUserBadge(role: string, reputationTier?: string): string {
   if (role === 'admin') return '🛡️';
   if (reputationTier === 'notable') return '⭐';
   if (reputationTier === 'active') return '📚';
-  return '🔰';
+  return '🌱';
 }
 
 /**
@@ -62,7 +62,7 @@ export async function verifySessionToken(token: string): Promise<AuthUser | null
       role: payload.role as string,
       username: (payload.username as string) || null,
       realName: (payload.realName as string) || '',
-      badge: (payload.badge as string) || '🔰',
+      badge: (payload.badge as string) || '🌱',
       reputationScore: (payload.reputationScore as number) || 0,
       specialty: (payload.specialty as string) || null,
       avatarUrl: (payload.avatarUrl as string) || null,

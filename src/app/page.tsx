@@ -65,7 +65,7 @@ function FadeInSection({
    Community Feed (shown for logged-in users)
    ═══════════════════════════════════════════════════════════════════ */
 const tabs = [
-  { value: 'shares', label: 'مشاركات', icon: 'forum' },
+  { value: 'shares', label: 'مشاركاتي', icon: 'edit_note' },
   { value: 'trending', label: 'رائج', icon: 'trending_up' },
   { value: 'doctors', label: 'أطباء', icon: 'verified' },
 ] as const;
@@ -81,22 +81,15 @@ const trendingTopics = [
 function CommunityFeed({ user }: { user: NonNullable<ReturnType<typeof useAuth>['user']> }) {
   const [section, setSection] = useState('shares');
 
-  const greeting = () => {
-    const h = new Date().getHours();
-    if (h < 12) return 'صباح الخير';
-    if (h < 17) return 'مساء الخير';
-    return 'مساء النور';
-  };
-
   return (
     <div className="flex gap-6 max-w-[1280px] mx-auto">
       {/* ── Main Feed Column ── */}
       <div className="flex-1 min-w-0 max-w-2xl mx-auto lg:mx-0">
-        {/* Greeting */}
+        {/* Section Header */}
         <div className="mt-6 mb-6">
           <h1 className="text-2xl font-bold text-wesal-navy">المجتمع</h1>
           <p className="text-sm text-wesal-medium mt-0.5">
-            {greeting()}، {user.badge}
+            مساحتك لمشاركة تجربتك والتواصل مع مجتمع داعم وآمن
           </p>
         </div>
 

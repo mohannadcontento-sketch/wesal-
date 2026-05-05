@@ -13,7 +13,12 @@ export async function GET(req: Request) {
 
     let where = {};
     if (section === 'shares') {
-      where = { authorRole: { in: ['user', 'trusted'] } };
+      // Show only the current user's own posts
+      if (user) {
+        where = { authorId: user.id };
+      } else {
+        where = { authorRole: { in: ['user', 'trusted'] } };
+      }
     } else if (section === 'doctors') {
       where = { authorRole: 'doctor' };
     } else if (section === 'trending') {

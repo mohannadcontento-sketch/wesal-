@@ -15,7 +15,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ username
 
     const result: Record<string, unknown> = {
       username: profile.username,
-      badge: user.role === 'doctor' ? '🏥' : user.role === 'trusted' ? '🌟' : '🔰',
+      badge: user.role === 'doctor' ? '🏥' : user.role === 'trusted' ? '🌟' : '🌱',
       reputationScore: profile.reputationScore,
       reputationTier: profile.reputationTier,
     };
