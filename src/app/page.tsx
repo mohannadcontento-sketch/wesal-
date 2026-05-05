@@ -12,6 +12,7 @@ import { ScrollReveal } from '@/components/animations/ScrollReveal';
 import { PageTransition } from '@/components/animations/PageTransition';
 import { StaggeredList } from '@/components/animations/StaggeredList';
 import { ParticleField } from '@/components/3d/ParticleField';
+import { renderAvatarSvg, isBuiltInAvatar } from '@/lib/avatars';
 
 /* ═══════════════════════════════════════════════════════════════════
    Intersection Observer hook — adds "animate-fade-in-up" when visible
@@ -94,8 +95,16 @@ function CommunityFeed({ user }: { user: NonNullable<ReturnType<typeof useAuth>[
       <div className="flex-1 min-w-0 max-w-2xl mx-auto lg:mx-0">
         {/* Greeting */}
         <div className="mt-6 mb-6 flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-wesal-ice to-wesal-sky/30 flex items-center justify-center shadow-sm">
-            <span className="material-symbols-outlined filled text-wesal-dark text-xl">forum</span>
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-wesal-ice to-wesal-sky/30 flex items-center justify-center shadow-sm border-2 border-white overflow-hidden">
+            {user.avatarUrl && isBuiltInAvatar(user.avatarUrl) ? (
+              <div className="w-full h-full [&_svg]:w-full [&_svg]:h-full">
+                {renderAvatarSvg(user.avatarUrl)}
+              </div>
+            ) : user.avatarUrl ? (
+              <Image src={user.avatarUrl} alt={user.badge} width={48} height={48} className="object-cover w-full h-full" />
+            ) : (
+              <span className="text-lg font-bold text-wesal-dark">{user.badge}</span>
+            )}
           </div>
           <div>
             <h1 className="text-2xl font-bold text-wesal-navy">المجتمع</h1>
@@ -286,8 +295,8 @@ function LandingPage() {
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
-            {['الرئيسية', 'المجتمع', 'الأطباء'].map((item, i) => (
-              <a key={item} href={i === 0 ? '/' : i === 1 ? '/community' : '/doctors'} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${i === 0 ? (scrolled ? 'text-wesal-dark bg-wesal-ice/60' : 'text-white bg-white/15') : (scrolled ? 'text-wesal-medium hover:text-wesal-dark hover:bg-wesal-ice/40' : 'text-white/70 hover:text-white hover:bg-white/10')}`}>{item}</a>
+            {['الرئيسية', 'الأطباء'].map((item, i) => (
+              <a key={item} href={i === 0 ? '/' : '/doctors'} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${i === 0 ? (scrolled ? 'text-wesal-dark bg-wesal-ice/60' : 'text-white bg-white/15') : (scrolled ? 'text-wesal-medium hover:text-wesal-dark hover:bg-wesal-ice/40' : 'text-white/70 hover:text-white hover:bg-white/10')}`}>{item}</a>
             ))}
           </div>
 
@@ -303,8 +312,8 @@ function LandingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden glass-panel border-t border-wesal-ice/50 animate-fade-in-up">
             <div className="px-4 py-4 space-y-1">
-              {['الرئيسية', 'المجتمع', 'الأطباء'].map((item, i) => (
-                <a key={item} href={i === 0 ? '/' : i === 1 ? '/community' : '/doctors'} className={`block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${i === 0 ? 'text-wesal-dark bg-wesal-ice/60' : 'text-wesal-medium hover:text-wesal-dark hover:bg-wesal-ice/40'}`} onClick={() => setMobileMenuOpen(false)}>{item}</a>
+              {['الرئيسية', 'الأطباء'].map((item, i) => (
+                <a key={item} href={i === 0 ? '/' : '/doctors'} className={`block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${i === 0 ? 'text-wesal-dark bg-wesal-ice/60' : 'text-wesal-medium hover:text-wesal-dark hover:bg-wesal-ice/40'}`} onClick={() => setMobileMenuOpen(false)}>{item}</a>
               ))}
               <div className="pt-2 border-t border-wesal-ice/50 mt-2">
                 <Link href="/login" className="block px-4 py-3 rounded-xl text-sm font-semibold text-wesal-dark hover:bg-wesal-ice/40 transition-colors" onClick={() => setMobileMenuOpen(false)}>تسجيل الدخول</Link>
