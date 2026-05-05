@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
 import { UserAvatar } from '@/components/avatars/UserAvatar';
 import { AvatarPicker } from '@/components/avatars/AvatarPicker';
+import { useAuthStore } from '@/stores/auth-store';
 
 export function TopNavbar() {
   const pathname = usePathname();
@@ -26,10 +27,11 @@ export function TopNavbar() {
   };
 
   const handleAvatarConfirm = (avatarUrl: string) => {
-    // The avatar is saved via the AvatarPicker component
-    // We need to update the auth store to reflect the new avatar
-    // The session will be refreshed on next page load
     setShowMenu(false);
+    // Update auth store immediately with new avatar
+    if (user) {
+      useAuthStore.getState().setUser({ ...user, avatarUrl });
+    }
   };
 
   return (
@@ -43,7 +45,7 @@ export function TopNavbar() {
               alt="وصال"
               width={93}
               height={32}
-              className="object-contain flex-shrink-0 rounded-lg ring-1 ring-wesal-ice/50 group-hover:ring-wesal-sky/60 transition-all duration-300"
+              className="object-contain flex-shrink-0"
               priority
             />
           </Link>

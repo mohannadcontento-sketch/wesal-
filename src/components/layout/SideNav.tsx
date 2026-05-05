@@ -43,7 +43,7 @@ export function SideNav() {
             alt="وصال"
             width={82}
             height={28}
-            className="object-contain flex-shrink-0 rounded-lg ring-1 ring-wesal-ice/50"
+            className="object-contain flex-shrink-0"
             priority
           />
         </Link>

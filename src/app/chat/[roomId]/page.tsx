@@ -43,6 +43,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const recordStartTimeRef = useRef<number>(0);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -144,10 +145,11 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
         reader.onloadend = async () => {
           const base64 = reader.result as string;
           try {
+            const duration = Math.round((Date.now() - recordStartTimeRef.current) / 1000);
             const res = await fetch(`/api/chat/${roomId}/voice`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ voiceData: base64, duration: 0 }),
+              body: JSON.stringify({ voiceData: base64, duration }),
             });
             if (res.ok) {
               const data = await res.json();
@@ -161,6 +163,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
       recorder.start();
       setMediaRecorder(recorder);
       setRecording(true);
+      recordStartTimeRef.current = Date.now();
     } catch { toast.error('مش قادر أصل للميكروفون'); }
   };
 
@@ -336,7 +339,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
                       {getWaveformBars(msg.id, isMe)}
                     </div>
                     <span className={`text-xs shrink-0 ${isMe ? 'text-white/70' : 'text-wesal-medium'}`}>
-                      {msg.voiceDuration ? `${msg.voiceDuration}:${(msg.voiceDuration % 60).toString().padStart(2, '0')}` : '0:00'}
+                      {msg.voiceDuration ? `${Math.floor(msg.voiceDuration / 60)}:${(msg.voiceDuration % 60).toString().padStart(2, '0')}` : '0:00'}
                     </span>
                   </div>
                 )}

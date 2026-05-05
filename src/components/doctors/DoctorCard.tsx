@@ -90,13 +90,35 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
         ))}
       </div>
 
-      {/* Book Button */}
-      <Link
-        href={`/book/${doctor.id}`}
-        className="mt-auto w-full py-3 rounded-xl bg-gradient-to-l from-primary to-primary-container text-on-primary font-bold text-sm shadow-md hover:shadow-lg hover:from-primary-container hover:to-primary transition-all z-10 text-center block"
-      >
-        حجز موعد
-      </Link>
+      {/* Action Buttons */}
+      <div className="mt-auto flex gap-2 z-10">
+        <button
+          onClick={async () => {
+            try {
+              const res = await fetch('/api/chat/quick', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ doctorId: doctor.id }),
+              });
+              if (res.ok) {
+                const data = await res.json();
+                window.location.href = `/chat/${data.roomId}`;
+              }
+            } catch { /* ignore */ }
+          }}
+          className="flex-1 py-2.5 rounded-xl bg-wesal-ice text-wesal-dark font-bold text-sm border border-wesal-sky/30 hover:bg-wesal-sky/20 transition-all text-center flex items-center justify-center gap-1.5"
+        >
+          <span className="material-symbols-outlined text-[18px]">chat</span>
+          محادثة
+        </button>
+        <Link
+          href={`/book/${doctor.id}`}
+          className="flex-1 py-2.5 rounded-xl bg-gradient-to-l from-wesal-dark to-wesal-medium text-white font-bold text-sm shadow-md hover:shadow-lg hover:brightness-110 transition-all text-center flex items-center justify-center gap-1.5"
+        >
+          <span className="material-symbols-outlined text-[18px]">event_available</span>
+          حجز موعد
+        </Link>
+      </div>
     </div>
   );
 }
