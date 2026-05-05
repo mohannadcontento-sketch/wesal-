@@ -17,7 +17,6 @@ export function TopNavbar() {
 
   const navLinks = [
     { href: '/', label: 'الرئيسية' },
-    { href: '/community', label: 'المجتمع' },
     { href: '/doctors', label: 'الأطباء' },
     { href: '/bookmarks', label: 'المحفوظات' },
   ];

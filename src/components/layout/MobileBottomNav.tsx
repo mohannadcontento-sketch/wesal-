@@ -12,7 +12,6 @@ export function MobileBottomNav() {
 
   const links = [
     { href: '/', label: 'الرئيسية', icon: 'home' },
-    { href: '/community', label: 'المجتمع', icon: 'forum' },
     { href: '/doctors', label: 'الأطباء', icon: 'medical_services' },
     { href: '/bookmarks', label: 'المحفوظات', icon: 'bookmark' },
   ];

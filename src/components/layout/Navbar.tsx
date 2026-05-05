@@ -17,7 +17,8 @@ export function Navbar() {
         <div className="flex justify-between items-center w-full max-w-5xl mx-auto px-4 sm:px-6 py-3">
           {/* Logo */}
           <Link
-            href={user ? '/community' : '/'}
+            href="/"
+
             className="flex items-center gap-2.5 group"
           >
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-600 text-white shadow-sm group-hover:shadow-md transition-shadow">
