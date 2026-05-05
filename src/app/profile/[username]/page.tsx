@@ -1,12 +1,13 @@
 'use client';
 
 import { MainLayout } from '@/components/layout/MainLayout';
-import { useState, useEffect, use, useCallback } from 'react';
+import { useState, useEffect, use, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { AvatarPicker } from '@/components/avatars/AvatarPicker';
 import { renderAvatarSvg, isBuiltInAvatar } from '@/lib/avatars';
 import { UserAvatar } from '@/components/avatars/UserAvatar';
+import { toast } from 'sonner';
 import Image from 'next/image';
 
 interface ProfileData {
@@ -65,13 +66,49 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'about' | 'posts'>('about');
   const [reputationExpanded, setReputationExpanded] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
 
   const isOwnProfile = user?.username === username;
+  const isDoctorProfile = user?.role === 'doctor' && isOwnProfile;
 
   const handleAvatarConfirm = useCallback((avatarUrl: string) => {
     setProfile((prev) => prev ? { ...prev, avatarUrl } : prev);
   }, []);
+
+  const handleDoctorPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const dataUrl = reader.result as string;
+        try {
+          const res = await fetch('/api/profiles/me/avatar', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ avatarUrl: dataUrl }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setProfile(prev => prev ? { ...prev, avatarUrl: data.avatarUrl } : prev);
+            toast.success('تم تحديث الصورة');
+          } else {
+            toast.error('حصل خطأ في رفع الصورة');
+          }
+        } catch {
+          toast.error('حصل خطأ');
+        }
+        setUploading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch {
+      toast.error('حصل خطأ');
+      setUploading(false);
+    }
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -174,11 +211,20 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 {/* Edit avatar button (only for own profile) */}
                 {isOwnProfile && (
                   <button
-                    onClick={() => setAvatarPickerOpen(true)}
+                    onClick={() => isDoctorProfile
+                      ? fileInputRef.current?.click()
+                      : setAvatarPickerOpen(true)
+                    }
                     className="absolute inset-0 rounded-full bg-wesal-navy/0 group-hover:bg-wesal-navy/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer"
-                    aria-label="تعديل الصورة الشخصية"
+                    aria-label={isDoctorProfile ? 'رفع صورة شخصية' : 'تعديل الصورة الشخصية'}
                   >
-                    <span className="material-symbols-outlined text-white text-2xl">photo_camera</span>
+                    {uploading ? (
+                      <span className="material-symbols-outlined text-white text-2xl animate-spin">progress_activity</span>
+                    ) : (
+                      <span className="material-symbols-outlined text-white text-2xl">{
+                        isDoctorProfile ? 'add_a_photo' : 'photo_camera'
+                      }</span>
+                    )}
                   </button>
                 )}
                 {/* Tier badge */}
@@ -216,13 +262,26 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               {/* Edit Button */}
               {isOwnProfile && (
                 <div className="flex gap-3 pb-2">
-                  <button
-                    onClick={() => setAvatarPickerOpen(true)}
-                    className="bg-wesal-dark hover:bg-wesal-navy text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-wesal-dark/20 active:scale-95 transition-all duration-200 flex items-center gap-2 cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-lg">edit</span>
-                    تعديل الصورة
-                  </button>
+                  {isDoctorProfile ? (
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="bg-wesal-dark hover:bg-wesal-navy text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-wesal-dark/20 active:scale-95 transition-all duration-200 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      <span className="material-symbols-outlined text-lg">
+                        {uploading ? 'progress_activity' : 'add_a_photo'}
+                      </span>
+                      {uploading ? 'جاري الرفع...' : 'رفع صورة شخصية'}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setAvatarPickerOpen(true)}
+                      className="bg-wesal-dark hover:bg-wesal-navy text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-wesal-dark/20 active:scale-95 transition-all duration-200 flex items-center gap-2 cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-lg">edit</span>
+                      تعديل الصورة
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -565,13 +624,26 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
         </div>
       </div>
 
-      {/* Avatar Picker Sheet */}
-      <AvatarPicker
-        open={avatarPickerOpen}
-        onOpenChange={setAvatarPickerOpen}
-        currentAvatar={profile?.avatarUrl || undefined}
-        onConfirm={handleAvatarConfirm}
-      />
+      {/* Hidden file input for doctor photo upload */}
+      {isDoctorProfile && (
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleDoctorPhotoUpload}
+          className="hidden"
+        />
+      )}
+
+      {/* Avatar Picker Sheet (only for non-doctors) */}
+      {!isDoctorProfile && (
+        <AvatarPicker
+          open={avatarPickerOpen}
+          onOpenChange={setAvatarPickerOpen}
+          currentAvatar={profile?.avatarUrl || undefined}
+          onConfirm={handleAvatarConfirm}
+        />
+      )}
     </MainLayout>
   );
 }

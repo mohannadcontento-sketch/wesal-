@@ -6,6 +6,7 @@ import EmptyState from '@/components/shared/EmptyState';
 
 interface Post {
   id: string;
+  authorId: string;
   authorDisplay: string;
   authorBadge: string;
   authorRole: string;
@@ -17,6 +18,7 @@ interface Post {
   createdAt: string;
   reactions: Record<string, number>;
   userReaction?: string | null;
+  authorAvatarUrl?: string | null;
   isSensitive?: boolean;
   sensitiveReason?: string;
   imageUrl?: string;

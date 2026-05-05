@@ -10,6 +10,7 @@ import { UserAvatar } from '@/components/avatars/UserAvatar';
 interface PostCardProps {
   post: {
     id: string;
+    authorId: string;
     authorDisplay: string;
     authorBadge: string;
     authorAvatarUrl?: string | null;
@@ -25,9 +26,10 @@ interface PostCardProps {
     sensitiveReason?: string;
     imageUrl?: string;
   };
+  onDelete?: (postId: string) => void;
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, onDelete }: PostCardProps) {
   const { user } = useAuth();
   const [showComments, setShowComments] = useState(false);
   const [reactions, setReactions] = useState(post.reactions || {});
@@ -36,6 +38,8 @@ export function PostCard({ post }: PostCardProps) {
   // Initialize from server data so the button shows correct state on load
   const [userReaction, setUserReaction] = useState<string | null>(post.userReaction || null);
   const [showSensitive, setShowSensitive] = useState(!post.isSensitive);
+  const [showMenu, setShowMenu] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const timeAgo = (date: string) => {
     const diff = Date.now() - new Date(date).getTime();
@@ -148,6 +152,28 @@ export function PostCard({ post }: PostCardProps) {
   const totalReactions = Object.values(reactions).reduce((a, b) => a + b, 0);
   const isDoctor = post.authorRole === 'doctor';
   const isLiked = userReaction === 'heart' || userReaction === 'like';
+  const canManage = user && (user.userId === post.authorId || user.role === 'admin');
+
+  const handleDelete = async () => {
+    setShowMenu(false);
+    if (!user || deleting) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/posts/${post.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast.success('تم حذف المنشور');
+        if (onDelete) onDelete(post.id);
+        else window.dispatchEvent(new CustomEvent('post-created'));
+      } else {
+        const data = await res.json();
+        toast.error(data.error || 'حصل خطأ');
+      }
+    } catch {
+      toast.error('حصل خطأ');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <article className={`bg-surface-bright rounded-xl border p-4 sm:p-5 transition-shadow duration-200 hover:shadow-[0_4px_20px_0_rgba(23,42,57,0.06)] ${
@@ -181,9 +207,31 @@ export function PostCard({ post }: PostCardProps) {
             </p>
           </div>
         </div>
-        <button className="text-on-surface-variant hover:text-on-surface transition-colors p-1">
-          <span className="material-symbols-outlined text-[20px]">more_vert</span>
-        </button>
+        {canManage && (
+          <div className="relative">
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="text-on-surface-variant hover:text-on-surface transition-colors p-1"
+            >
+              <span className="material-symbols-outlined text-[20px]">more_vert</span>
+            </button>
+            {showMenu && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
+                <div className="absolute left-0 top-8 z-20 bg-white rounded-xl border border-outline-variant/30 shadow-lg py-1 min-w-[140px] animate-fade-in-up">
+                  <button
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">delete</span>
+                    {deleting ? 'جاري الحذف...' : 'حذف المنشور'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Content / Sensitive Warning */}

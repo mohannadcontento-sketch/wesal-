@@ -63,8 +63,8 @@ export function PostForm({ onPostCreated }: PostFormProps) {
     <section className="bg-surface-bright rounded-xl border border-outline-variant/30 p-4 sm:p-5 shadow-[0_4px_20px_0_rgba(23,42,57,0.02)] mb-6">
       <div className="flex gap-4 items-start">
         {/* Avatar */}
-        <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 mt-1 bg-primary-container/10 flex items-center justify-center">
-          <BadgeIcon badge={user.badge} className="text-sm" />
+        <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 mt-1 bg-wesal-ice flex items-center justify-center">
+          <BadgeIcon badge={user.badge} className="text-sm text-wesal-dark" />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -76,7 +76,7 @@ export function PostForm({ onPostCreated }: PostFormProps) {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full bg-surface-container-low rounded-lg p-3 text-base text-on-surface placeholder:text-on-surface-variant border-none focus:ring-2 focus:ring-primary-container/50 resize-none min-h-[80px] transition-shadow"
+              className="w-full bg-surface-container-low rounded-lg p-3 text-base text-on-surface placeholder:text-on-surface-variant border-none focus:ring-2 focus:ring-wesal-sky/50 resize-none min-h-[80px] transition-shadow"
               maxLength={maxChars}
               disabled={loading}
               rows={3}
@@ -109,7 +109,7 @@ export function PostForm({ onPostCreated }: PostFormProps) {
               <button
                 onClick={handleSubmit}
                 disabled={loading || !content.trim()}
-                className="bg-primary-container text-on-primary text-sm font-semibold px-5 py-2 rounded-full hover:opacity-90 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                className="bg-wesal-dark text-white text-sm font-semibold px-5 py-2 rounded-full hover:bg-wesal-navy transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 shadow-md shadow-wesal-dark/15"
               >
                 {loading ? (
                   <span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
