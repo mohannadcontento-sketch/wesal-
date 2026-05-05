@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import type { Profile, User } from '@/types';
+import { UserAvatar } from '@/components/avatars/UserAvatar';
+import { isBuiltInAvatar, renderAvatarSvg } from '@/lib/avatars';
 
 interface DoctorCardProps {
   doctor: User & { profile?: Profile };
@@ -16,11 +18,6 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
   const isVerified = profile?.isVerified;
   const bio = profile?.bio;
   const avatarUrl = profile?.avatarUrl;
-  const initials = displayName
-    .split(' ')
-    .map(n => n[0])
-    .slice(0, 2)
-    .join('');
 
   const renderStars = (ratingValue: number) => {
     const stars: React.ReactNode[] = [];
@@ -56,14 +53,16 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
       <div className="flex items-start gap-4 mb-6 z-10">
         <div className="relative shrink-0">
           {avatarUrl ? (
-            <img
-              alt={displayName}
-              src={avatarUrl}
-              className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-sm"
-            />
+            <div className="w-20 h-20">
+              {isBuiltInAvatar(avatarUrl) ? (
+                <UserAvatar avatarUrl={avatarUrl} username={displayName} size="xl" className="!w-20 !h-20" />
+              ) : (
+                <UserAvatar avatarUrl={avatarUrl} username={displayName} size="xl" className="!w-20 !h-20" />
+              )}
+            </div>
           ) : (
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-fixed to-primary-container flex items-center justify-center border-4 border-white shadow-sm">
-              <span className="text-xl font-bold text-on-primary-fixed">{initials}</span>
+              <span className="material-symbols-outlined text-3xl text-on-primary-fixed">person</span>
             </div>
           )}
           {isVerified && (

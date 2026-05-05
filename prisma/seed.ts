@@ -1,138 +1,259 @@
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
 import { PrismaClient } from '@prisma/client';
 import { hash } from 'bcryptjs';
 
-// Load .env manually
-const envPath = resolve(process.cwd(), '.env');
-const envContent = readFileSync(envPath, 'utf-8');
-for (const line of envContent.split('\n')) {
-  const trimmed = line.trim();
-  if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
-    const eqIndex = trimmed.indexOf('=');
-    const key = trimmed.slice(0, eqIndex).replace(/^["']|["']$/g, '');
-    let value = trimmed.slice(eqIndex + 1).trim();
-    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-      value = value.slice(1, -1);
-    }
-    if (!process.env[key]) {
-      process.env[key] = value;
-    }
-  }
-}
-
 const db = new PrismaClient();
 
+const DOCTORS = [
+  {
+    email: 'dr.sara@wesal.com',
+    password: 'Doctor123!',
+    role: 'doctor',
+    realName: 'د. سارة أحمد',
+    username: 'dr-sara',
+    specialty: 'طب نفسي',
+    bio: 'أخصائية في الطب النفسي وعلاج الاكتئاب والقلق. خبرة أكثر من 10 سنوات في العلاج المعرفي السلوكي',
+    location: 'القاهرة، مصر',
+    avatarUrl: 'avatar:heart',
+    rating: 4.8,
+    isVerified: true,
+  },
+  {
+    email: 'dr.omar@wesal.com',
+    password: 'Doctor123!',
+    role: 'doctor',
+    realName: 'د. عمر خالد',
+    username: 'dr-omar',
+    specialty: 'علاج سلوكي',
+    bio: 'معالج سلوكي متخصص في اضطرابات القلق والوسواس. أساعدك تتغلب على مخاوفك بطريقة علمية',
+    location: 'الرياض، السعودية',
+    avatarUrl: 'avatar:brain',
+    rating: 4.6,
+    isVerified: true,
+  },
+  {
+    email: 'dr.nora@wesal.com',
+    password: 'Doctor123!',
+    role: 'doctor',
+    realName: 'د. نورة محمد',
+    username: 'dr-nora',
+    specialty: 'إرشاد أسري',
+    bio: 'أخصائية إرشاد أسري وزواجي. أساعد الأسر في حل الخلافات وبناء علاقات صحية',
+    location: 'دبي، الإمارات',
+    avatarUrl: 'avatar:flower',
+    rating: 4.9,
+    isVerified: true,
+  },
+  {
+    email: 'dr.karim@wesal.com',
+    password: 'Doctor123!',
+    role: 'doctor',
+    realName: 'د. كريم حسن',
+    username: 'dr-karim',
+    specialty: 'طب نفسي للأطفال',
+    bio: 'أخصائي في الصحة النفسية للأطفال والمراهقين. متخصص في اضطراب فرط الحركة وتوهم Autism',
+    location: 'عمّان، الأردن',
+    avatarUrl: 'avatar:sun',
+    rating: 4.7,
+    isVerified: true,
+  },
+];
+
+// Test user account
+const TEST_USER = {
+  email: 'test@wesal.com',
+  password: 'Test123!',
+  role: 'user',
+  realName: 'أحمد محمد',
+  username: 'ahmed-test',
+  bio: 'عضو في مجتمع وصال',
+  avatarUrl: 'avatar:star',
+};
+
 async function main() {
-  console.log('🌱 Seeding test users...\n');
+  console.log('🌱 Seeding Wesal database...');
 
-  // ── 1. Admin Account ──
-  const adminPasswordHash = await hash('Admin123!', 12);
-  const admin = await db.user.upsert({
-    where: { email: 'admin@wesal.com' },
-    update: {},
-    create: {
-      email: 'admin@wesal.com',
-      passwordHash: adminPasswordHash,
-      role: 'admin',
-      emailVerified: true,
-      profile: {
-        create: {
-          realName: 'مدير وصال',
-          reputationScore: 500,
-          reputationTier: 'notable',
+  // Create doctor accounts
+  const createdDoctors: { id: string; realName: string; email: string; password: string; chatUrl: string }[] = [];
+
+  for (const doc of DOCTORS) {
+    const existing = await db.user.findUnique({ where: { email: doc.email } });
+    if (existing) {
+      console.log(`  ⏭️  Doctor ${doc.realName} already exists (${doc.email})`);
+      const profile = await db.profile.findUnique({ where: { userId: existing.id } });
+      if (profile) {
+        createdDoctors.push({
+          id: existing.id,
+          realName: doc.realName,
+          email: doc.email,
+          password: doc.password,
+          chatUrl: `https://wesal-omega.vercel.app/chat/`,
+        });
+      }
+      continue;
+    }
+
+    const passwordHash = await hash(doc.password, 12);
+    const user = await db.user.create({
+      data: {
+        email: doc.email,
+        passwordHash,
+        role: doc.role,
+        emailVerified: true,
+        profile: {
+          create: {
+            username: doc.username,
+            realName: doc.realName,
+            specialty: doc.specialty,
+            bio: doc.bio,
+            location: doc.location,
+            avatarUrl: doc.avatarUrl,
+            rating: doc.rating,
+            isVerified: doc.isVerified,
+          },
         },
       },
-    },
-    include: { profile: true },
-  });
-  console.log(`✅ Admin: ${admin.email} (role: ${admin.role})`);
+    });
 
-  // ── 2. Doctor Account ──
-  const doctorPasswordHash = await hash('Doctor123!', 12);
-  const doctor = await db.user.upsert({
-    where: { email: 'doctor@wesal.com' },
-    update: {},
-    create: {
-      email: 'doctor@wesal.com',
-      passwordHash: doctorPasswordHash,
-      role: 'doctor',
-      emailVerified: true,
-      profile: {
-        create: {
-          realName: 'د. أحمد محمود',
-          username: null,
-          specialty: 'طب نفسي',
-          isVerified: true,
-          rating: 4.8,
-          reputationScore: 320,
-          reputationTier: 'eligible',
+    createdDoctors.push({
+      id: user.id,
+      realName: doc.realName,
+      email: doc.email,
+      password: doc.password,
+      chatUrl: `https://wesal-omega.vercel.app/chat/`,
+    });
+    console.log(`  ✅ Created doctor: ${doc.realName} (${doc.email})`);
+  }
+
+  // Create test user
+  const existingUser = await db.user.findUnique({ where: { email: TEST_USER.email } });
+  let testUserId: string;
+
+  if (existingUser) {
+    console.log(`  ⏭️  Test user already exists (${TEST_USER.email})`);
+    testUserId = existingUser.id;
+  } else {
+    const passwordHash = await hash(TEST_USER.password, 12);
+    const user = await db.user.create({
+      data: {
+        email: TEST_USER.email,
+        passwordHash,
+        role: TEST_USER.role,
+        emailVerified: true,
+        profile: {
+          create: {
+            username: TEST_USER.username,
+            realName: TEST_USER.realName,
+            bio: TEST_USER.bio,
+            avatarUrl: TEST_USER.avatarUrl,
+          },
         },
       },
-    },
-    include: { profile: true },
-  });
-  console.log(`✅ Doctor: ${doctor.email} (role: ${doctor.role}, specialty: ${doctor.profile?.specialty})`);
+    });
+    testUserId = user.id;
+    console.log(`  ✅ Created test user: ${TEST_USER.realName} (${TEST_USER.email})`);
+  }
 
-  // ── 3. Regular User Account ──
-  const userPasswordHash = await hash('User123!', 12);
-  const user = await db.user.upsert({
-    where: { email: 'user@wesal.com' },
-    update: {},
-    create: {
-      email: 'user@wesal.com',
-      passwordHash: userPasswordHash,
-      role: 'user',
-      emailVerified: true,
-      profile: {
-        create: {
-          realName: 'مستخدم تجريبي',
-          username: 'test_user',
-          reputationScore: 120,
-          reputationTier: 'active',
+  // Create a test appointment + chat room between test user and first doctor
+  if (createdDoctors.length > 0) {
+    const doctorId = createdDoctors[0].id;
+
+    // Check if appointment already exists
+    const existingAppointment = await db.appointment.findFirst({
+      where: { patientId: testUserId, doctorId },
+    });
+
+    if (!existingAppointment) {
+      const appointment = await db.appointment.create({
+        data: {
+          patientId: testUserId,
+          doctorId,
+          appointmentDate: new Date(Date.now() + 60 * 60 * 1000), // 1 hour from now
+          reason: 'أعاني من ضغوط شغل وحاجة أتكلم مع متخصص',
+          status: 'confirmed',
         },
-      },
-    },
-    include: { profile: true },
-  });
-  console.log(`✅ User: ${user.email} (role: ${user.role}, username: ${user.profile?.username})`);
+      });
 
-  // ── 4. Trusted User Account ──
-  const trustedPasswordHash = await hash('Trusted123!', 12);
-  const trusted = await db.user.upsert({
-    where: { email: 'trusted@wesal.com' },
-    update: {},
-    create: {
-      email: 'trusted@wesal.com',
-      passwordHash: trustedPasswordHash,
-      role: 'trusted',
-      emailVerified: true,
-      profile: {
-        create: {
-          realName: 'عضو موثوق',
-          username: 'trusted_member',
-          reputationScore: 280,
-          reputationTier: 'notable',
+      const chatRoom = await db.chatRoom.create({
+        data: {
+          appointmentId: appointment.id,
+          patientId: testUserId,
+          doctorId,
+          status: 'open',
         },
-      },
-    },
-    include: { profile: true },
-  });
-  console.log(`✅ Trusted: ${trusted.email} (role: ${trusted.role}, username: ${trusted.profile?.username})`);
+      });
 
-  console.log('\n🎉 Seed completed! Test accounts created.');
-  console.log('\nCredentials:');
-  console.log('  Admin:   admin@wesal.com / Admin123!');
-  console.log('  Doctor:  doctor@wesal.com / Doctor123!');
-  console.log('  User:    user@wesal.com / User123!');
-  console.log('  Trusted: trusted@wesal.com / Trusted123!');
+      await db.appointment.update({
+        where: { id: appointment.id },
+        data: { chatRoomId: chatRoom.id },
+      });
+
+      // Add some test messages
+      await db.chatMessage.createMany({
+        data: [
+          {
+            roomId: chatRoom.id,
+            senderId: testUserId,
+            messageType: 'text',
+            content: 'مرحباً دكتورة سارة، أنا عاوز أتكلم عن مشكلة بتواجهني في الشغل',
+          },
+          {
+            roomId: chatRoom.id,
+            senderId: doctorId,
+            messageType: 'text',
+            content: 'أهلاً بيك أحمد، أنا هنا عشان أساعدك. خليك مرتاح وقولي إيه اللي بيحصل معاك',
+          },
+          {
+            roomId: chatRoom.id,
+            senderId: testUserId,
+            messageType: 'text',
+            content: 'من فترة حس بضغط كبير وقلق مستمر و مش قادر أنام كويس',
+          },
+          {
+            roomId: chatRoom.id,
+            senderId: doctorId,
+            messageType: 'text',
+            content: 'فهمتك. الأعراض دي ممكن تكون مؤشر على قلق عام. خلينا ننفصل أكتر - من أول وين بدأت الإحساس بالضغط ده؟',
+          },
+        ],
+      });
+
+      // Update chat URL
+      createdDoctors[0].chatUrl = `https://wesal-omega.vercel.app/chat/${chatRoom.id}`;
+
+      console.log(`  ✅ Created test appointment + chat room with ${createdDoctors[0].realName}`);
+      console.log(`  💬 Chat URL: https://wesal-omega.vercel.app/chat/${chatRoom.id}`);
+    } else {
+      // Find existing chat room
+      const existingRoom = await db.chatRoom.findFirst({
+        where: { patientId: testUserId, doctorId },
+      });
+      if (existingRoom) {
+        createdDoctors[0].chatUrl = `https://wesal-omega.vercel.app/chat/${existingRoom.id}`;
+        console.log(`  ⏭️  Appointment/chat already exists. Chat URL: https://wesal-omega.vercel.app/chat/${existingRoom.id}`);
+      }
+    }
+  }
+
+  console.log('\n📋 Seed complete! Here are the login credentials:');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('');
+  console.log('👤 TEST USER:');
+  console.log(`   Email: ${TEST_USER.email}`);
+  console.log(`   Password: ${TEST_USER.password}`);
+  console.log('');
+  console.log('👨‍⚕️  DOCTORS:');
+  for (const doc of createdDoctors) {
+    console.log(`   ${doc.realName}: ${doc.email} / ${doc.password}`);
+  }
+  console.log('');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('💬 To test the chat, login as test user and go to the chat URL above');
+  console.log('   Or login as a doctor to see appointments');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Seed error:', e);
+    console.error('Seed error:', e);
     process.exit(1);
   })
-  .finally(async () => {
-    await db.$disconnect();
-  });
+  .finally(() => db.$disconnect());

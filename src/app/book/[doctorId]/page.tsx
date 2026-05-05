@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { UserAvatar } from '@/components/avatars/UserAvatar';
 
 export default function BookDoctorPage({ params }: { params: Promise<{ doctorId: string }> }) {
   const { user } = useAuth();
@@ -74,7 +75,6 @@ export default function BookDoctorPage({ params }: { params: Promise<{ doctorId:
   };
 
   const displayName = doctor?.realName || 'طبيب';
-  const initials = displayName.split(' ').map(n => n[0]).slice(0, 2).join('');
 
   return (
     <MainLayout>
@@ -89,17 +89,12 @@ export default function BookDoctorPage({ params }: { params: Promise<{ doctorId:
           <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-5 mb-6 shadow-[0_8px_32px_0_rgba(0,67,70,0.05)]">
             <div className="flex items-center gap-4">
               <div className="relative shrink-0">
-                {doctor.avatarUrl ? (
-                  <img
-                    alt={displayName}
-                    src={doctor.avatarUrl}
-                    className="w-14 h-14 rounded-full object-cover border-2 border-primary-fixed shadow-sm"
-                  />
-                ) : (
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary-fixed to-primary-container flex items-center justify-center border-2 border-primary-fixed shadow-sm">
-                    <span className="text-lg font-bold text-on-primary-fixed">{initials}</span>
-                  </div>
-                )}
+                <UserAvatar
+                  avatarUrl={doctor.avatarUrl || null}
+                  username={displayName}
+                  size="lg"
+                  className="!w-14 !h-14"
+                />
                 {doctor.isVerified && (
                   <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
                 )}
