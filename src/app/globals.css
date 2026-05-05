@@ -22,6 +22,8 @@
   --color-primary-fixed: #d6f3f4;
   --color-primary-fixed-dim: #73b3ce;
   --color-on-primary-fixed: #172a39;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #004346;
 
   /* Secondary */
   --color-secondary: #508992;
@@ -46,7 +48,7 @@
   --color-surface-bright: #ffffff;
   --color-surface-container-lowest: #ffffff;
   --color-surface-container-low: #f3f0ea;
-  --color-surface-container: #edea e4;
+  --color-surface-container: #edeae4;
   --color-surface-container-high: #e7e4de;
   --color-surface-container-highest: #e1ded8;
   --color-surface-variant: #d6f3f4;

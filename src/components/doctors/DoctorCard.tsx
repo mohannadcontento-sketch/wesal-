@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { Profile, User } from '@/types';
 import { UserAvatar } from '@/components/avatars/UserAvatar';
+import { toast } from 'sonner';
 
 interface DoctorCardProps {
   doctor: User & { profile?: Profile };
@@ -102,9 +103,10 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
                   window.location.href = '/login';
                   return;
                 }
+                toast.error(data.error || 'حصل خطأ في فتح المحادثة');
               }
             } catch {
-              // ignore
+              toast.error('حصل خطأ، تأكد من اتصالك بالإنترنت');
             }
           }}
           className="flex-1 py-2.5 rounded-xl bg-wesal-ice text-wesal-dark font-bold text-sm border border-wesal-sky/30 hover:bg-wesal-sky/20 transition-all text-center flex items-center justify-center gap-1.5 active:scale-95"

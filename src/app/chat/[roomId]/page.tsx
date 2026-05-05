@@ -26,6 +26,8 @@ interface Message {
 interface RoomInfo {
   id: string;
   status: string;
+  patientId: string;
+  doctorId: string;
   patientName: string;
   patientAvatar?: string | null;
   doctorName: string;
@@ -391,7 +393,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
         </div>
         <div className="flex items-center gap-1">
           <Link
-            href={`/book/${roomInfo ? (user.role === 'doctor' ? roomInfo.patientName : roomInfo.doctorName) : ''}`}
+            href={roomInfo ? `/book/${roomInfo.doctorId}` : '#'}
             className="p-2 rounded-full hover:bg-wesal-ice transition-colors text-wesal-dark"
             aria-label="حجز موعد"
           >

@@ -5,7 +5,7 @@ import React from 'react';
 export interface AvatarOption {
   id: string;
   name: string;
-  category: 'nature' | 'wellness' | 'abstract' | 'animals' | 'people' | 'emotions' | 'space' | 'music';
+  category: 'nature' | 'wellness' | 'abstract' | 'animals' | 'people' | 'emotions' | 'space' | 'music' | 'food' | 'sports' | 'art';
 }
 
 /* ── Wesal Brand Colors ── */
@@ -585,6 +585,252 @@ function PianoSvg() {
   );
 }
 
+/* ═══════════════════════════════════════════
+   CATEGORY 9: FOOD (الطعام) - NEW
+   ═══════════════════════════════════════════ */
+
+function CoffeeSvg() {
+  return (
+    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="28" cy="28" r="28" fill="#EFEBE9" />
+      {/* Cup body */}
+      <path d="M14 22H36V40C36 43 33 46 30 46H20C17 46 14 43 14 40V22Z" fill={DARK} />
+      <path d="M16 22H34V38C34 41 31 44 28 44H22C19 44 16 41 16 38V22Z" fill={MEDIUM} opacity="0.3" />
+      {/* Cup rim */}
+      <rect x="12" y="19" width="26" height="5" rx="2.5" fill={NAVY} />
+      {/* Handle */}
+      <path d="M36 26C40 26 42 30 42 34C42 38 40 40 36 40" stroke={DARK} strokeWidth="3" strokeLinecap="round" fill="none" />
+      {/* Steam */}
+      <path d="M22 16Q24 12 22 8" stroke={SKY} strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.5" />
+      <path d="M28 14Q30 10 28 6" stroke={SKY} strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.4" />
+      <path d="M34 16Q36 12 34 8" stroke={SKY} strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.3" />
+    </svg>
+  );
+}
+
+function CupcakeSvg() {
+  return (
+    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="28" cy="28" r="28" fill="#FCE4EC" />
+      {/* Cup wrapper */}
+      <path d="M16 28L18 46H38L40 28Z" fill={DARK} />
+      <path d="M18 28L19.5 44H36.5L38 28Z" fill={MEDIUM} opacity="0.3" />
+      {/* Wrapper lines */}
+      <line x1="22" y1="30" x2="23" y2="44" stroke={ICE} strokeWidth="0.8" opacity="0.3" />
+      <line x1="28" y1="30" x2="28" y2="44" stroke={ICE} strokeWidth="0.8" opacity="0.3" />
+      <line x1="34" y1="30" x2="33" y2="44" stroke={ICE} strokeWidth="0.8" opacity="0.3" />
+      {/* Frosting */}
+      <path d="M14 28C14 28 18 16 28 16C38 16 42 28 42 28Z" fill={SKY} />
+      <circle cx="28" cy="16" r="3" fill="#FF8A80" />
+      <circle cx="20" cy="20" r="2" fill={ICE} opacity="0.5" />
+      <circle cx="36" cy="20" r="2" fill={ICE} opacity="0.5" />
+    </svg>
+  );
+}
+
+function FruitSvg() {
+  return (
+    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="28" cy="28" r="28" fill="#E8F5E9" />
+      {/* Apple body */}
+      <path d="M28 16C22 16 16 22 16 30C16 40 22 46 28 46C34 46 40 40 40 30C40 22 34 16 28 16Z" fill="#E57373" />
+      <path d="M28 20C26 18 24 16 24 14" stroke={DARK} strokeWidth="1.5" strokeLinecap="round" fill="none" />
+      {/* Leaf */}
+      <path d="M26 16Q30 12 34 14" fill="#66BB6A" />
+      <ellipse cx="24" cy="24" rx="4" ry="6" fill={WHITE} opacity="0.15" />
+    </svg>
+  );
+}
+
+function TeaSvg() {
+  return (
+    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="28" cy="28" r="28" fill="#FFF8E1" />
+      {/* Teapot body */}
+      <ellipse cx="26" cy="32" rx="14" ry="12" fill={DARK} />
+      <ellipse cx="26" cy="30" rx="10" ry="8" fill={MEDIUM} opacity="0.2" />
+      {/* Spout */}
+      <path d="M40 28C44 28 46 32 44 36" stroke={DARK} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      {/* Handle */}
+      <path d="M12 26C8 26 6 32 8 36" stroke={DARK} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      {/* Lid */}
+      <ellipse cx="26" cy="20" rx="10" ry="3" fill={NAVY} />
+      <circle cx="26" cy="17" r="2.5" fill={NAVY} />
+      {/* Steam */}
+      <path d="M20 14Q22 10 20 6" stroke={SKY} strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.4" />
+      <path d="M28 12Q30 8 28 4" stroke={SKY} strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.3" />
+    </svg>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   CATEGORY 10: SPORTS (الرياضة) - NEW
+   ═══════════════════════════════════════════ */
+
+function YogaSvg() {
+  return (
+    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="28" cy="28" r="28" fill="#E8EAF6" />
+      {/* Person in lotus pose */}
+      <circle cx="28" cy="14" r="6" fill={DARK} />
+      {/* Body */}
+      <path d="M28 20V32" stroke={DARK} strokeWidth="3.5" strokeLinecap="round" />
+      {/* Arms stretched out */}
+      <path d="M28 24L16 18" stroke={DARK} strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M28 24L40 18" stroke={DARK} strokeWidth="2.5" strokeLinecap="round" />
+      {/* Crossed legs */}
+      <path d="M22 32Q28 40 34 32" stroke={DARK} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      <path d="M18 36Q28 44 38 36" stroke={DARK} strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.5" />
+      {/* Zen circle */}
+      <circle cx="28" cy="28" r="22" stroke={SKY} strokeWidth="1" fill="none" opacity="0.3" />
+    </svg>
+  );
+}
+
+function RunningSvg() {
+  return (
+    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="28" cy="28" r="28" fill="#E3F2FD" />
+      {/* Head */}
+      <circle cx="34" cy="14" r="5" fill={DARK} />
+      {/* Body - running pose */}
+      <path d="M34 19L30 30" stroke={DARK} strokeWidth="3" strokeLinecap="round" />
+      {/* Arms */}
+      <path d="M32 22L24 20" stroke={DARK} strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M32 24L38 30" stroke={DARK} strokeWidth="2.5" strokeLinecap="round" />
+      {/* Legs */}
+      <path d="M30 30L20 42" stroke={DARK} strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M30 30L38 42" stroke={DARK} strokeWidth="2.5" strokeLinecap="round" />
+      {/* Motion lines */}
+      <line x1="10" y1="20" x2="16" y2="20" stroke={SKY} strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
+      <line x1="8" y1="28" x2="14" y2="28" stroke={SKY} strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
+      <line x1="12" y1="36" x2="18" y2="36" stroke={SKY} strokeWidth="1.5" strokeLinecap="round" opacity="0.3" />
+    </svg>
+  );
+}
+
+function CyclingSvg() {
+  return (
+    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="28" cy="28" r="28" fill="#E0F7FA" />
+      {/* Wheels */}
+      <circle cx="16" cy="38" r="8" stroke={DARK} strokeWidth="2" fill="none" />
+      <circle cx="40" cy="38" r="8" stroke={DARK} strokeWidth="2" fill="none" />
+      <circle cx="16" cy="38" r="1.5" fill={DARK} />
+      <circle cx="40" cy="38" r="1.5" fill={DARK} />
+      {/* Frame */}
+      <path d="M16 38L28 20L40 38" stroke={DARK} strokeWidth="2" strokeLinecap="round" fill="none" />
+      <path d="M28 20L36 20" stroke={DARK} strokeWidth="2" strokeLinecap="round" />
+      {/* Handlebars */}
+      <path d="M36 20L38 16" stroke={DARK} strokeWidth="2" strokeLinecap="round" />
+      {/* Seat */}
+      <line x1="26" y1="18" x2="30" y2="18" stroke={DARK} strokeWidth="3" strokeLinecap="round" />
+      {/* Rider head */}
+      <circle cx="38" cy="13" r="4" fill={MEDIUM} />
+    </svg>
+  );
+}
+
+function SwimmingSvg() {
+  return (
+    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="28" cy="28" r="28" fill={ICE} />
+      {/* Water waves */}
+      <path d="M4 34C12 30 18 38 26 34C34 30 40 38 48 34" stroke={SKY} strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.5" />
+      <path d="M4 40C12 36 18 44 26 40C34 36 40 44 48 40" stroke={MEDIUM} strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.4" />
+      <path d="M4 46C12 42 18 50 26 46C34 42 40 50 48 46" stroke={SKY} strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.3" />
+      {/* Swimmer */}
+      <circle cx="32" cy="20" r="4" fill={DARK} />
+      <path d="M28 24L16 28" stroke={DARK} strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M28 24L38 28" stroke={DARK} strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M36 28L44 24" stroke={DARK} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   CATEGORY 11: ART (الفنون) - NEW
+   ═══════════════════════════════════════════ */
+
+function PaletteSvg() {
+  return (
+    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="28" cy="28" r="28" fill="#F3E5F5" />
+      {/* Palette shape */}
+      <path d="M28 10C18 10 10 18 10 28C10 38 18 46 28 46C30 46 32 44 32 42C32 40 30 39 30 37C30 35 32 33 34 33H38C44 33 48 29 48 23C48 16 39 10 28 10Z" fill={CREAM} stroke={DARK} strokeWidth="1.5" />
+      {/* Color dots */}
+      <circle cx="20" cy="22" r="3.5" fill="#E57373" />
+      <circle cx="28" cy="18" r="3.5" fill="#FFD54F" />
+      <circle cx="36" cy="22" r="3.5" fill="#4FC3F7" />
+      <circle cx="16" cy="32" r="3.5" fill="#66BB6A" />
+      <circle cx="24" cy="38" r="3" fill={SKY} />
+    </svg>
+  );
+}
+
+function CameraSvg() {
+  return (
+    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="28" cy="28" r="28" fill="#ECEFF1" />
+      {/* Camera body */}
+      <rect x="10" y="18" width="36" height="24" rx="4" fill={DARK} />
+      <rect x="12" y="20" width="32" height="20" rx="3" fill={MEDIUM} opacity="0.2" />
+      {/* Flash/viewfinder */}
+      <rect x="22" y="12" width="12" height="8" rx="2" fill={NAVY} />
+      {/* Lens */}
+      <circle cx="28" cy="32" r="8" fill={ICE} stroke={NAVY} strokeWidth="2" />
+      <circle cx="28" cy="32" r="5" fill={SKY} />
+      <circle cx="28" cy="32" r="2.5" fill={NAVY} opacity="0.5" />
+      {/* Flash dot */}
+      <circle cx="38" cy="22" r="1.5" fill={WHITE} opacity="0.6" />
+    </svg>
+  );
+}
+
+function BrushSvg() {
+  return (
+    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="28" cy="28" r="28" fill="#FFF3E0" />
+      {/* Brush handle */}
+      <rect x="26" y="8" width="4" height="24" rx="2" fill={NAVY} />
+      {/* Ferrule */}
+      <rect x="24" y="30" width="8" height="4" rx="1" fill={MEDIUM} />
+      {/* Bristles */}
+      <path d="M22 34Q28 48 34 34" fill={DARK} />
+      <path d="M24 34Q28 46 32 34" fill={MEDIUM} opacity="0.4" />
+      {/* Paint splashes */}
+      <circle cx="14" cy="44" r="3" fill={SKY} opacity="0.5" />
+      <circle cx="40" cy="42" r="2.5" fill="#E57373" opacity="0.4" />
+      <circle cx="42" cy="48" r="1.5" fill="#FFD54F" opacity="0.5" />
+      <circle cx="10" cy="48" r="2" fill="#66BB6A" opacity="0.4" />
+    </svg>
+  );
+}
+
+function BookSvg() {
+  return (
+    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="28" cy="28" r="28" fill="#E8F5E9" />
+      {/* Open book */}
+      <path d="M8 16L28 12L48 16V44L28 40L8 44V16Z" fill={CREAM} stroke={DARK} strokeWidth="1.5" />
+      {/* Spine */}
+      <line x1="28" y1="12" x2="28" y2="40" stroke={DARK} strokeWidth="1.5" />
+      {/* Left page lines */}
+      <line x1="12" y1="22" x2="24" y2="20" stroke={MEDIUM} strokeWidth="0.8" opacity="0.5" />
+      <line x1="12" y1="26" x2="24" y2="24" stroke={MEDIUM} strokeWidth="0.8" opacity="0.5" />
+      <line x1="12" y1="30" x2="24" y2="28" stroke={MEDIUM} strokeWidth="0.8" opacity="0.5" />
+      <line x1="12" y1="34" x2="24" y2="32" stroke={MEDIUM} strokeWidth="0.8" opacity="0.5" />
+      {/* Right page lines */}
+      <line x1="32" y1="20" x2="44" y2="22" stroke={MEDIUM} strokeWidth="0.8" opacity="0.5" />
+      <line x1="32" y1="24" x2="44" y2="26" stroke={MEDIUM} strokeWidth="0.8" opacity="0.5" />
+      <line x1="32" y1="28" x2="44" y2="30" stroke={MEDIUM} strokeWidth="0.8" opacity="0.5" />
+      <line x1="32" y1="32" x2="44" y2="34" stroke={MEDIUM} strokeWidth="0.8" opacity="0.5" />
+      {/* Bookmark */}
+      <path d="M36 12L36 20L38 18L40 20L40 12" fill={SKY} />
+    </svg>
+  );
+}
+
 /* ── Map of avatar id to SVG component ── */
 const avatarSvgs: Record<string, () => React.ReactElement> = {
   // Nature
@@ -627,6 +873,21 @@ const avatarSvgs: Record<string, () => React.ReactElement> = {
   'avatar:headphones': HeadphonesSvg,
   'avatar:guitar': GuitarSvg,
   'avatar:piano': PianoSvg,
+  // Food (NEW)
+  'avatar:coffee': CoffeeSvg,
+  'avatar:cupcake': CupcakeSvg,
+  'avatar:fruit': FruitSvg,
+  'avatar:tea': TeaSvg,
+  // Sports (NEW)
+  'avatar:yoga': YogaSvg,
+  'avatar:running': RunningSvg,
+  'avatar:cycling': CyclingSvg,
+  'avatar:swimming': SwimmingSvg,
+  // Art (NEW)
+  'avatar:palette': PaletteSvg,
+  'avatar:camera': CameraSvg,
+  'avatar:brush': BrushSvg,
+  'avatar:book': BookSvg,
 };
 
 /* ── Avatar data list ── */
@@ -671,6 +932,21 @@ export const AVATARS: AvatarOption[] = [
   { id: 'avatar:headphones', name: 'سماعات', category: 'music' },
   { id: 'avatar:guitar', name: 'جيتار', category: 'music' },
   { id: 'avatar:piano', name: 'بيانو', category: 'music' },
+  // Food (الطعام) - NEW
+  { id: 'avatar:coffee', name: 'قهوة', category: 'food' },
+  { id: 'avatar:cupcake', name: 'كب كيك', category: 'food' },
+  { id: 'avatar:fruit', name: 'فاكهة', category: 'food' },
+  { id: 'avatar:tea', name: 'شاي', category: 'food' },
+  // Sports (الرياضة) - NEW
+  { id: 'avatar:yoga', name: 'يوجا', category: 'sports' },
+  { id: 'avatar:running', name: 'جري', category: 'sports' },
+  { id: 'avatar:cycling', name: 'دراجة', category: 'sports' },
+  { id: 'avatar:swimming', name: 'سباحة', category: 'sports' },
+  // Art (الفنون) - NEW
+  { id: 'avatar:palette', name: 'لوحة ألوان', category: 'art' },
+  { id: 'avatar:camera', name: 'كاميرا', category: 'art' },
+  { id: 'avatar:brush', name: 'فرشاة', category: 'art' },
+  { id: 'avatar:book', name: 'كتاب', category: 'art' },
 ];
 
 /* ── Category labels in Arabic ── */
@@ -683,6 +959,9 @@ export const CATEGORY_LABELS: Record<string, string> = {
   emotions: 'المشاعر',
   space: 'الفضاء',
   music: 'الموسيقى',
+  food: 'الطعام',
+  sports: 'الرياضة',
+  art: 'الفنون',
 };
 
 /* ── Get SVG component by avatar id ── */

@@ -51,6 +51,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
       room: {
         id: room.id,
         status: room.status,
+        patientId: room.patientId,
+        doctorId: room.doctorId,
         patientName: senderMap[room.patientId].name,
         patientAvatar: senderMap[room.patientId].avatarUrl,
         doctorName: senderMap[room.doctorId].name,

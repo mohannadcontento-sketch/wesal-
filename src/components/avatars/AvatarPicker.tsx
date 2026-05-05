@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { AvatarSet } from './AvatarSet';
+import { toast } from 'sonner';
 
 interface AvatarPickerProps {
   open: boolean;
@@ -43,9 +44,12 @@ export function AvatarPicker({
       if (res.ok) {
         onConfirm(selected);
         onOpenChange(false);
+      } else {
+        const data = await res.json();
+        toast.error(data.error || 'حصل خطأ في تغيير الصورة');
       }
     } catch {
-      // Silent fail – could add toast notification here
+      toast.error('حصل خطأ، تأكد من اتصالك بالإنترنت');
     }
   };
 
