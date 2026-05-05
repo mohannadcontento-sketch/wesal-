@@ -66,7 +66,7 @@ export function UserAvatar({
   }
 
   // External image URL
-  if (avatarUrl && (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://'))) {
+  if (avatarUrl && (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://') || avatarUrl.startsWith('/'))) {
     return (
       <div
         className={`
