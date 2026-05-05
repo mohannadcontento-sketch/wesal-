@@ -149,12 +149,15 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
       <div className="max-w-4xl mx-auto">
         {/* Hero Profile Header */}
         <section className="relative">
-          <div className="h-48 md:h-64 profile-gradient w-full" />
+          {/* Gradient background with smooth bottom fade */}
+          <div className="h-52 md:h-72 profile-gradient w-full relative">
+            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-wesal-cream to-transparent" />
+          </div>
           <div className="max-w-4xl mx-auto px-6 -mt-20 relative">
             <div className="flex flex-col md:flex-row items-end md:items-center gap-6">
               {/* Avatar */}
-              <div className="relative group">
-                <div className="w-[120px] h-[120px] rounded-full bg-gradient-to-br from-primary-fixed to-primary-container flex items-center justify-center border-4 border-white shadow-lg overflow-hidden">
+              <div className="relative group flex-shrink-0">
+                <div className="w-[128px] h-[128px] rounded-full bg-gradient-to-br from-wesal-ice to-wesal-sky flex items-center justify-center border-4 border-white shadow-xl overflow-hidden">
                   {profile.avatarUrl && isBuiltInAvatar(profile.avatarUrl) ? (
                     <div className="w-full h-full [&_svg]:w-full [&_svg]:h-full">
                       {renderAvatarSvg(profile.avatarUrl)}
@@ -163,49 +166,50 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                     <Image
                       src={profile.avatarUrl}
                       alt={profile.realName || username}
-                      width={120}
-                      height={120}
+                      width={128}
+                      height={128}
                       className="object-cover w-full h-full"
                     />
                   ) : profile.badge ? (
-                    <span className="text-4xl font-bold text-on-primary-fixed">{profile.badge}</span>
+                    <span className="text-4xl font-bold text-wesal-navy">{profile.badge}</span>
                   ) : (
-                    <span className="material-symbols-outlined text-5xl text-on-primary-fixed">person</span>
+                    <span className="material-symbols-outlined text-5xl text-wesal-navy">person</span>
                   )}
                 </div>
                 {/* Edit avatar button (only for own profile) */}
                 {isOwnProfile && (
                   <button
                     onClick={() => setAvatarPickerOpen(true)}
-                    className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer"
+                    className="absolute inset-0 rounded-full bg-wesal-navy/0 group-hover:bg-wesal-navy/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer"
                     aria-label="تعديل الصورة الشخصية"
                   >
                     <span className="material-symbols-outlined text-white text-2xl">photo_camera</span>
                   </button>
                 )}
-                <div className="absolute bottom-1 left-1 bg-primary text-on-primary text-[10px] px-2 py-0.5 rounded-full border-2 border-white font-medium">
+                {/* Tier badge */}
+                <div className="absolute -bottom-1 left-1 bg-wesal-dark text-white text-[10px] px-2.5 py-0.5 rounded-full border-2 border-wesal-cream font-semibold tracking-wide">
                   {tierLabel}
                 </div>
               </div>
 
               {/* Name & Badges */}
               <div className="flex-1 pb-2">
-                <h1 className="text-[32px] font-semibold text-white md:text-on-background md:mb-1 leading-tight">
+                <h1 className="text-[32px] font-bold text-wesal-navy mb-1 leading-tight drop-shadow-sm">
                   {isPublic ? profile.realName : 'مستخدم مجهول'}
                 </h1>
                 <div className="flex items-center gap-2 flex-wrap">
                   {!isPublic && (
-                    <span className="bg-surface-container-highest/80 backdrop-blur px-3 py-1 rounded-full text-xs text-secondary">
+                    <span className="bg-wesal-ice px-3 py-1 rounded-full text-xs font-medium text-wesal-dark">
                       مستخدم مجهول
                     </span>
                   )}
                   {profile.isVerified && (
-                    <span className="text-on-surface-variant text-sm flex items-center gap-1">
-                      <span className="material-symbols-outlined filled text-base text-primary-container">verified</span>
+                    <span className="text-wesal-dark text-sm flex items-center gap-1 font-medium">
+                      <span className="material-symbols-outlined filled text-base text-wesal-dark">verified</span>
                       موثق
                     </span>
                   )}
-                  <span className="text-on-surface-variant text-sm flex items-center gap-1">
+                  <span className="text-wesal-medium text-sm font-medium">
                     عضو منذ {joinYear}
                   </span>
                 </div>
@@ -216,7 +220,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 <div className="flex gap-3 pb-2">
                   <button
                     onClick={() => setAvatarPickerOpen(true)}
-                    className="bg-primary text-on-primary px-4 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-primary/20 active:scale-95 transition-transform flex items-center gap-2"
+                    className="bg-wesal-dark hover:bg-wesal-navy text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-wesal-dark/20 active:scale-95 transition-all duration-200 flex items-center gap-2 cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-lg">edit</span>
                     تعديل الصورة
@@ -228,64 +232,65 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
         </section>
 
         {/* Profile Body Grid */}
-        <div className="max-w-4xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="max-w-4xl mx-auto px-6 pt-10 pb-16 grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Sidebar Info (4 Columns) */}
           <div className="lg:col-span-4 space-y-6">
             {/* Stats Card */}
-            <div className="glass-card p-6 rounded-xl space-y-4">
+            <div className="glass-card p-6 rounded-2xl space-y-5">
               {profile.specialty && (
                 <>
-                  <div className="flex items-center gap-3 text-primary">
-                    <span className="material-symbols-outlined">psychology</span>
-                    <span className="text-xl font-semibold">التخصص</span>
+                  <div className="flex items-center gap-3 text-wesal-dark">
+                    <span className="material-symbols-outlined text-wesal-dark">psychology</span>
+                    <span className="text-lg font-bold text-wesal-navy">التخصص</span>
                   </div>
-                  <p className="text-base text-on-surface-variant">{profile.specialty}</p>
-                  <hr className="border-outline-variant/30" />
+                  <p className="text-base text-wesal-navy/80 pr-9">{profile.specialty}</p>
+                  <hr className="border-wesal-ice" />
                 </>
               )}
 
               {profile.location && (
                 <>
-                  <div className="flex items-center gap-3 text-primary">
-                    <span className="material-symbols-outlined">location_on</span>
-                    <span className="text-xl font-semibold">الموقع</span>
+                  <div className="flex items-center gap-3 text-wesal-dark">
+                    <span className="material-symbols-outlined text-wesal-dark">location_on</span>
+                    <span className="text-lg font-bold text-wesal-navy">الموقع</span>
                   </div>
-                  <p className="text-base text-on-surface-variant">{profile.location}</p>
-                  <hr className="border-outline-variant/30" />
+                  <p className="text-base text-wesal-navy/80 pr-9">{profile.location}</p>
+                  <hr className="border-wesal-ice" />
                 </>
               )}
 
               {profile.rating != null && profile.rating > 0 && (
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 text-primary">
-                    <span className="material-symbols-outlined filled">star</span>
-                    <span className="text-xl font-semibold">التقييم</span>
+                  <div className="flex items-center gap-3 text-wesal-dark">
+                    <span className="material-symbols-outlined filled text-amber-500">star</span>
+                    <span className="text-lg font-bold text-wesal-navy">التقييم</span>
                   </div>
-                  <span className="text-xl font-semibold text-secondary">{profile.rating.toFixed(1)}</span>
+                  <span className="text-xl font-bold text-wesal-dark">{profile.rating.toFixed(1)}</span>
                 </div>
               )}
             </div>
 
             {/* Reputation Card */}
-            <div className="bg-primary text-on-primary p-6 rounded-xl relative overflow-hidden">
-              <div className="absolute -right-4 -top-4 opacity-10 pointer-events-none">
-                <span className="material-symbols-outlined text-[120px]">shield</span>
+            <div className="bg-gradient-to-br from-wesal-navy to-wesal-dark text-white p-6 rounded-2xl relative overflow-hidden shadow-lg shadow-wesal-navy/15">
+              {/* Decorative shield watermark */}
+              <div className="absolute -left-6 -top-6 pointer-events-none">
+                <span className="material-symbols-outlined text-[120px] text-white/[0.07]">shield</span>
               </div>
               <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="material-symbols-outlined filled">shield</span>
-                  <h3 className="text-xl font-semibold">درع السمعة</h3>
+                <div className="flex items-center gap-2 mb-5">
+                  <span className="material-symbols-outlined filled text-wesal-sky">shield</span>
+                  <h3 className="text-xl font-bold">درع السمعة</h3>
                 </div>
-                <p className="text-[48px] font-bold leading-none mb-2">{profile.reputationScore}</p>
-                <p className="text-sm opacity-80 mb-4">نقطة تم جمعها من مساعدة الآخرين</p>
-                <div className="w-full bg-white/20 h-2 rounded-full mb-2">
+                <p className="text-[52px] font-black leading-none mb-2 tracking-tight">{profile.reputationScore}</p>
+                <p className="text-sm text-white/90 mb-5 font-medium">نقطة تم جمعها من مساعدة الآخرين</p>
+                <div className="w-full bg-white/20 h-2.5 rounded-full mb-3">
                   <div
-                    className="bg-inverse-primary h-full rounded-full transition-all duration-700"
+                    className="bg-wesal-ice h-full rounded-full transition-all duration-700"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
-                <div className="flex justify-between text-[10px] font-medium">
-                  <span>المستوى الحالي</span>
+                <div className="flex justify-between text-xs font-semibold text-white/80">
+                  <span>{tierLabel}</span>
                   <span>{nextTierLabel} ({maxScore})</span>
                 </div>
               </div>
@@ -296,9 +301,12 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
           <div className="lg:col-span-8 space-y-6">
             {/* Bio Section */}
             {profile.bio && (
-              <div className="glass-card p-8 rounded-xl">
-                <h3 className="text-2xl font-semibold text-primary mb-4">نبذة شخصية</h3>
-                <p className="text-lg text-on-surface leading-relaxed">
+              <div className="glass-card p-8 rounded-2xl">
+                <h3 className="text-2xl font-bold text-wesal-navy mb-4 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-wesal-dark">edit_note</span>
+                  نبذة شخصية
+                </h3>
+                <p className="text-lg text-wesal-dark/90 leading-relaxed whitespace-pre-line">
                   {profile.bio}
                 </p>
               </div>
@@ -306,14 +314,14 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
             {/* Interests */}
             {interests.length > 0 && (
-              <div className="glass-card p-6 rounded-xl">
-                <h3 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+              <div className="glass-card p-6 rounded-2xl">
+                <h3 className="text-lg font-bold text-wesal-navy mb-4 flex items-center gap-2">
                   <span className="material-symbols-outlined filled text-amber-500">star</span>
                   الاهتمامات
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {interests.map((interest, i) => (
-                    <span key={i} className="px-3 py-1 rounded-full bg-surface-container-low text-on-surface-variant text-xs">
+                    <span key={i} className="px-4 py-1.5 rounded-full bg-wesal-ice text-wesal-navy text-sm font-medium border border-wesal-sky/30">
                       {interest}
                     </span>
                   ))}
@@ -324,8 +332,11 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             {/* Activity Feed */}
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-2xl font-semibold text-primary">آخر المشاركات</h3>
-                <button className="text-secondary text-sm font-semibold hover:underline flex items-center gap-1">
+                <h3 className="text-2xl font-bold text-wesal-navy flex items-center gap-2">
+                  <span className="material-symbols-outlined text-wesal-dark">forum</span>
+                  آخر المشاركات
+                </h3>
+                <button className="text-wesal-medium hover:text-wesal-dark text-sm font-semibold transition-colors flex items-center gap-1 cursor-pointer">
                   عرض الكل
                   <span className="material-symbols-outlined text-lg">chevron_left</span>
                 </button>
@@ -333,40 +344,43 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
               {posts.length > 0 ? (
                 posts.map((post) => (
-                  <article key={post.id} className="bg-white border border-outline-variant/30 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                  <article key={post.id} className="bg-white border border-wesal-ice p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-wesal-sky/40 transition-all duration-200">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-secondary">
+                      <div className="w-11 h-11 rounded-xl bg-wesal-ice flex items-center justify-center text-wesal-dark flex-shrink-0">
                         <span className="material-symbols-outlined">{sectionIconMap[post.section] || 'article'}</span>
                       </div>
-                      <div>
-                        <h4 className="text-xl font-semibold text-on-surface leading-snug">{post.content.slice(0, 60)}{post.content.length > 60 ? '...' : ''}</h4>
-                        <p className="text-sm text-on-surface-variant">
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-lg font-bold text-wesal-navy leading-snug truncate">{post.content.slice(0, 60)}{post.content.length > 60 ? '...' : ''}</h4>
+                        <p className="text-sm text-wesal-medium font-medium mt-0.5">
                           {getRelativeTime(post.createdAt)}
                         </p>
                       </div>
                     </div>
-                    <p className="text-base text-on-surface mb-4 line-clamp-3 leading-relaxed">
+                    <p className="text-base text-wesal-dark/90 mb-4 line-clamp-3 leading-relaxed">
                       {post.content}
                     </p>
-                    <div className="flex items-center gap-6 pt-4 border-t border-outline-variant/20">
-                      <span className="flex items-center gap-1 text-on-surface-variant text-sm">
+                    <div className="flex items-center gap-5 pt-4 border-t border-wesal-ice">
+                      <span className="flex items-center gap-1.5 text-wesal-medium text-sm font-medium hover:text-wesal-dark transition-colors">
                         <span className="material-symbols-outlined text-xl">favorite</span>
                         {post.reactionCount}
                       </span>
-                      <span className="flex items-center gap-1 text-on-surface-variant text-sm">
+                      <span className="flex items-center gap-1.5 text-wesal-medium text-sm font-medium hover:text-wesal-dark transition-colors">
                         <span className="material-symbols-outlined text-xl">comment</span>
                         {post.commentCount}
                       </span>
-                      <span className="flex items-center gap-1 text-on-surface-variant text-sm mr-auto">
+                      <span className="flex items-center gap-1.5 text-wesal-medium text-sm font-medium hover:text-wesal-dark transition-colors mr-auto cursor-pointer">
                         <span className="material-symbols-outlined text-xl">share</span>
                       </span>
                     </div>
                   </article>
                 ))
               ) : (
-                <div className="bg-white border border-outline-variant/30 p-8 rounded-xl text-center">
-                  <span className="material-symbols-outlined text-5xl text-outline-variant mx-auto mb-2 block">forum</span>
-                  <p className="text-sm text-on-surface-variant">لا توجد مشاركات بعد</p>
+                <div className="bg-white border border-wesal-ice p-12 rounded-2xl text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-wesal-ice flex items-center justify-center mx-auto mb-4">
+                    <span className="material-symbols-outlined text-3xl text-wesal-medium">forum</span>
+                  </div>
+                  <p className="text-base font-semibold text-wesal-navy">لا توجد مشاركات بعد</p>
+                  <p className="text-sm text-wesal-medium mt-1">سيظهر هنا آخر نشاطات المستخدم</p>
                 </div>
               )}
             </div>

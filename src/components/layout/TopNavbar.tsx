@@ -16,9 +16,10 @@ export function TopNavbar() {
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   const navLinks = [
-    { href: '/', label: 'الرئيسية', icon: 'home' },
-    { href: '/doctors', label: 'الأطباء', icon: 'medical_services' },
-    { href: '/bookmarks', label: 'المحفوظات', icon: 'bookmark' },
+    { href: '/', label: 'الرئيسية' },
+    { href: '/community', label: 'المجتمع' },
+    { href: '/doctors', label: 'الأطباء' },
+    { href: '/bookmarks', label: 'المحفوظات' },
   ];
 
   const handleLogout = async () => {
@@ -38,7 +39,7 @@ export function TopNavbar() {
     <header className="fixed top-0 right-0 left-0 z-50 h-14 bg-wesal-cream/90 backdrop-blur-xl border-b border-wesal-ice/70 shadow-[0_1px_12px_rgba(0,67,70,0.04)]">
       <nav className="flex justify-between items-center w-full h-full max-w-screen-2xl mx-auto px-4 sm:px-6">
         {/* ── Right side: Logo + Nav links ── */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-10">
           <Link href="/" className="flex items-center group">
             <Image
               src="/logo.png"
@@ -49,20 +50,19 @@ export function TopNavbar() {
               priority
             />
           </Link>
-          <div className="hidden md:flex gap-1 text-sm font-medium">
+          <div className="hidden md:flex gap-2 text-sm font-medium">
             {navLinks.map((link) => {
               const isActive = pathname === link.href || (link.href === '/' && pathname === '/');
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3 py-2 rounded-lg transition-all duration-200 flex items-center gap-1.5 ${
+                  className={`px-4 py-2 rounded-lg transition-all duration-200 ${
                     isActive
                       ? 'text-wesal-dark bg-wesal-ice font-semibold'
                       : 'text-wesal-medium hover:text-wesal-dark hover:bg-wesal-ice/50'
                   }`}
                 >
-                  <span className={`material-symbols-outlined text-[18px] ${isActive ? 'filled' : ''}`}>{link.icon}</span>
                   {link.label}
                 </Link>
               );

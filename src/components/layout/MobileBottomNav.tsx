@@ -6,20 +6,15 @@ import { useAuth } from '@/hooks/useAuth';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const { user, loading, logout } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading || !user) return null;
 
   const links = [
     { href: '/', label: 'الرئيسية', icon: 'home' },
+    { href: '/community', label: 'المجتمع', icon: 'forum' },
     { href: '/doctors', label: 'الأطباء', icon: 'medical_services' },
-    { href: '/notifications', label: 'التنبيهات', icon: 'notifications' },
-    {
-      href: `/profile/${user.username || 'me'}`,
-      label: 'حسابي',
-      icon: 'person',
-      matchPath: '/profile',
-    },
+    { href: '/bookmarks', label: 'المحفوظات', icon: 'bookmark' },
   ];
 
   const isActive = (link: (typeof links)[0]) => {
@@ -35,7 +30,7 @@ export function MobileBottomNav() {
           <Link
             key={link.href + link.label}
             href={link.href}
-            className={`flex flex-col items-center justify-center px-3 py-1.5 rounded-xl transition-all duration-200 ${
+            className={`flex flex-col items-center justify-center px-4 py-1.5 rounded-xl transition-all duration-200 ${
               active
                 ? 'text-wesal-dark bg-wesal-ice'
                 : 'text-wesal-medium hover:bg-wesal-ice/30'
@@ -48,15 +43,6 @@ export function MobileBottomNav() {
           </Link>
         );
       })}
-
-      {/* Logout Button */}
-      <button
-        onClick={logout}
-        className="flex flex-col items-center justify-center px-3 py-1.5 rounded-xl text-red-500 hover:bg-red-50 transition-all duration-200"
-      >
-        <span className="material-symbols-outlined text-[22px] mb-0.5">logout</span>
-        <span>خروج</span>
-      </button>
     </nav>
   );
 }
