@@ -81,6 +81,22 @@ async function main() {
       console.log(`  ⏭️  Doctor ${doc.realName} already exists (${doc.email})`);
       const profile = await db.profile.findUnique({ where: { userId: existing.id } });
       if (profile) {
+        // Force-update avatarUrl if it doesn't match
+        if (profile.avatarUrl !== doc.avatarUrl) {
+          await db.profile.update({
+            where: { userId: existing.id },
+            data: {
+              avatarUrl: doc.avatarUrl,
+              realName: doc.realName,
+              specialty: doc.specialty,
+              bio: doc.bio,
+              location: doc.location,
+              rating: doc.rating,
+              isVerified: doc.isVerified,
+            },
+          });
+          console.log(`  🔄 Updated ${doc.realName} profile with avatar and data`);
+        }
         createdDoctors.push({
           id: existing.id,
           realName: doc.realName,
@@ -131,6 +147,19 @@ async function main() {
   if (existingUser) {
     console.log(`  ⏭️  Test user already exists (${TEST_USER.email})`);
     testUserId = existingUser.id;
+    // Force-update avatarUrl if it doesn't match
+    const existingProfile = await db.profile.findUnique({ where: { userId: existingUser.id } });
+    if (existingProfile && existingProfile.avatarUrl !== TEST_USER.avatarUrl) {
+      await db.profile.update({
+        where: { userId: existingUser.id },
+        data: {
+          avatarUrl: TEST_USER.avatarUrl,
+          realName: TEST_USER.realName,
+          bio: TEST_USER.bio,
+        },
+      });
+      console.log(`  🔄 Updated test user profile with avatar`);
+    }
   } else {
     const passwordHash = await hash(TEST_USER.password, 12);
     const user = await db.user.create({
