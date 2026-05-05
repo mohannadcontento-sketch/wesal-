@@ -44,25 +44,29 @@ export function UserAvatar({
 
   // Built-in SVG avatar
   if (avatarUrl && isBuiltInAvatar(avatarUrl)) {
-    return (
-      <div
-        className={`
-          ${sizeClasses} ${borderClasses} rounded-full overflow-hidden
-          border-wesal-sky/40 shadow-sm
-          flex items-center justify-center
-          bg-wesal-ice
-          ${className}
-        `}
-      >
-        <div className="w-full h-full [&>svg]:w-full [&>svg]:h-full">
-          {renderAvatarSvg(avatarUrl)}
+    const svgContent = renderAvatarSvg(avatarUrl);
+    if (svgContent) {
+      return (
+        <div
+          className={`
+            ${sizeClasses} ${borderClasses} rounded-full overflow-hidden
+            border-wesal-sky/40 shadow-sm
+            flex items-center justify-center
+            bg-wesal-ice
+            ${className}
+          `}
+        >
+          <div className="w-full h-full [&_svg]:w-full [&_svg]:h-full">
+            {svgContent}
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
+    // If renderAvatarSvg returns null (unknown avatar id), fall through to initial
   }
 
   // External image URL
-  if (avatarUrl) {
+  if (avatarUrl && (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://'))) {
     return (
       <div
         className={`

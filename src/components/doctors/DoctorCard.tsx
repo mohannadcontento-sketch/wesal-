@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import type { Profile, User } from '@/types';
 import { UserAvatar } from '@/components/avatars/UserAvatar';
-import { isBuiltInAvatar, renderAvatarSvg } from '@/lib/avatars';
 
 interface DoctorCardProps {
   doctor: User & { profile?: Profile };
@@ -52,19 +51,12 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
       {/* Doctor Header */}
       <div className="flex items-start gap-4 mb-6 z-10">
         <div className="relative shrink-0">
-          {avatarUrl ? (
-            <div className="w-20 h-20">
-              {isBuiltInAvatar(avatarUrl) ? (
-                <UserAvatar avatarUrl={avatarUrl} username={displayName} size="xl" className="!w-20 !h-20" />
-              ) : (
-                <UserAvatar avatarUrl={avatarUrl} username={displayName} size="xl" className="!w-20 !h-20" />
-              )}
-            </div>
-          ) : (
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-fixed to-primary-container flex items-center justify-center border-4 border-white shadow-sm">
-              <span className="material-symbols-outlined text-3xl text-on-primary-fixed">person</span>
-            </div>
-          )}
+          <UserAvatar
+            avatarUrl={avatarUrl}
+            username={displayName}
+            size="xl"
+            className="!w-20 !h-20"
+          />
           {isVerified && (
             <div className="absolute bottom-0 right-0 w-5 h-5 bg-green-500 border-2 border-white rounded-full" />
           )}
@@ -103,10 +95,19 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
               if (res.ok) {
                 const data = await res.json();
                 window.location.href = `/chat/${data.roomId}`;
+              } else {
+                const data = await res.json();
+                // If user is not logged in, redirect to login
+                if (res.status === 401) {
+                  window.location.href = '/login';
+                  return;
+                }
               }
-            } catch { /* ignore */ }
+            } catch {
+              // ignore
+            }
           }}
-          className="flex-1 py-2.5 rounded-xl bg-wesal-ice text-wesal-dark font-bold text-sm border border-wesal-sky/30 hover:bg-wesal-sky/20 transition-all text-center flex items-center justify-center gap-1.5"
+          className="flex-1 py-2.5 rounded-xl bg-wesal-ice text-wesal-dark font-bold text-sm border border-wesal-sky/30 hover:bg-wesal-sky/20 transition-all text-center flex items-center justify-center gap-1.5 active:scale-95"
         >
           <span className="material-symbols-outlined text-[18px]">chat</span>
           محادثة

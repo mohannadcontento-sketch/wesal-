@@ -10,7 +10,7 @@ interface AvatarSetProps {
   className?: string;
 }
 
-const categories = ['nature', 'wellness', 'abstract', 'animals'] as const;
+const categories = ['nature', 'wellness', 'abstract', 'animals', 'people', 'emotions', 'space', 'music'] as const;
 
 export function AvatarSet({ currentAvatar, onSelect, className = '' }: AvatarSetProps) {
   const [hoveredAvatar, setHoveredAvatar] = useState<string | null>(null);
@@ -19,6 +19,8 @@ export function AvatarSet({ currentAvatar, onSelect, className = '' }: AvatarSet
     <div className={`space-y-6 ${className}`}>
       {categories.map((category) => {
         const categoryAvatars = AVATARS.filter((a) => a.category === category);
+        if (categoryAvatars.length === 0) return null;
+
         return (
           <div key={category}>
             <h4 className="text-sm font-semibold text-wesal-medium mb-3 flex items-center gap-2">
@@ -57,7 +59,7 @@ export function AvatarSet({ currentAvatar, onSelect, className = '' }: AvatarSet
                         flex items-center justify-center bg-wesal-ice
                       `}
                     >
-                      <div className="w-full h-full [&>svg]:w-full [&>svg]:h-full">
+                      <div className="w-full h-full [&_svg]:w-full [&_svg]:h-full">
                         {renderAvatarSvg(avatar.id)}
                       </div>
                     </div>

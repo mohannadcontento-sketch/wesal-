@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, use } from 'react';
+import { useState, useEffect, useRef, use, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Link from 'next/link';
@@ -39,14 +39,17 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
   const [roomInfo, setRoomInfo] = useState<RoomInfo | null>(null);
   const [text, setText] = useState('');
   const [recording, setRecording] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [playingVoiceId, setPlayingVoiceId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recordStartTimeRef = useRef<number>(0);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const recordTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Determine the other person's info (the one we're chatting with)
   const otherPerson = (() => {
@@ -57,7 +60,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
     return { name: roomInfo.doctorName, avatarUrl: roomInfo.doctorAvatar };
   })();
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     try {
       const res = await fetch(`/api/chat/${roomId}/messages`);
       const data = await res.json();
@@ -70,7 +73,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
     } finally {
       setLoading(false);
     }
-  };
+  }, [roomId]);
 
   // Safety timeout to prevent infinite loading
   useEffect(() => {
@@ -86,11 +89,24 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
     return () => {
       if (pollingRef.current) clearInterval(pollingRef.current);
     };
-  }, [roomId]);
+  }, [roomId, fetchMessages]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      if (recordTimerRef.current) {
+        clearInterval(recordTimerRef.current);
+      }
+    };
+  }, []);
 
   const sendText = async () => {
     if (!text.trim() || sending) return;
@@ -129,48 +145,141 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
       toast.error('حصل خطأ');
     } finally {
       setSending(false);
-      inputRef.current?.focus();
+      textareaRef.current?.focus();
     }
   };
 
+  // Voice recording with proper MIME type detection
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
+
+      // Detect supported MIME type
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/webm')
+          ? 'audio/webm'
+          : MediaRecorder.isTypeSupported('audio/mp4')
+            ? 'audio/mp4'
+            : '';
+
+      const options: MediaRecorderOptions = mimeType ? { mimeType } : {};
+      const recorder = new MediaRecorder(stream, options);
       const chunks: BlobPart[] = [];
-      recorder.ondataavailable = (e) => chunks.push(e.data);
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
       recorder.onstop = async () => {
-        const blob = new Blob(chunks, { type: 'audio/webm' });
+        // Clear recording timer
+        if (recordTimerRef.current) {
+          clearInterval(recordTimerRef.current);
+          recordTimerRef.current = null;
+        }
+
+        const finalDuration = Math.round((Date.now() - recordStartTimeRef.current) / 1000);
+
+        if (finalDuration < 1 || chunks.length === 0) {
+          stream.getTracks().forEach(t => t.stop());
+          toast.error('التسجيل قصير أوف، سجّل أكتر من ثانية');
+          return;
+        }
+
+        const blob = new Blob(chunks, { type: mimeType || 'audio/webm' });
         const reader = new FileReader();
         reader.onloadend = async () => {
           const base64 = reader.result as string;
           try {
-            const duration = Math.round((Date.now() - recordStartTimeRef.current) / 1000);
             const res = await fetch(`/api/chat/${roomId}/voice`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ voiceData: base64, duration }),
+              body: JSON.stringify({ voiceData: base64, duration: finalDuration }),
             });
             if (res.ok) {
               const data = await res.json();
               setMessages(prev => [...prev, data.message]);
+              toast.success('تم إرسال الرسالة الصوتية');
+            } else {
+              toast.error('مش قادر ترسل الصوت');
             }
-          } catch { toast.error('حصل خطأ في إرسال الصوت'); }
+          } catch {
+            toast.error('حصل خطأ في إرسال الصوت');
+          }
         };
         reader.readAsDataURL(blob);
         stream.getTracks().forEach(t => t.stop());
       };
-      recorder.start();
+
+      recorder.onerror = () => {
+        toast.error('حصل خطأ في التسجيل');
+        stream.getTracks().forEach(t => t.stop());
+        setRecording(false);
+        if (recordTimerRef.current) clearInterval(recordTimerRef.current);
+      };
+
+      recorder.start(250); // Collect data every 250ms for better reliability
       setMediaRecorder(recorder);
       setRecording(true);
+      setRecordingDuration(0);
       recordStartTimeRef.current = Date.now();
-    } catch { toast.error('مش قادر أصل للميكروفون'); }
+
+      // Start recording timer
+      recordTimerRef.current = setInterval(() => {
+        setRecordingDuration(Math.round((Date.now() - recordStartTimeRef.current) / 1000));
+      }, 1000);
+
+    } catch (err) {
+      const msg = err instanceof DOMException && err.name === 'NotAllowedError'
+        ? 'الميكروفون مش متاح. سمح بالوصول للميكروفون من إعدادات المتصفح'
+        : 'مش قادر أصل للميكروفون. تأكد إن المتصفح مسموحله';
+      toast.error(msg);
+    }
   };
 
   const stopRecording = () => {
-    mediaRecorder?.stop();
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+    }
     setRecording(false);
     setMediaRecorder(null);
+  };
+
+  // Voice playback
+  const toggleVoicePlayback = (msgId: string, voiceUrl: string) => {
+    if (playingVoiceId === msgId) {
+      // Stop playing
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        audioRef.current = null;
+      }
+      setPlayingVoiceId(null);
+      return;
+    }
+
+    // Stop any currently playing audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+
+    try {
+      const audio = new Audio(voiceUrl);
+      audio.onended = () => setPlayingVoiceId(null);
+      audio.onerror = () => {
+        toast.error('مش قادر يشغل الرسالة الصوتية');
+        setPlayingVoiceId(null);
+      };
+      audio.play().catch(() => {
+        toast.error('مش قادر يشغل الصوت');
+        setPlayingVoiceId(null);
+      });
+      audioRef.current = audio;
+      setPlayingVoiceId(msgId);
+    } catch {
+      toast.error('مش قادر يشغل الصوت');
+    }
   };
 
   const formatTime = (date: string) => {
@@ -179,6 +288,12 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
     const mins = d.getMinutes().toString().padStart(2, '0');
     if (hours < 12) return `${hours}:${mins} ص`;
     return `${hours - 12}:${mins} م`;
+  };
+
+  const formatRecordingTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -196,17 +311,25 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
   };
 
   // Generate consistent waveform bars from message id
-  const getWaveformBars = (id: string, isSent: boolean) => {
+  const getWaveformBars = (id: string, isSent: boolean, isPlaying: boolean) => {
     const bars: React.ReactNode[] = [];
     let seed = 0;
     for (let i = 0; i < id.length; i++) seed += id.charCodeAt(i);
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 20; i++) {
       const h = ((seed * (i + 1) * 7) % 100) / 100;
       bars.push(
         <div
           key={i}
-          className={`w-1 rounded-full ${isSent ? 'bg-on-primary' : i < 5 ? 'bg-primary/60' : 'bg-surface-dim'}`}
-          style={{ height: `${Math.max(20, h * 100)}%` }}
+          className={`w-[3px] rounded-full transition-all duration-300 ${
+            isSent
+              ? isPlaying ? 'bg-white' : 'bg-white/60'
+              : isPlaying ? 'bg-wesal-dark' : i < 10 ? 'bg-wesal-dark/40' : 'bg-wesal-medium/30'
+          }`}
+          style={{
+            height: isPlaying
+              ? `${Math.max(15, Math.min(100, h * 100 + Math.sin(Date.now() / 200 + i) * 20))}%`
+              : `${Math.max(15, h * 100)}%`,
+          }}
         />
       );
     }
@@ -239,13 +362,13 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
   return (
     <PageTransition>
     <div className="flex flex-col h-screen bg-wesal-cream">
-      {/* Chat Header */}
-      <header className="sticky top-14 z-40 flex items-center justify-between px-4 md:px-6 py-3 bg-white/80 backdrop-blur-xl border-b border-wesal-ice shadow-sm">
+      {/* Chat Header - top-0 since chat page is standalone (no MainLayout) */}
+      <header className="sticky top-0 z-40 flex items-center justify-between px-4 md:px-6 py-3 bg-white/80 backdrop-blur-xl border-b border-wesal-ice shadow-sm">
         <div className="flex items-center gap-3">
           <Link
             href="/doctors"
             aria-label="العودة"
-            className="p-1 rounded-full hover:bg-wesal-ice transition-colors text-wesal-dark"
+            className="p-1.5 rounded-full hover:bg-wesal-ice transition-colors text-wesal-dark"
           >
             <span className="material-symbols-outlined text-2xl">arrow_forward</span>
           </Link>
@@ -267,12 +390,13 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <button aria-label="مكالمة صوتية" className="p-2 rounded-full hover:bg-wesal-ice transition-colors text-wesal-dark">
-            <span className="material-symbols-outlined text-xl">call</span>
-          </button>
-          <button aria-label="خيارات إضافية" className="p-2 rounded-full hover:bg-wesal-ice transition-colors text-wesal-dark">
-            <span className="material-symbols-outlined text-xl">more_vert</span>
-          </button>
+          <Link
+            href={`/book/${roomInfo ? (user.role === 'doctor' ? roomInfo.patientName : roomInfo.doctorName) : ''}`}
+            className="p-2 rounded-full hover:bg-wesal-ice transition-colors text-wesal-dark"
+            aria-label="حجز موعد"
+          >
+            <span className="material-symbols-outlined text-xl">event_available</span>
+          </Link>
         </div>
       </header>
 
@@ -299,6 +423,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
           const isMe = msg.senderId === user?.userId;
           const senderName = msg.sender?.name || (isMe ? 'أنت' : otherPerson.name);
           const senderAvatar = msg.sender?.avatarUrl || (isMe ? user?.avatarUrl : otherPerson.avatarUrl);
+          const isPlaying = playingVoiceId === msg.id;
 
           return (
             <div
@@ -325,18 +450,27 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
 
                 {msg.messageType === 'text' && (
                   <div className={`p-3 rounded-2xl ${isMe ? 'bg-wesal-dark text-white rounded-bl-sm shadow-md' : 'bg-white text-wesal-navy border border-wesal-ice rounded-br-sm shadow-sm'}`}>
-                    <p className="text-[15px] leading-relaxed">{msg.content}</p>
+                    <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                   </div>
                 )}
 
                 {msg.messageType === 'voice' && (
-                  <div className={`p-3 rounded-2xl ${isMe ? 'bg-wesal-dark text-white rounded-bl-sm shadow-md' : 'bg-white text-wesal-navy border border-wesal-ice rounded-br-sm shadow-sm'} flex items-center gap-3 min-w-[180px]`}>
-                    <button className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isMe ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-wesal-ice text-wesal-dark hover:bg-wesal-ice/70'} transition-colors`}>
-                      <span className="material-symbols-outlined filled">play_arrow</span>
+                  <div className={`p-3 rounded-2xl ${isMe ? 'bg-wesal-dark text-white rounded-bl-sm shadow-md' : 'bg-white text-wesal-navy border border-wesal-ice rounded-br-sm shadow-sm'} flex items-center gap-3 min-w-[200px]`}>
+                    <button
+                      onClick={() => msg.voiceUrl && toggleVoicePlayback(msg.id, msg.voiceUrl)}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                        isMe
+                          ? 'bg-white/20 text-white hover:bg-white/30 active:scale-90'
+                          : 'bg-wesal-ice text-wesal-dark hover:bg-wesal-sky/30 active:scale-90'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined filled text-2xl">
+                        {isPlaying ? 'pause' : 'play_arrow'}
+                      </span>
                     </button>
                     {/* Waveform */}
                     <div className="flex-1 flex items-center gap-[2px] h-8 px-2 overflow-hidden">
-                      {getWaveformBars(msg.id, isMe)}
+                      {getWaveformBars(msg.id, isMe, isPlaying)}
                     </div>
                     <span className={`text-xs shrink-0 ${isMe ? 'text-white/70' : 'text-wesal-medium'}`}>
                       {msg.voiceDuration ? `${Math.floor(msg.voiceDuration / 60)}:${(msg.voiceDuration % 60).toString().padStart(2, '0')}` : '0:00'}
@@ -380,13 +514,16 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
 
       {/* Recording Indicator */}
       {recording && (
-        <div className="flex items-center gap-2 px-4 md:px-6 py-2 bg-red-50 border-t border-red-200">
-          <div className="h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse" />
-          <span className="text-sm text-red-600 font-medium">جاري التسجيل...</span>
-          <div className="flex-1" />
+        <div className="flex items-center gap-3 px-4 md:px-6 py-3 bg-red-50 border-t border-red-200">
+          <div className="h-3 w-3 rounded-full bg-red-500 animate-pulse" />
+          <span className="text-sm text-red-600 font-bold">{formatRecordingTime(recordingDuration)}</span>
+          <div className="flex-1 h-1 bg-red-100 rounded-full overflow-hidden">
+            <div className="h-full bg-red-400 rounded-full animate-pulse" style={{ width: '60%' }} />
+          </div>
+          <span className="text-sm text-red-600 font-medium">جاري التسجيل</span>
           <button
             onClick={stopRecording}
-            className="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-bold hover:bg-red-600 transition-colors active:scale-95"
           >
             <span className="material-symbols-outlined text-lg">mic_off</span>
             <span>إيقاف</span>
@@ -395,7 +532,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
       )}
 
       {/* Input Area */}
-      <div className="fixed bottom-0 w-full bg-white/90 backdrop-blur-xl p-3 border-t border-wesal-ice shadow-[0_-2px_16px_0_rgba(0,43,45,0.04)] md:bottom-0">
+      <div className="fixed bottom-0 w-full bg-white/90 backdrop-blur-xl p-3 border-t border-wesal-ice shadow-[0_-2px_16px_0_rgba(0,43,45,0.04)]">
         <div className="max-w-4xl mx-auto flex items-end gap-3">
           {/* Attach Button */}
           <button aria-label="إرفاق ملف" className="p-1.5 text-wesal-dark hover:bg-wesal-ice rounded-full transition-colors mb-1">
@@ -406,7 +543,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
           <div className="flex-1 bg-wesal-cream border border-wesal-ice rounded-2xl flex items-end focus-within:border-wesal-dark focus-within:ring-1 focus-within:ring-wesal-dark/20 transition-all overflow-hidden">
             <textarea
               ref={textareaRef}
-              className="w-full bg-transparent border-none focus:ring-0 resize-none text-[15px] p-3 text-wesal-navy placeholder:text-wesal-medium/50 max-h-32"
+              className="w-full bg-transparent border-none focus:ring-0 focus:outline-none resize-none text-[15px] p-3 text-wesal-navy placeholder:text-wesal-medium/50 max-h-32"
               placeholder="اكتب رسالة..."
               rows={1}
               value={text}
@@ -423,9 +560,13 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
           {/* Action Buttons */}
           <div className="flex gap-1.5 mb-1">
             <button
-              aria-label="تسجيل صوتي"
+              aria-label={recording ? 'إيقاف التسجيل' : 'تسجيل صوتي'}
               onClick={recording ? stopRecording : startRecording}
-              className={`p-2 rounded-full transition-colors ${recording ? 'bg-red-500 text-white' : 'bg-wesal-ice text-wesal-dark hover:bg-wesal-ice/70'}`}
+              className={`p-2.5 rounded-full transition-all active:scale-90 ${
+                recording
+                  ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/30'
+                  : 'bg-wesal-ice text-wesal-dark hover:bg-wesal-sky/30'
+              }`}
             >
               <span className="material-symbols-outlined text-xl">{recording ? 'mic_off' : 'mic'}</span>
             </button>
@@ -433,7 +574,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
               aria-label="إرسال"
               onClick={sendText}
               disabled={!text.trim() || sending || recording}
-              className="p-2 rounded-full bg-wesal-dark text-white hover:bg-wesal-navy shadow-md transition-colors disabled:opacity-40"
+              className="p-2.5 rounded-full bg-wesal-dark text-white hover:bg-wesal-navy shadow-md transition-all active:scale-90 disabled:opacity-40"
             >
               <span className="material-symbols-outlined text-xl rotate-180 filled">send</span>
             </button>
