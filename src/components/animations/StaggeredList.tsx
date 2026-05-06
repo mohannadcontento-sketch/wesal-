@@ -4,7 +4,7 @@ import React, { useRef, useEffect, useState, useSyncExternalStore } from 'react'
 import { motion } from 'framer-motion';
 
 interface StaggeredListProps {
-  children: React.ReactNode[];
+  children: React.ReactNode;
   /** Delay in seconds between each item */
   stagger?: number;
   /** Base delay before the first item appears */
@@ -13,6 +13,8 @@ interface StaggeredListProps {
   direction?: 'up' | 'down' | 'left' | 'right' | 'fade';
   /** Duration per item in seconds */
   duration?: number;
+  /** Additional class for the container */
+  className?: string;
   /** Additional class for each item wrapper */
   itemClassName?: string;
   /** Only animate once */
@@ -38,6 +40,7 @@ export function StaggeredList({
   baseDelay = 0,
   direction = 'up',
   duration = 0.5,
+  className = '',
   itemClassName = '',
   once = true,
   viewportMargin = '-80px',
@@ -88,7 +91,7 @@ export function StaggeredList({
   })();
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} className={className}>
       {React.Children.map(children, (child, index) => (
         <motion.div
           key={index}

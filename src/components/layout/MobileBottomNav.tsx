@@ -18,7 +18,6 @@ export function MobileBottomNav() {
   ];
 
   const isActive = (link: (typeof links)[0]) => {
-    if (link.matchPath) return pathname.startsWith(link.matchPath);
     return pathname === link.href;
   };
 

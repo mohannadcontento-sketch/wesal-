@@ -10,10 +10,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
     const { roomId } = await params;
     const room = await db.chatRoom.findUnique({
       where: { id: roomId },
-      include: {
-        patient: { include: { profile: true } },
-        doctor: { include: { profile: true } },
-      },
     });
     if (!room) return NextResponse.json({ error: 'الشات مش موجود' }, { status: 404 });
 
@@ -26,16 +22,22 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
       orderBy: { createdAt: 'asc' },
     });
 
+    // Fetch profiles separately
+    const [patientUser, doctorUser] = await Promise.all([
+      db.user.findUnique({ where: { id: room.patientId }, include: { profile: true } }),
+      db.user.findUnique({ where: { id: room.doctorId }, include: { profile: true } }),
+    ]);
+
     // Build a sender lookup map
     const senderMap: Record<string, { name: string; avatarUrl?: string | null }> = {};
-    const patientProfile = room.patient.profile;
-    const doctorProfile = room.doctor.profile;
+    const patientProfile = patientUser?.profile;
+    const doctorProfile = doctorUser?.profile;
     senderMap[room.patientId] = {
       name: patientProfile?.realName || patientProfile?.username || 'مستخدم',
       avatarUrl: patientProfile?.avatarUrl,
     };
     senderMap[room.doctorId] = {
-      name: doctorProfile?.realName || 'دكتور',
+      name: doctorProfile?.realName || doctorUser?.email || 'دكتور',
       avatarUrl: doctorProfile?.avatarUrl,
     };
 
