@@ -1,13 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 export default function AdminSettingsPage() {
   const { user } = useAuth();
-  const router = useRouter();
 
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [allowRegistration, setAllowRegistration] = useState(true);
@@ -15,6 +13,24 @@ export default function AdminSettingsPage() {
   const [allowComments, setAllowComments] = useState(true);
   const [maxPostsPerDay, setMaxPostsPerDay] = useState('10');
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user || user.role !== 'admin') return;
+
+    fetch('/api/settings')
+      .then(r => r.json())
+      .then(data => {
+        const s = data.settings || {};
+        setMaintenanceMode(s.maintenance_mode === 'true');
+        setAllowRegistration(s.allow_registration === 'true');
+        setAllowPosts(s.allow_posts === 'true');
+        setAllowComments(s.allow_comments === 'true');
+        setMaxPostsPerDay(s.max_posts_per_day || '10');
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [user]);
 
   if (!user || user.role !== 'admin') {
     return null;
@@ -22,11 +38,44 @@ export default function AdminSettingsPage() {
 
   const handleSave = async () => {
     setSaving(true);
-    // Simulate save (in production, this would call an API)
-    await new Promise(resolve => setTimeout(resolve, 800));
-    toast.success('تم حفظ الإعدادات');
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          settings: {
+            maintenance_mode: String(maintenanceMode),
+            allow_registration: String(allowRegistration),
+            allow_posts: String(allowPosts),
+            allow_comments: String(allowComments),
+            max_posts_per_day: maxPostsPerDay,
+          },
+        }),
+      });
+
+      if (res.ok) {
+        toast.success('تم حفظ الإعدادات');
+      } else {
+        toast.error('حصل خطأ في حفظ الإعدادات');
+      }
+    } catch {
+      toast.error('حصل خطأ في الاتصال');
+    }
     setSaving(false);
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="bg-white/10 backdrop-blur rounded-xl p-6 animate-pulse">
+            <div className="h-5 bg-white/20 rounded w-1/3 mb-3" />
+            <div className="h-3 bg-white/20 rounded w-2/3" />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div>

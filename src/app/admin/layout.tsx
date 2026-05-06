@@ -37,7 +37,7 @@ export default function AdminLayout({
             هذه الصفحة متاحة للمديرين فقط
           </p>
           <Link
-            href="/community"
+            href="/"
             className="inline-flex items-center gap-2 mt-4 px-6 py-2.5 bg-primary text-on-primary rounded-xl text-sm font-semibold shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity"
           >
             <span className="material-symbols-outlined text-lg">arrow_forward</span>
@@ -149,7 +149,7 @@ export default function AdminLayout({
           <span className="hidden sm:inline text-xs font-medium text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-full">لوحة الإدارة</span>
         </div>
         <div className="hidden md:flex gap-6 items-center">
-          <Link href="/community" className="text-sm font-medium text-on-surface-variant hover:text-primary-container hover:opacity-80 transition-all">
+          <Link href="/" className="text-sm font-medium text-on-surface-variant hover:text-primary-container hover:opacity-80 transition-all">
             المجتمع
           </Link>
           <Link href="/doctors" className="text-sm font-medium text-on-surface-variant hover:text-primary-container hover:opacity-80 transition-all">

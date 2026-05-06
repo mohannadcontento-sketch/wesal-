@@ -39,14 +39,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     // Notify post author (skip if reacting to own post)
     const post = await db.post.findUnique({ where: { id } });
+    const reactorName = user.profile?.realName || user.profile?.username || 'مستخدم';
+    const reactorUsername = user.profile?.username || 'me';
     if (post && post.authorId !== user.id) {
       await db.notification.create({
         data: {
           userId: post.authorId,
           type: 'reaction',
           title: 'تفاعل جديد على منشورك',
-          body: `${user.realName || 'مستخدم'} تفاعل بـ(${type === 'like' ? 'إعجاب' : type}) على منشورك`,
-          link: `/profile/${user.username || 'me'}`,
+          body: `${reactorName} تفاعل بـ(${type === 'like' ? 'إعجاب' : type}) على منشورك`,
+          link: `/profile/${reactorUsername}`,
         },
       });
     }

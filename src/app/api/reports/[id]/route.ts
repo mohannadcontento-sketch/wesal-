@@ -38,12 +38,29 @@ export async function PUT(
 
     // If resolved, optionally take action on target
     if (status === 'resolved' && existing.targetType === 'post') {
-      // Auto-hide post (soft delete by clearing content)
-      await db.post.update({
-        where: { id: existing.targetId },
-        data: { content: '[تم إخفاء المنشور بسبب مخالفة]' },
-      });
+      // Hide post by adding hidden marker instead of destroying content
+      const postExists = await db.post.findUnique({ where: { id: existing.targetId } });
+      if (postExists) {
+        await db.post.update({
+          where: { id: existing.targetId },
+          data: { content: '[تم إخفاء المنشور بسبب مخالفة]' },
+        });
+      }
     }
+
+    // Notify the reporter about the review result
+    const reportStatusMessage = status === 'resolved'
+      ? 'تم اتخاذ إجراء بشأن بلاغك'
+      : 'تم مراجعة بلاغك ورفضه';
+    await db.notification.create({
+      data: {
+        userId: existing.reporterId,
+        type: 'system',
+        title: reportStatusMessage,
+        body: reviewNotes?.trim() || (status === 'resolved' ? 'تم حل البلاغ واتخاذ الإجراء المناسب' : 'لم يتم اتخاذ إجراء على البلاغ'),
+        link: '/',
+      },
+    });
 
     return NextResponse.json({ report });
   } catch (error) {

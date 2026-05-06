@@ -757,8 +757,8 @@ function LandingPage() {
             <div>
               <h4 className="text-sm font-bold text-white mb-5">روابط سريعة</h4>
               <ul className="space-y-3">
-                <li><a href="/community" className="text-sm text-white/50 hover:text-white transition-colors duration-300">عن المنصة</a></li>
-                <li><a href="/community" className="text-sm text-white/50 hover:text-white transition-colors duration-300">كيف نعمل</a></li>
+                <li><a href="/" className="text-sm text-white/50 hover:text-white transition-colors duration-300">المجتمع</a></li>
+                <li><a href="/events" className="text-sm text-white/50 hover:text-white transition-colors duration-300">الفعاليات</a></li>
                 <li><a href="/doctors" className="text-sm text-white/50 hover:text-white transition-colors duration-300">الأطباء</a></li>
                 <li><a href="#" onClick={(e) => e.preventDefault()} className="text-sm text-white/50 hover:text-white transition-colors duration-300">الأسئلة الشائعة</a></li>
               </ul>

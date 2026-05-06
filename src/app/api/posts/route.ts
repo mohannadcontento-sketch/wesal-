@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getUserFromSession } from '@/lib/auth/session';
 import { getUserBadge, getDisplayName } from '@/types';
+import { arePostsAllowed, isMaintenanceMode } from '@/lib/settings';
 
 export async function GET(req: Request) {
   try {
@@ -99,6 +100,13 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
+    if (await isMaintenanceMode()) {
+      return NextResponse.json({ error: 'المنصة في وضع الصيانة' }, { status: 503 });
+    }
+    if (!(await arePostsAllowed())) {
+      return NextResponse.json({ error: 'النشر مغلق حالياً' }, { status: 403 });
+    }
+
     const user = await getUserFromSession(req);
     if (!user || !user.profile) {
       return NextResponse.json({ error: 'سجل دخول الأول' }, { status: 401 });

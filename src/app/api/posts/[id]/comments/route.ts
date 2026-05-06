@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getUserFromSession } from '@/lib/auth/session';
 import { getUserBadge, getDisplayName } from '@/types';
+import { areCommentsAllowed, isMaintenanceMode } from '@/lib/settings';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -70,6 +71,13 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    if (await isMaintenanceMode()) {
+      return NextResponse.json({ error: 'المنصة في وضع الصيانة' }, { status: 503 });
+    }
+    if (!(await areCommentsAllowed())) {
+      return NextResponse.json({ error: 'التعليقات مغلقة حالياً' }, { status: 403 });
+    }
+
     const user = await getUserFromSession(req);
     if (!user || !user.profile) {
       return NextResponse.json({ error: 'سجل دخول الأول' }, { status: 401 });
@@ -108,14 +116,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     // Notify post author (skip if commenting on own post)
     const post = await db.post.findUnique({ where: { id } });
+    const commenterName = user.profile?.realName || user.profile?.username || 'مستخدم';
+    const commenterUsername = user.profile?.username || 'me';
     if (post && post.authorId !== user.id) {
       await db.notification.create({
         data: {
           userId: post.authorId,
           type: 'comment',
           title: 'تعليق جديد على منشورك',
-          body: `${user.realName || 'مستخدم'} علّق: "${content.trim().substring(0, 60)}${content.trim().length > 60 ? '...' : ''}"`,
-          link: `/profile/${user.username || 'me'}`,
+          body: `${commenterName} علّق: "${content.trim().substring(0, 60)}${content.trim().length > 60 ? '...' : ''}"`,
+          link: `/profile/${commenterUsername}`,
         },
       });
     }
@@ -129,8 +139,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
             userId: parentComment.authorId,
             type: 'comment',
             title: 'رد جديد على تعليقك',
-            body: `${user.realName || 'مستخدم'} ردّ على تعليقك`,
-            link: `/profile/${user.username || 'me'}`,
+            body: `${commenterName} ردّ على تعليقك`,
+            link: `/profile/${commenterUsername}`,
           },
         });
       }

@@ -41,6 +41,29 @@ export async function POST(req: Request) {
       data: { chatRoomId: chatRoom.id },
     });
 
+    // Notify the doctor about the new appointment
+    const patientName = user.profile?.realName || user.profile?.username || 'مستخدم';
+    await db.notification.create({
+      data: {
+        userId: doctorId,
+        type: 'appointment',
+        title: 'موعد جديد',
+        body: `${patientName} حجز موعد معاك: ${reason.substring(0, 60)}`,
+        link: '/chat/' + chatRoom.id,
+      },
+    });
+
+    // Notify the patient that the appointment was booked
+    await db.notification.create({
+      data: {
+        userId: user.id,
+        type: 'appointment',
+        title: 'تم حجز الموعد',
+        body: 'تم حجز موعدك بنجاح. هيتم تواصلك مع الدكتور قريب',
+        link: '/chat/' + chatRoom.id,
+      },
+    });
+
     return NextResponse.json({ appointment, chatRoom }, { status: 201 });
   } catch (error) {
     console.error('Appointment POST error:', error);

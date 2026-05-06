@@ -40,6 +40,11 @@ export function PostCard({ post, onDelete }: PostCardProps) {
   const [showSensitive, setShowSensitive] = useState(!post.isSensitive);
   const [showMenu, setShowMenu] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [reportDetails, setReportDetails] = useState('');
+  const [reporting, setReporting] = useState(false);
+  const [reported, setReported] = useState(false);
 
   const timeAgo = (date: string) => {
     const diff = Date.now() - new Date(date).getTime();
@@ -138,7 +143,7 @@ export function PostCard({ post, onDelete }: PostCardProps) {
         await navigator.share({
           title: 'وصال - مشاركة',
           text: post.content.substring(0, 100),
-          url: window.location.origin + `/community`,
+          url: window.location.origin + `/`,
         });
       } catch {
         // User cancelled
@@ -153,6 +158,37 @@ export function PostCard({ post, onDelete }: PostCardProps) {
   const isDoctor = post.authorRole === 'doctor';
   const isLiked = userReaction === 'heart' || userReaction === 'like';
   const canManage = user && (user.userId === post.authorId || user.role === 'admin');
+  const canReport = user && user.userId !== post.authorId;
+
+  const handleReport = async () => {
+    if (!user || reporting || !reportReason) return;
+    setReporting(true);
+    try {
+      const res = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          targetId: post.id,
+          targetType: 'post',
+          reason: reportReason,
+          details: reportDetails.trim() || undefined,
+        }),
+      });
+      if (res.ok) {
+        toast.success('تم إرسال البلاغ بنجاح');
+        setReported(true);
+        setShowReport(false);
+        setShowMenu(false);
+      } else {
+        const data = await res.json();
+        toast.error(data.error || 'حصل خطأ');
+      }
+    } catch {
+      toast.error('حصل خطأ');
+    } finally {
+      setReporting(false);
+    }
+  };
 
   const handleDelete = async () => {
     setShowMenu(false);
@@ -207,7 +243,7 @@ export function PostCard({ post, onDelete }: PostCardProps) {
             </p>
           </div>
         </div>
-        {canManage && (
+        {(canManage || canReport) && (
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
@@ -219,17 +255,113 @@ export function PostCard({ post, onDelete }: PostCardProps) {
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
                 <div className="absolute left-0 top-8 z-20 bg-white rounded-xl border border-outline-variant/30 shadow-lg py-1 min-w-[140px] animate-fade-in-up">
-                  <button
-                    onClick={handleDelete}
-                    disabled={deleting}
-                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">delete</span>
-                    {deleting ? 'جاري الحذف...' : 'حذف المنشور'}
-                  </button>
+                  {canManage && (
+                    <button
+                      onClick={handleDelete}
+                      disabled={deleting}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">delete</span>
+                      {deleting ? 'جاري الحذف...' : 'حذف المنشور'}
+                    </button>
+                  )}
+                  {canReport && !reported && (
+                    <button
+                      onClick={() => { setShowMenu(false); setShowReport(true); }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-on-surface-variant hover:bg-surface-container-high transition-colors cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">flag</span>
+                      بلاغ عن المنشور
+                    </button>
+                  )}
+                  {reported && (
+                    <div className="px-4 py-2.5 text-sm text-on-surface-variant/60 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-[18px] text-emerald-500">check_circle</span>
+                      تم إرسال البلاغ
+                    </div>
+                  )}
                 </div>
               </>
             )}
+          </div>
+        )}
+
+        {/* Report Dialog */}
+        {showReport && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+            onClick={() => setShowReport(false)}
+          >
+            <div
+              className="bg-white rounded-2xl shadow-2xl w-[90vw] max-w-md p-6 relative animate-fade-in-up"
+              onClick={(e) => e.stopPropagation()}
+              dir="rtl"
+            >
+              <button
+                onClick={() => setShowReport(false)}
+                className="absolute top-4 left-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+              >
+                <span className="material-symbols-outlined text-gray-600 text-lg">close</span>
+              </button>
+
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-red-500 text-xl">flag</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-on-surface">بلاغ عن المنشور</h3>
+                  <p className="text-xs text-on-surface-variant">ساعدنا في الحفاظ على المجتمع آمن</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 mb-5">
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { value: 'spam', label: 'محتوى مزعج' },
+                    { value: 'inappropriate', label: 'محتوى غير لائق' },
+                    { value: 'harassment', label: 'تحرش أو تنمر' },
+                    { value: 'false_info', label: 'معلومات مضللة' },
+                    { value: 'other', label: 'سبب آخر' },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setReportReason(opt.value)}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors border cursor-pointer ${
+                        reportReason === opt.value
+                          ? 'bg-red-50 border-red-200 text-red-700'
+                          : 'bg-gray-50 border-gray-200 text-on-surface-variant hover:bg-gray-100'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+
+                <textarea
+                  value={reportDetails}
+                  onChange={e => setReportDetails(e.target.value)}
+                  placeholder="تفاصيل إضافية (اختياري)..."
+                  className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-red-200 resize-none"
+                  rows={3}
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowReport(false)}
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium bg-gray-100 text-on-surface-variant hover:bg-gray-200 transition-colors"
+                >
+                  إلغاء
+                </button>
+                <button
+                  onClick={handleReport}
+                  disabled={!reportReason || reporting}
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  {reporting ? 'جاري الإرسال...' : 'إرسال البلاغ'}
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

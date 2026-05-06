@@ -105,10 +105,15 @@ export function SideNav() {
           <span className="material-symbols-outlined filled text-wesal-dark text-lg">stars</span>
           <span className="text-sm font-semibold text-wesal-dark">نقاط السمعة</span>
         </div>
-        <div className="text-2xl font-bold text-wesal-dark">1,500</div>
-        <div className="text-xs text-wesal-medium mb-2">مستوى بلاتيني</div>
+        <div className="text-2xl font-bold text-wesal-dark">{user.reputationScore || 0}</div>
+        <div className="text-xs text-wesal-medium mb-2">
+          {user.reputationScore >= 300 ? 'مؤهل للتوثيق' : user.reputationScore >= 150 ? 'مميز' : user.reputationScore >= 50 ? 'نشط' : 'مبتدئ'}
+        </div>
         <div className="h-1.5 w-full bg-wesal-cream rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-l from-wesal-sky to-wesal-dark rounded-full w-[72%]" />
+          <div
+            className="h-full bg-gradient-to-l from-wesal-sky to-wesal-dark rounded-full transition-all duration-700"
+            style={{ width: `${Math.min(100, ((user.reputationScore || 0) % 50) / 50 * 100)}%` }}
+          />
         </div>
       </div>
 

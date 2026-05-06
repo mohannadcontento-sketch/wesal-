@@ -4,9 +4,26 @@ import { hash } from 'bcryptjs';
 import { buildAuthUser, createSessionToken } from '@/lib/auth/session';
 import { randomInt } from 'crypto';
 import { sendOtpEmail } from '@/lib/email';
+import { isRegistrationAllowed, isMaintenanceMode } from '@/lib/settings';
 
 export async function POST(req: Request) {
   try {
+    // Check maintenance mode
+    if (await isMaintenanceMode()) {
+      return NextResponse.json(
+        { error: 'المنصة في وضع الصيانة حالياً' },
+        { status: 503 }
+      );
+    }
+
+    // Check if registration is allowed
+    if (!(await isRegistrationAllowed())) {
+      return NextResponse.json(
+        { error: 'التسجيل مغلق حالياً' },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
     const { username, email, phone, password, type, realName, specialty } = body;
 
@@ -121,9 +138,6 @@ export async function POST(req: Request) {
     if (process.env.NODE_ENV !== 'production') {
       console.log(`[AUTH] Registration OTP for ${email}: ${otpCode}`);
     }
-
-    // Include delivery method info in response
-    response.headers.set('X-Email-Method', emailResult.method);
 
     return response;
   } catch (error) {
