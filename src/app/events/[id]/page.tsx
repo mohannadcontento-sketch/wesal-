@@ -46,6 +46,15 @@ function getCategoryIcon(cat: string): string {
   }
 }
 
+function formatTime(timeStr: string): string {
+  if (!timeStr) return '';
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  const h = hours % 12 || 12;
+  const m = String(minutes).padStart(2, '0');
+  const period = hours >= 12 ? 'مساءً' : 'صباحاً';
+  return `${h}:${m} ${period}`;
+}
+
 function getStatusLabel(status: string): { label: string; color: string } {
   switch (status) {
     case 'upcoming': return { label: 'قادمة', color: 'bg-emerald-100 text-emerald-700' };
@@ -186,7 +195,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
             <div className="bg-white rounded-xl border border-wesal-ice/60 p-3.5 text-center">
               <span className="material-symbols-outlined text-wesal-sky text-xl mb-1 block">schedule</span>
               <div className="text-xs text-wesal-medium mb-0.5">الوقت</div>
-              <div className="text-sm font-semibold text-wesal-navy">{event.eventTime || 'سيحدد لاحقاً'}</div>
+              <div className="text-sm font-semibold text-wesal-navy">{event.eventTime ? formatTime(event.eventTime) : 'سيحدد لاحقاً'}</div>
             </div>
             <div className="bg-white rounded-xl border border-wesal-ice/60 p-3.5 text-center">
               <span className="material-symbols-outlined text-wesal-sky text-xl mb-1 block">location_on</span>

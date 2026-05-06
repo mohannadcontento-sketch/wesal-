@@ -45,12 +45,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'العنوان والوصف والتاريخ مطلوبين' }, { status: 400 });
     }
 
+    // Handle date safely - use UTC to avoid timezone shifts
+    const [year, month, day] = eventDate.split('-').map(Number);
+    const safeDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+
     const event = await db.event.create({
       data: {
         title: title.trim(),
         description: description.trim(),
         imageUrl: imageUrl?.trim() || null,
-        eventDate: new Date(eventDate),
+        eventDate: safeDate,
         eventTime: eventTime?.trim() || null,
         location: location?.trim() || null,
         category: category?.trim() || 'عام',

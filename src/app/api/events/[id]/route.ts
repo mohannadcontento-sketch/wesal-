@@ -47,7 +47,12 @@ export async function PUT(
         ...(body.title !== undefined && { title: body.title.trim() }),
         ...(body.description !== undefined && { description: body.description.trim() }),
         ...(body.imageUrl !== undefined && { imageUrl: body.imageUrl?.trim() || null }),
-        ...(body.eventDate !== undefined && { eventDate: new Date(body.eventDate) }),
+        ...(body.eventDate !== undefined && {
+          eventDate: (() => {
+            const [y, m, d] = body.eventDate.split('-').map(Number);
+            return new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+          })()
+        }),
         ...(body.eventTime !== undefined && { eventTime: body.eventTime?.trim() || null }),
         ...(body.location !== undefined && { location: body.location?.trim() || null }),
         ...(body.category !== undefined && { category: body.category?.trim() || 'عام' }),

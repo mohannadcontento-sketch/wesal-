@@ -88,6 +88,14 @@ export default function AdminEventsPage() {
       toast.error('العنوان والوصف والتاريخ مطلوبين');
       return;
     }
+    if (form.imageUrl && !form.imageUrl.match(/^https?:\/\/.+/)) {
+      toast.error('رابط الصورة لازم يبدا بـ http:// أو https://');
+      return;
+    }
+    if (!form.isWesal && form.registrationUrl && !form.registrationUrl.match(/^https?:\/\/.+/)) {
+      toast.error('رابط التسجيل لازم يبدا بـ http:// أو https://');
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -136,6 +144,15 @@ export default function AdminEventsPage() {
     return new Date(dateStr).toLocaleDateString('ar-EG', {
       year: 'numeric', month: 'short', day: 'numeric',
     });
+  };
+
+  const formatTime = (timeStr: string) => {
+    if (!timeStr) return '';
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const h = hours % 12 || 12;
+    const m = String(minutes).padStart(2, '0');
+    const period = hours >= 12 ? 'مساءً' : 'صباحاً';
+    return `${h}:${m} ${period}`;
   };
 
   const getStatusLabel = (status: string) => {
@@ -233,23 +250,28 @@ export default function AdminEventsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">التاريخ *</label>
-                  <input
-                    type="date"
-                    value={form.eventDate}
-                    onChange={(e) => setForm({ ...form, eventDate: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-                  />
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none">calendar_today</span>
+                    <input
+                      type="date"
+                      value={form.eventDate}
+                      onChange={(e) => setForm({ ...form, eventDate: e.target.value })}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">الوقت</label>
-                  <input
-                    type="text"
-                    value={form.eventTime}
-                    onChange={(e) => setForm({ ...form, eventTime: e.target.value })}
-                    placeholder="مثال: 6:00 مساءً"
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-                    dir="rtl"
-                  />
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none">schedule</span>
+                    <input
+                      type="time"
+                      value={form.eventTime}
+                      onChange={(e) => setForm({ ...form, eventTime: e.target.value })}
+                      className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -304,14 +326,17 @@ export default function AdminEventsPage() {
               {/* Image URL */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">رابط الصورة (اختياري)</label>
-                <input
-                  type="url"
-                  value={form.imageUrl}
-                  onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                  placeholder="https://example.com/event-image.jpg"
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-                  dir="ltr"
-                />
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none">image</span>
+                  <input
+                    type="url"
+                    value={form.imageUrl}
+                    onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+                    placeholder="https://example.com/event-image.jpg"
+                    className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    dir="ltr"
+                  />
+                </div>
               </div>
 
               {/* Is Wesal Toggle */}
@@ -347,7 +372,7 @@ export default function AdminEventsPage() {
                     value={form.registrationUrl}
                     onChange={(e) => setForm({ ...form, registrationUrl: e.target.value })}
                     placeholder="https://external-site.com/register"
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    className="w-full pl-4 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                     dir="ltr"
                   />
                 </div>
@@ -455,6 +480,12 @@ export default function AdminEventsPage() {
                       <span className="material-symbols-outlined text-sm">calendar_today</span>
                       {formatDate(event.eventDate)}
                     </span>
+                    {event.eventTime && (
+                      <span className="flex items-center gap-1">
+                        <span className="material-symbols-outlined text-sm">schedule</span>
+                        {formatTime(event.eventTime)}
+                      </span>
+                    )}
                     {event.location && (
                       <span className="flex items-center gap-1 truncate">
                         <span className="material-symbols-outlined text-sm">location_on</span>

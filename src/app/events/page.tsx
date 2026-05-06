@@ -32,6 +32,15 @@ function formatDate(dateStr: string): string {
   return `${day} ${month} ${year}`;
 }
 
+function formatTime(timeStr: string): string {
+  if (!timeStr) return '';
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  const h = hours % 12 || 12;
+  const m = String(minutes).padStart(2, '0');
+  const period = hours >= 12 ? 'مساءً' : 'صباحاً';
+  return `${h}:${m} ${period}`;
+}
+
 function isUpcoming(dateStr: string): boolean {
   return new Date(dateStr) >= new Date();
 }
@@ -276,7 +285,7 @@ export default function EventsPage() {
                           {event.eventTime && (
                             <div className="flex items-center gap-1">
                               <span className="material-symbols-outlined text-sm">schedule</span>
-                              <span>{event.eventTime}</span>
+                              <span>{formatTime(event.eventTime)}</span>
                             </div>
                           )}
                           {event.location && (
