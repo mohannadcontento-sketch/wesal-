@@ -11,7 +11,8 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
-    "seed": "DATABASE_URL=\"postgresql://postgres.awocfanvwzrylwxtgoov:qoqouo!191979@aws-0-eu-west-1.pooler.supabase.com:5432/postgres\" npx tsx prisma/seed.ts"
+    "seed": "DATABASE_URL=\"postgresql://postgres.awocfanvwzrylwxtgoov:qoqouo!191979@aws-0-eu-west-1.pooler.supabase.com:5432/postgres\" npx tsx prisma/seed.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
