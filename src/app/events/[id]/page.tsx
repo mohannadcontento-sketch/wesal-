@@ -70,7 +70,6 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   const router = useRouter();
   const [event, setEvent] = useState<EventDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [registered, setRegistered] = useState(false);
 
   useEffect(() => {
     fetch(`/api/events/${id}`)
@@ -162,12 +161,6 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                 <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusInfo.color}`}>
                   {statusInfo.label}
                 </span>
-                {event.isWesal && (
-                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-white/20 text-white backdrop-blur-sm flex items-center gap-1">
-                    <span className="material-symbols-outlined text-sm">verified</span>
-                    فعالية وصال
-                  </span>
-                )}
               </div>
             </div>
           </div>
@@ -226,41 +219,25 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         {/* Action Buttons */}
         <ScrollReveal delay={250}>
           <div className="flex flex-col sm:flex-row gap-3 mb-8">
-            {/* Registration Button - for external events */}
-            {!event.isWesal && event.registrationUrl && isUpcoming && event.status === 'upcoming' && (
+            {/* Registration Button - opens the registration link */}
+            {event.registrationUrl && isUpcoming && event.status === 'upcoming' && (
               <a
                 href={event.registrationUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-wesal-dark text-white rounded-xl font-medium shadow-lg shadow-wesal-dark/20 hover:bg-wesal-dark/90 hover:shadow-xl transition-all text-sm"
               >
-                <span className="material-symbols-outlined text-xl">open_in_new</span>
+                <span className="material-symbols-outlined text-xl">how_to_reg</span>
                 سجّل في الفعالية
               </a>
             )}
 
-            {/* Wesal Event - In-app action */}
-            {event.isWesal && isUpcoming && event.status === 'upcoming' && (
-              <button
-                onClick={() => {
-                  if (registered) {
-                    toast.info('أنت مسجل بالفعل في الفعالية');
-                  } else {
-                    setRegistered(true);
-                    toast.success('تم تسجيل مشاركتك بنجاح! هنوصلك بتفاصيل الفعالية');
-                  }
-                }}
-                className={`flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all text-sm ${
-                  registered
-                    ? 'bg-emerald-600 text-white shadow-emerald-600/20'
-                    : 'bg-wesal-dark text-white shadow-wesal-dark/20 hover:bg-wesal-dark/90'
-                }`}
-              >
-                <span className="material-symbols-outlined text-xl">
-                  {registered ? 'check_circle' : 'how_to_reg'}
-                </span>
-                {registered ? 'تم التسجيل' : 'سجّل مشاركتك'}
-              </button>
+            {/* No registration link - show coming soon */}
+            {!event.registrationUrl && isUpcoming && event.status === 'upcoming' && (
+              <div className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-gray-200 text-gray-500 rounded-xl font-medium text-sm">
+                <span className="material-symbols-outlined text-xl">event_available</span>
+                التسجيل سيفتح قريباً
+              </div>
             )}
 
             {/* Share Button */}
@@ -274,6 +251,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                   });
                 } else {
                   navigator.clipboard.writeText(window.location.href);
+                  toast.success('تم نسخ رابط الفعالية!');
                 }
               }}
               className="flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-wesal-dark border border-wesal-ice rounded-xl font-medium hover:bg-wesal-ice/30 transition-all text-sm"
@@ -283,21 +261,6 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
             </button>
           </div>
         </ScrollReveal>
-
-        {/* External Event Notice */}
-        {!event.isWesal && (
-          <ScrollReveal delay={300}>
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3 mb-8">
-              <span className="material-symbols-outlined text-amber-600 text-xl mt-0.5">info</span>
-              <div>
-                <h4 className="text-sm font-semibold text-amber-800 mb-1">فعالية خارجية</h4>
-                <p className="text-xs text-amber-700 leading-relaxed">
-                  هذه الفعالية ليست تابعة لمنصة وصال، وتم نشرها للاطلاع فقط. للتسجيل والمشاركة، سيتم توجيهك للموقع الرسمي للفعالية.
-                </p>
-              </div>
-            </div>
-          </ScrollReveal>
-        )}
 
         {/* Past Event Notice */}
         {!isUpcoming && (

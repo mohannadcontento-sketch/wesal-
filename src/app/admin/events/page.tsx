@@ -88,11 +88,7 @@ export default function AdminEventsPage() {
       toast.error('العنوان والوصف والتاريخ مطلوبين');
       return;
     }
-    if (form.imageUrl && !form.imageUrl.match(/^https?:\/\/.+/)) {
-      toast.error('رابط الصورة لازم يبدا بـ http:// أو https://');
-      return;
-    }
-    if (!form.isWesal && form.registrationUrl && !form.registrationUrl.match(/^https?:\/\/.+/)) {
+    if (form.registrationUrl && !form.registrationUrl.match(/^https?:\/\/.+/)) {
       toast.error('رابط التسجيل لازم يبدا بـ http:// أو https://');
       return;
     }
@@ -323,60 +319,22 @@ export default function AdminEventsPage() {
                 </div>
               </div>
 
-              {/* Image URL */}
+              {/* Registration Link */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">رابط الصورة (اختياري)</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">رابط التسجيل في الفعالية</label>
                 <div className="relative">
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none">image</span>
-                  <input
-                    type="url"
-                    value={form.imageUrl}
-                    onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                    placeholder="https://example.com/event-image.jpg"
-                    className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-                    dir="ltr"
-                  />
-                </div>
-              </div>
-
-              {/* Is Wesal Toggle */}
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <div>
-                  <div className="text-sm font-semibold text-gray-700">فعالية تابعة لوصال</div>
-                  <div className="text-xs text-gray-500 mt-0.5">فعاليات وصال يتم التسجيل فيها من داخل المنصة</div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setForm({ ...form, isWesal: !form.isWesal })}
-                  className={`relative w-12 h-7 rounded-full transition-colors ${
-                    form.isWesal ? 'bg-primary' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform ${
-                      form.isWesal ? 'right-0.5' : 'right-[calc(100%-1.625rem)]'
-                    }`}
-                  />
-                </button>
-              </div>
-
-              {/* Registration URL - only for non-Wesal events */}
-              {!form.isWesal && (
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    رابط التسجيل الخارجي
-                    <span className="text-xs text-gray-400 font-normal mr-1">(للفعاليات الخارجية)</span>
-                  </label>
+                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none">how_to_reg</span>
                   <input
                     type="url"
                     value={form.registrationUrl}
                     onChange={(e) => setForm({ ...form, registrationUrl: e.target.value })}
-                    placeholder="https://external-site.com/register"
-                    className="w-full pl-4 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    placeholder="https://example.com/register — اللينك اللي هيودي المستخدم لما يضغط سجل"
+                    className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                     dir="ltr"
                   />
                 </div>
-              )}
+                <p className="text-xs text-gray-400 mt-1">اللينك اللي يظهر لما المستخدم يضغط على زرار &quot;سجل في الفعالية&quot; — ممكن يكون فورم جوجل، رابط خارجي، أو أي صفحة تسجيل</p>
+              </div>
 
               {/* Submit Buttons */}
               <div className="flex gap-3 pt-2">

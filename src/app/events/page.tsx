@@ -237,16 +237,6 @@ export default function EventsPage() {
                           </span>
                         </div>
 
-                        {/* Wesal Badge */}
-                        {event.isWesal && (
-                          <div className="absolute top-3 left-3">
-                            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-wesal-dark/90 text-white flex items-center gap-1">
-                              <span className="material-symbols-outlined text-sm">verified</span>
-                              وصال
-                            </span>
-                          </div>
-                        )}
-
                         {/* Date Overlay */}
                         <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-xl px-3 py-2 text-center shadow-sm">
                           <div className="text-lg font-bold text-wesal-dark leading-tight">
@@ -297,10 +287,10 @@ export default function EventsPage() {
                         </div>
 
                         {/* Registration Indicator */}
-                        {!event.isWesal && event.registrationUrl && upcoming && (
+                        {event.registrationUrl && upcoming && (
                           <div className="mt-3 pt-3 border-t border-wesal-ice/40 flex items-center gap-1 text-xs text-wesal-dark font-medium">
-                            <span className="material-symbols-outlined text-sm">open_in_new</span>
-                            <span>زر التسجيل متاح</span>
+                            <span className="material-symbols-outlined text-sm">how_to_reg</span>
+                            <span>التسجيل متاح</span>
                             <span className="material-symbols-outlined text-sm mr-auto">arrow_back</span>
                           </div>
                         )}
