@@ -137,6 +137,16 @@ export function TopNavbar() {
                         الإشعارات
                       </Link>
 
+                      {/* Chats */}
+                      <Link
+                        href="/chat"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-wesal-navy hover:bg-wesal-ice/50 transition-colors"
+                        onClick={() => setShowMenu(false)}
+                      >
+                        <span className="material-symbols-outlined text-[20px] text-wesal-medium">forum</span>
+                        المحادثات
+                      </Link>
+
                       {/* Profile */}
                       <Link
                         href={`/profile/${user.username || 'me'}`}

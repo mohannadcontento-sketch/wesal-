@@ -22,6 +22,7 @@ const typeConfig: Record<string, { icon: string; colorClass: string }> = {
   system: { icon: 'campaign', colorClass: 'bg-amber-50 text-amber-500' },
   appointment: { icon: 'calendar_today', colorClass: 'bg-teal-50 text-teal-600' },
   bookmark: { icon: 'bookmark_added', colorClass: 'bg-emerald-50 text-emerald-500' },
+  session_reminder: { icon: 'alarm', colorClass: 'bg-orange-50 text-orange-600' },
 };
 
 function getTypeConfig(type: string) {
