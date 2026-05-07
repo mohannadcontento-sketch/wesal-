@@ -23,6 +23,13 @@ interface Message {
   sender?: SenderInfo;
 }
 
+interface AppointmentInfo {
+  id: string;
+  appointmentDate: string;
+  status: string;
+  reason: string;
+}
+
 interface RoomInfo {
   id: string;
   status: string;
@@ -32,6 +39,10 @@ interface RoomInfo {
   patientAvatar?: string | null;
   doctorName: string;
   doctorAvatar?: string | null;
+  appointment: AppointmentInfo | null;
+  patientCanSend: boolean;
+  sessionMessage: string;
+  isPatient: boolean;
 }
 
 export default function ChatPage({ params }: { params: Promise<{ roomId: string }> }) {
@@ -117,8 +128,10 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
     };
   }, []);
 
+  const patientBlocked = roomInfo?.isPatient && !roomInfo?.patientCanSend;
+
   const sendText = async () => {
-    if (!text.trim() || sending) return;
+    if (!text.trim() || sending || patientBlocked) return;
     setSending(true);
     const optimisticMsg: Message = {
       id: `temp-${Date.now()}`,
@@ -376,7 +389,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
       <header className="sticky top-0 z-40 flex items-center justify-between px-4 md:px-6 py-3 bg-white/80 backdrop-blur-xl border-b border-wesal-ice shadow-sm">
         <div className="flex items-center gap-3">
           <Link
-            href="/doctors"
+            href="/"
             aria-label="العودة"
             className="p-1.5 rounded-full hover:bg-wesal-ice transition-colors text-wesal-dark"
           >
@@ -393,22 +406,42 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
           </div>
           <div className="flex flex-col">
             <h2 className="text-base font-bold text-wesal-navy leading-tight">{otherPerson.name}</h2>
-            <span className="text-xs text-wesal-medium flex items-center gap-1">
-              <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block" />
-              متصل الآن
-            </span>
+            {roomInfo?.appointment && roomInfo?.isPatient && (
+              <span className={`text-xs flex items-center gap-1 ${roomInfo.patientCanSend ? 'text-emerald-600' : 'text-amber-600'}`}>
+                <span className={`material-symbols-outlined text-xs`}>
+                  {roomInfo.appointment.status === 'pending' ? 'schedule' : roomInfo.patientCanSend ? 'video_camera_front' : 'lock_clock'}
+                </span>
+                {roomInfo.sessionMessage}
+              </span>
+            )}
+            {!roomInfo?.isPatient && (
+              <span className="text-xs text-wesal-medium flex items-center gap-1">
+                <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block" />
+                متصل الآن
+              </span>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <Link
-            href={roomInfo ? `/book/${roomInfo.doctorId}` : '#'}
-            className="p-2 rounded-full hover:bg-wesal-ice transition-colors text-wesal-dark"
-            aria-label="حجز موعد"
-          >
-            <span className="material-symbols-outlined text-xl">event_available</span>
-          </Link>
+          {roomInfo?.appointment && roomInfo?.isPatient && (
+            <Link
+              href={`/book/${roomInfo.doctorId}`}
+              className="p-2 rounded-full hover:bg-wesal-ice transition-colors text-wesal-dark"
+              aria-label="حجز موعد جديد"
+            >
+              <span className="material-symbols-outlined text-xl">event_available</span>
+            </Link>
+          )}
         </div>
       </header>
+
+      {/* Session info banner for patient */}
+      {roomInfo?.isPatient && roomInfo?.appointment && !roomInfo?.patientCanSend && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5 flex items-center gap-2">
+          <span className="material-symbols-outlined text-amber-600 text-lg">info</span>
+          <span className="text-xs text-amber-700 font-medium">{roomInfo.sessionMessage}</span>
+        </div>
+      )}
 
       {/* Main Chat Area */}
       <main className="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col gap-3 pb-36">
@@ -560,7 +593,8 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
               onChange={(e) => setText(e.target.value)}
               onKeyDown={handleKeyDown}
               onInput={handleTextareaInput}
-              disabled={recording}
+              disabled={recording || patientBlocked}
+              placeholder={patientBlocked ? 'مش متقدر تبعت رسالة دلوقتي...' : 'اكتب رسالة...'}
             />
             <button aria-label="إضافة رموز تعبيرية" className="p-2.5 text-wesal-medium hover:text-wesal-dark transition-colors">
               <span className="material-symbols-outlined text-xl">mood</span>
@@ -571,11 +605,14 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
           <div className="flex gap-1.5 mb-1">
             <button
               aria-label={recording ? 'إيقاف التسجيل' : 'تسجيل صوتي'}
-              onClick={recording ? stopRecording : startRecording}
+              onClick={recording ? stopRecording : (patientBlocked ? undefined : startRecording)}
+              disabled={patientBlocked && !recording}
               className={`p-2.5 rounded-full transition-all active:scale-90 ${
                 recording
                   ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/30'
-                  : 'bg-wesal-ice text-wesal-dark hover:bg-wesal-sky/30'
+                  : patientBlocked
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-wesal-ice text-wesal-dark hover:bg-wesal-sky/30'
               }`}
             >
               <span className="material-symbols-outlined text-xl">{recording ? 'mic_off' : 'mic'}</span>
@@ -583,7 +620,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
             <button
               aria-label="إرسال"
               onClick={sendText}
-              disabled={!text.trim() || sending || recording}
+              disabled={!text.trim() || sending || recording || patientBlocked}
               className="p-2.5 rounded-full bg-wesal-dark text-white hover:bg-wesal-navy shadow-md transition-all active:scale-90 disabled:opacity-40"
             >
               <span className="material-symbols-outlined text-xl rotate-180 filled">send</span>
