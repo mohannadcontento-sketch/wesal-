@@ -1,7 +1,6 @@
 'use client';
 
 import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -20,9 +19,8 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const pathname = usePathname();
-  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (user && user.role !== 'admin') {
@@ -67,6 +65,13 @@ export default function AdminLayout({
           <p className="text-xs text-outline">صلاحيات كاملة</p>
         </div>
         <nav className="flex flex-col gap-2 flex-grow">
+              <Link
+                href="/"
+                className="rounded-lg flex items-center gap-3 px-4 py-3 text-base font-medium text-on-surface-variant hover:bg-surface-container-low/50 hover:translate-x-1 transition-transform"
+              >
+                <span className="material-symbols-outlined">home</span>
+                الصفحة الرئيسية
+              </Link>
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
@@ -110,6 +115,14 @@ export default function AdminLayout({
               </button>
             </div>
             <nav className="flex flex-col gap-2">
+              <Link
+                href="/"
+                onClick={() => setSidebarOpen(false)}
+                className="rounded-lg flex items-center gap-3 px-4 py-3 text-sm font-medium text-on-surface-variant hover:bg-surface-container"
+              >
+                <span className="material-symbols-outlined">home</span>
+                الصفحة الرئيسية
+              </Link>
               {navItems.map((item) => {
                 const active = isActive(item.href);
                 return (
@@ -167,9 +180,10 @@ export default function AdminLayout({
           >
             <span className="material-symbols-outlined">menu</span>
           </button>
-          <button onClick={() => { logout(); router.push('/'); }} className="text-sm font-medium text-primary-container hover:opacity-80 transition-all">
-            تسجيل الخروج
-          </button>
+          <Link href="/" className="text-sm font-medium text-primary-container hover:opacity-80 transition-all flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-lg">home</span>
+            الصفحة الرئيسية
+          </Link>
         </div>
       </nav>
 
