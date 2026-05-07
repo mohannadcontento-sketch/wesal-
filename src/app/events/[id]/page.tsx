@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { ScrollReveal } from '@/components/animations/ScrollReveal';
 
 interface EventDetail {
   id: string;
@@ -43,6 +42,18 @@ function getCategoryIcon(cat: string): string {
     case 'توعية': return 'campaign';
     case 'ويبنار': return 'videocam';
     default: return 'event';
+  }
+}
+
+function getCategoryColor(cat: string): string {
+  switch (cat) {
+    case 'ورشة عمل': return 'bg-amber-100 text-amber-700';
+    case 'ندوة': return 'bg-purple-100 text-purple-700';
+    case 'مؤتمر': return 'bg-blue-100 text-blue-700';
+    case 'دعم نفسي': return 'bg-rose-100 text-rose-700';
+    case 'توعية': return 'bg-teal-100 text-teal-700';
+    case 'ويبنار': return 'bg-indigo-100 text-indigo-700';
+    default: return 'bg-gray-100 text-gray-600';
   }
 }
 
@@ -87,9 +98,16 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
       <MainLayout>
         <div className="max-w-3xl mx-auto">
           <div className="animate-pulse">
-            <div className="h-56 bg-wesal-ice/50 rounded-2xl mb-6" />
+            <div className="h-4 bg-wesal-ice/50 rounded w-20 mb-6" />
+            <div className="h-48 bg-wesal-ice/50 rounded-2xl mb-6" />
             <div className="h-6 bg-wesal-ice/50 rounded w-2/3 mb-3" />
             <div className="h-4 bg-wesal-ice/50 rounded w-1/3 mb-6" />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+              <div className="h-20 bg-wesal-ice/50 rounded-xl" />
+              <div className="h-20 bg-wesal-ice/50 rounded-xl" />
+              <div className="h-20 bg-wesal-ice/50 rounded-xl" />
+              <div className="h-20 bg-wesal-ice/50 rounded-xl" />
+            </div>
             <div className="h-4 bg-wesal-ice/50 rounded w-full mb-2" />
             <div className="h-4 bg-wesal-ice/50 rounded w-full mb-2" />
             <div className="h-4 bg-wesal-ice/50 rounded w-3/4" />
@@ -127,145 +145,132 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     <MainLayout>
       <div className="max-w-3xl mx-auto">
         {/* Back Button */}
-        <ScrollReveal>
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-1.5 text-sm text-wesal-medium hover:text-wesal-dark transition-colors mb-4"
-          >
-            <span className="material-symbols-outlined text-lg">arrow_forward</span>
-            رجوع
-          </button>
-        </ScrollReveal>
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-1.5 text-sm text-wesal-medium hover:text-wesal-dark transition-colors mb-4"
+        >
+          <span className="material-symbols-outlined text-lg">arrow_forward</span>
+          رجوع
+        </button>
 
         {/* Hero Image */}
-        <ScrollReveal delay={50}>
-          <div className="relative h-64 md:h-80 rounded-2xl overflow-hidden mb-6 shadow-lg">
-            {event.imageUrl ? (
-              <Image
-                src={event.imageUrl}
-                alt={event.title}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="w-full h-full gradient-hero flex items-center justify-center">
-                <span className="material-symbols-outlined text-[100px] text-white/20">
-                  {getCategoryIcon(event.category)}
-                </span>
-              </div>
-            )}
-
-            {/* Overlay with status */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-5">
-              <div className="flex items-center gap-2 mb-2">
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusInfo.color}`}>
-                  {statusInfo.label}
-                </span>
-              </div>
+        <div className="relative h-52 md:h-64 rounded-2xl overflow-hidden mb-5 shadow-lg">
+          {event.imageUrl ? (
+            <Image
+              src={event.imageUrl}
+              alt={event.title}
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <div className="w-full h-full gradient-hero flex items-center justify-center">
+              <span className="material-symbols-outlined text-[80px] text-white/20">
+                {getCategoryIcon(event.category)}
+              </span>
             </div>
+          )}
+
+          {/* Status Badge */}
+          <div className="absolute top-3 right-3">
+            <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusInfo.color}`}>
+              {statusInfo.label}
+            </span>
           </div>
-        </ScrollReveal>
+        </div>
 
         {/* Title & Category */}
-        <ScrollReveal delay={100}>
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="material-symbols-outlined text-wesal-sky text-xl">{getCategoryIcon(event.category)}</span>
-              <span className="text-sm text-wesal-medium font-medium">{event.category}</span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-wesal-navy leading-tight">{event.title}</h1>
+        <div className="mb-5">
+          <div className="flex items-center gap-2 mb-2">
+            <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${getCategoryColor(event.category)}`}>
+              {event.category}
+            </span>
           </div>
-        </ScrollReveal>
+          <h1 className="text-2xl font-bold text-wesal-navy leading-tight">{event.title}</h1>
+        </div>
 
         {/* Info Cards */}
-        <ScrollReveal delay={150}>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-            <div className="bg-white rounded-xl border border-wesal-ice/60 p-3.5 text-center">
-              <span className="material-symbols-outlined text-wesal-sky text-xl mb-1 block">calendar_today</span>
-              <div className="text-xs text-wesal-medium mb-0.5">التاريخ</div>
-              <div className="text-sm font-semibold text-wesal-navy">{formatDate(event.eventDate)}</div>
-            </div>
-            <div className="bg-white rounded-xl border border-wesal-ice/60 p-3.5 text-center">
-              <span className="material-symbols-outlined text-wesal-sky text-xl mb-1 block">schedule</span>
-              <div className="text-xs text-wesal-medium mb-0.5">الوقت</div>
-              <div className="text-sm font-semibold text-wesal-navy">{event.eventTime ? formatTime(event.eventTime) : 'سيحدد لاحقاً'}</div>
-            </div>
-            <div className="bg-white rounded-xl border border-wesal-ice/60 p-3.5 text-center">
-              <span className="material-symbols-outlined text-wesal-sky text-xl mb-1 block">location_on</span>
-              <div className="text-xs text-wesal-medium mb-0.5">المكان</div>
-              <div className="text-sm font-semibold text-wesal-navy">{event.location || 'أونلاين'}</div>
-            </div>
-            <div className="bg-white rounded-xl border border-wesal-ice/60 p-3.5 text-center">
-              <span className="material-symbols-outlined text-wesal-sky text-xl mb-1 block">category</span>
-              <div className="text-xs text-wesal-medium mb-0.5">النوع</div>
-              <div className="text-sm font-semibold text-wesal-navy">{event.category}</div>
-            </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+          <div className="bg-white rounded-xl border border-wesal-ice/60 p-3 text-center">
+            <span className="material-symbols-outlined text-wesal-sky text-lg mb-1 block">calendar_today</span>
+            <div className="text-[10px] text-wesal-medium mb-0.5">التاريخ</div>
+            <div className="text-xs font-semibold text-wesal-navy">{formatDate(event.eventDate)}</div>
           </div>
-        </ScrollReveal>
+          <div className="bg-white rounded-xl border border-wesal-ice/60 p-3 text-center">
+            <span className="material-symbols-outlined text-wesal-sky text-lg mb-1 block">schedule</span>
+            <div className="text-[10px] text-wesal-medium mb-0.5">الوقت</div>
+            <div className="text-xs font-semibold text-wesal-navy">{event.eventTime ? formatTime(event.eventTime) : 'سيحدد لاحقاً'}</div>
+          </div>
+          <div className="bg-white rounded-xl border border-wesal-ice/60 p-3 text-center">
+            <span className="material-symbols-outlined text-wesal-sky text-lg mb-1 block">location_on</span>
+            <div className="text-[10px] text-wesal-medium mb-0.5">المكان</div>
+            <div className="text-xs font-semibold text-wesal-navy">{event.location || 'أونلاين'}</div>
+          </div>
+          <div className="bg-white rounded-xl border border-wesal-ice/60 p-3 text-center">
+            <span className="material-symbols-outlined text-wesal-sky text-lg mb-1 block">category</span>
+            <div className="text-[10px] text-wesal-medium mb-0.5">النوع</div>
+            <div className="text-xs font-semibold text-wesal-navy">{event.category}</div>
+          </div>
+        </div>
 
         {/* Description */}
-        <ScrollReveal delay={200}>
-          <div className="bg-white rounded-2xl border border-wesal-ice/60 p-6 mb-6 shadow-sm">
-            <h2 className="text-lg font-bold text-wesal-navy mb-3 flex items-center gap-2">
-              <span className="material-symbols-outlined text-wesal-dark text-xl">description</span>
-              تفاصيل الفعالية
-            </h2>
-            <div className="text-sm text-wesal-navy/80 leading-relaxed whitespace-pre-wrap">
-              {event.description}
-            </div>
+        <div className="bg-white rounded-2xl border border-wesal-ice/60 p-5 mb-5 shadow-sm">
+          <h2 className="text-base font-bold text-wesal-navy mb-3 flex items-center gap-2">
+            <span className="material-symbols-outlined text-wesal-dark text-lg">description</span>
+            تفاصيل الفعالية
+          </h2>
+          <div className="text-sm text-wesal-navy/80 leading-relaxed whitespace-pre-wrap">
+            {event.description}
           </div>
-        </ScrollReveal>
+        </div>
 
         {/* Action Buttons */}
-        <ScrollReveal delay={250}>
-          <div className="flex flex-col sm:flex-row gap-3 mb-8">
-            {/* Registration Button - opens the registration link */}
-            {event.registrationUrl && isUpcoming && event.status === 'upcoming' && (
-              <a
-                href={event.registrationUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-wesal-dark text-white rounded-xl font-medium shadow-lg shadow-wesal-dark/20 hover:bg-wesal-dark/90 hover:shadow-xl transition-all text-sm"
-              >
-                <span className="material-symbols-outlined text-xl">how_to_reg</span>
-                سجّل في الفعالية
-              </a>
-            )}
-
-            {/* No registration link - show coming soon */}
-            {!event.registrationUrl && isUpcoming && event.status === 'upcoming' && (
-              <div className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-gray-200 text-gray-500 rounded-xl font-medium text-sm">
-                <span className="material-symbols-outlined text-xl">event_available</span>
-                التسجيل سيفتح قريباً
-              </div>
-            )}
-
-            {/* Share Button */}
-            <button
-              onClick={() => {
-                if (navigator.share) {
-                  navigator.share({
-                    title: event.title,
-                    text: event.description,
-                    url: window.location.href,
-                  });
-                } else {
-                  navigator.clipboard.writeText(window.location.href);
-                  toast.success('تم نسخ رابط الفعالية!');
-                }
-              }}
-              className="flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-wesal-dark border border-wesal-ice rounded-xl font-medium hover:bg-wesal-ice/30 transition-all text-sm"
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          {/* Registration Button */}
+          {event.registrationUrl && isUpcoming && event.status === 'upcoming' && (
+            <a
+              href={event.registrationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-wesal-dark text-white rounded-xl font-medium shadow-lg shadow-wesal-dark/20 hover:bg-wesal-dark/90 hover:shadow-xl transition-all text-sm"
             >
-              <span className="material-symbols-outlined text-xl">share</span>
-              شارك الفعالية
-            </button>
-          </div>
-        </ScrollReveal>
+              <span className="material-symbols-outlined text-lg">how_to_reg</span>
+              سجّل في الفعالية
+            </a>
+          )}
+
+          {/* No registration link */}
+          {!event.registrationUrl && isUpcoming && event.status === 'upcoming' && (
+            <div className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gray-200 text-gray-500 rounded-xl font-medium text-sm">
+              <span className="material-symbols-outlined text-lg">event_available</span>
+              التسجيل سيفتح قريباً
+            </div>
+          )}
+
+          {/* Share Button */}
+          <button
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: event.title,
+                  text: event.description,
+                  url: window.location.href,
+                });
+              } else {
+                navigator.clipboard.writeText(window.location.href);
+                toast.success('تم نسخ رابط الفعالية!');
+              }
+            }}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-wesal-dark border border-wesal-ice rounded-xl font-medium hover:bg-wesal-ice/30 transition-all text-sm"
+          >
+            <span className="material-symbols-outlined text-lg">share</span>
+            شارك الفعالية
+          </button>
+        </div>
 
         {/* Past Event Notice */}
         {!isUpcoming && (
-          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 flex items-start gap-3 mb-8">
-            <span className="material-symbols-outlined text-gray-500 text-xl mt-0.5">history</span>
+          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 flex items-start gap-3 mb-6">
+            <span className="material-symbols-outlined text-gray-500 text-lg mt-0.5">history</span>
             <div>
               <h4 className="text-sm font-semibold text-gray-700 mb-1">فعالية منتهية</h4>
               <p className="text-xs text-gray-600 leading-relaxed">

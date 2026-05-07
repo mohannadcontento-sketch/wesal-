@@ -180,9 +180,8 @@ export default function AdminLayout({
           >
             <span className="material-symbols-outlined">menu</span>
           </button>
-          <Link href="/" className="text-sm font-medium text-primary-container hover:opacity-80 transition-all flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-lg">home</span>
-            الصفحة الرئيسية
+          <Link href="/" className="text-primary-container hover:opacity-80 transition-all" title="الصفحة الرئيسية">
+            <span className="material-symbols-outlined text-2xl">home</span>
           </Link>
         </div>
       </nav>
