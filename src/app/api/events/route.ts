@@ -3,12 +3,37 @@ import { db } from '@/lib/db';
 import { getUserFromSession } from '@/lib/auth/session';
 
 // GET /api/events — list all events (public)
+// Also auto-cleans events older than 7 days and updates past event statuses
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status') || '';
     const category = searchParams.get('category') || '';
 
+    // ── Auto-maintenance (runs on every public fetch) ──
+
+    // 1. Delete events older than 7 days past their date
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    await db.event.deleteMany({
+      where: {
+        eventDate: { lt: sevenDaysAgo },
+        status: { in: ['completed', 'upcoming', 'ongoing'] },
+      },
+    });
+
+    // 2. Mark events that have passed as "completed"
+    const now = new Date();
+    await db.event.updateMany({
+      where: {
+        eventDate: { lt: now },
+        status: 'upcoming',
+      },
+      data: { status: 'completed' },
+    });
+
+    // ── Fetch visible events ──
     const where: Record<string, unknown> = {};
 
     if (status) {

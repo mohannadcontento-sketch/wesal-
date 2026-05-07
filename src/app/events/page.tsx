@@ -181,11 +181,15 @@ export default function EventsPage() {
 
               return (
                 <Link key={event.id} href={`/events/${event.id}`} className="block">
-                  <div className="group bg-white rounded-xl border border-wesal-ice/60 hover:border-wesal-sky/40 hover:shadow-md transition-all overflow-hidden cursor-pointer">
+                  <div className={`group rounded-xl border overflow-hidden cursor-pointer transition-all ${
+                    upcoming
+                      ? 'bg-white border-wesal-ice/60 hover:border-wesal-sky/40 hover:shadow-md'
+                      : 'bg-white/50 border-gray-200/60 opacity-60 grayscale-[40%] hover:opacity-80 hover:grayscale-0'
+                  }`}>
                     <div className="p-4">
-                      {/* Top Row: Category + Status + Date badge */}
+                      {/* Top Row: Category + Status */}
                       <div className="flex items-center gap-2 mb-2">
-                        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${getCategoryColor(event.category)}`}>
+                        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${upcoming ? getCategoryColor(event.category) : 'bg-gray-100 text-gray-400'}`}>
                           {event.category}
                         </span>
                         <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusInfo.color}`}>
@@ -199,17 +203,17 @@ export default function EventsPage() {
                       </div>
 
                       {/* Title */}
-                      <h3 className="font-bold text-wesal-navy text-base mb-2 group-hover:text-wesal-dark transition-colors">
+                      <h3 className={`font-bold text-base mb-2 transition-colors ${upcoming ? 'text-wesal-navy group-hover:text-wesal-dark' : 'text-gray-500'}`}>
                         {event.title}
                       </h3>
 
                       {/* Description */}
-                      <p className="text-sm text-wesal-medium/80 line-clamp-2 mb-3 leading-relaxed">
+                      <p className={`text-sm line-clamp-2 mb-3 leading-relaxed ${upcoming ? 'text-wesal-medium/80' : 'text-gray-400'}`}>
                         {event.description}
                       </p>
 
                       {/* Meta Info Row */}
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-wesal-medium">
+                      <div className={`flex flex-wrap gap-x-4 gap-y-1 text-xs ${upcoming ? 'text-wesal-medium' : 'text-gray-400'}`}>
                         <div className="flex items-center gap-1">
                           <span className="material-symbols-outlined text-sm">calendar_today</span>
                           <span>{formatDate(event.eventDate)}</span>
