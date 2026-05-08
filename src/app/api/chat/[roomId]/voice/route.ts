@@ -6,6 +6,10 @@ import { getUserFromSession } from '@/lib/auth/session';
 async function checkPatientCanSend(userId: string, room: { patientId: string; doctorId: string; appointmentId?: string | null }) {
   if (userId !== room.patientId) return { canSend: true, message: '' };
 
+  // Admin can always send voice
+  // (admin role is checked in caller via user.role but we don't pass it here;
+  //  the caller handles admin bypass separately)
+
   // Fetch appointment
   let appointment = null;
   if (room.appointmentId) {
@@ -57,10 +61,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
       return NextResponse.json({ error: 'مش مسموح' }, { status: 403 });
     }
 
-    // Check patient restriction
-    const { canSend, message } = await checkPatientCanSend(user.id, room);
-    if (!canSend) {
-      return NextResponse.json({ error: message }, { status: 403 });
+    // Check patient restriction (admin can always send)
+    if (user.role !== 'admin') {
+      const { canSend, message } = await checkPatientCanSend(user.id, room);
+      if (!canSend) {
+        return NextResponse.json({ error: message }, { status: 403 });
+      }
     }
 
     const body = await req.json();

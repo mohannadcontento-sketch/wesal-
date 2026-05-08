@@ -31,6 +31,10 @@ export default function BookDoctorPage({ params }: { params: Promise<{ doctorId:
   const minDateStr = minDate.toISOString().slice(0, 10);
 
   useEffect(() => {
+    if (user && user.role === 'doctor') {
+      router.push('/doctor');
+      return;
+    }
     if (doctorId) {
       fetch('/api/doctors').then(r => r.json()).then(data => {
         const doc = (data.doctors || []).find(

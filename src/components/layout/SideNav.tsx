@@ -24,6 +24,10 @@ export function SideNav() {
     },
   ];
 
+  const doctorItems = user.role === 'doctor'
+    ? [{ href: '/doctor', label: 'لوحة الطبيب', icon: 'stethoscope' }]
+    : [];
+
   const adminItems = user.role === 'admin'
     ? [{ href: '/admin', label: 'لوحة الإدارة', icon: 'admin_panel_settings' }]
     : [];
@@ -71,6 +75,32 @@ export function SideNav() {
             </Link>
           );
         })}
+
+        {/* ── Doctor Section ── */}
+        {doctorItems.length > 0 && (
+          <>
+            <div className="my-2 mx-2 border-t border-wesal-ice/60" />
+            {doctorItems.map((item) => {
+              const active = pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${
+                    active
+                      ? 'bg-emerald-100 text-emerald-700 font-semibold shadow-sm'
+                      : 'text-wesal-medium hover:bg-emerald-50 hover:text-emerald-700'
+                  }`}
+                >
+                  <span className={`material-symbols-outlined text-[22px] ${active ? 'filled' : ''}`}>
+                    {item.icon}
+                  </span>
+                  <span className="text-sm">{item.label}</span>
+                </Link>
+              );
+            })}
+          </>
+        )}
 
         {/* ── Admin Section ── */}
         {adminItems.length > 0 && (

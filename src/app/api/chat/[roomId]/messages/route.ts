@@ -61,10 +61,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
     // Determine if patient can send right now
     const appointment = room.appointment;
     const isPatient = user.id === room.patientId;
+    const isAdmin = user.role === 'admin';
     let patientCanSend = true;
     let sessionMessage = '';
 
-    if (isPatient && appointment && appointment.appointmentDate) {
+    // Admin can always send, no restrictions
+    if (!isAdmin && isPatient && appointment && appointment.appointmentDate) {
       const apptDate = new Date(appointment.appointmentDate);
       const now = new Date();
       // Session window: 15 minutes before to 30 minutes after
@@ -109,9 +111,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
         doctorName: senderMap[room.doctorId].name,
         doctorAvatar: senderMap[room.doctorId].avatarUrl,
         appointment: appointment || null,
-        patientCanSend,
-        sessionMessage,
-        isPatient,
+        patientCanSend: isAdmin ? true : patientCanSend,
+        sessionMessage: isAdmin ? '' : sessionMessage,
+        isPatient: isPatient && !isAdmin,
+        isAdmin,
       },
     });
   } catch (error) {
@@ -144,8 +147,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
     }
 
     // Restrict patient: can only send during session window or if confirmed
+    // Admin and doctor can always send
     const isPatient = user.id === room.patientId;
-    if (isPatient && room.appointment) {
+    const isAdmin = user.role === 'admin';
+    if (!isAdmin && isPatient && room.appointment) {
       const appointment = room.appointment;
       if (appointment.status === 'pending') {
         return NextResponse.json({ error: 'في انتظار تأكيد الدكتور للموعد' }, { status: 403 });

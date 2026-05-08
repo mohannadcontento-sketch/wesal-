@@ -14,6 +14,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'كل البيانات مطلوبة' }, { status: 400 });
     }
 
+    // Prevent booking with yourself
+    if (user.id === doctorId) {
+      return NextResponse.json({ error: 'مش تقدر تحجز مع نفسك' }, { status: 400 });
+    }
+
     const doctor = await db.user.findUnique({ where: { id: doctorId } });
     if (!doctor || doctor.role !== 'doctor') {
       return NextResponse.json({ error: 'الدكتور مش موجود' }, { status: 404 });
