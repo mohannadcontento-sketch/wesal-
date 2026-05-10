@@ -1,14 +1,11 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getUserFromSession } from '@/lib/auth/session';
+import { uploadVoice, MAX_VOICE_DURATION_SECONDS } from '@/lib/voice-storage';
 
 // Helper to check if patient can send
 async function checkPatientCanSend(userId: string, room: { patientId: string; doctorId: string; appointmentId?: string | null }) {
   if (userId !== room.patientId) return { canSend: true, message: '' };
-
-  // Admin can always send voice
-  // (admin role is checked in caller via user.role but we don't pass it here;
-  //  the caller handles admin bypass separately)
 
   // Fetch appointment
   let appointment = null;
@@ -74,12 +71,30 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
 
     if (!voiceData) return NextResponse.json({ error: 'سجل صوت' }, { status: 400 });
 
+    // Max voice duration: 5 minutes
+    if (duration && duration > MAX_VOICE_DURATION_SECONDS) {
+      return NextResponse.json({ error: 'الرسالة الصوتية طويلة أوي. الحد الأقصى 5 دقائق' }, { status: 400 });
+    }
+
+    // Rate limit: max 20 voice messages per hour
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const recentVoiceCount = await db.chatMessage.count({
+      where: { roomId, senderId: user.id, messageType: 'voice', createdAt: { gte: oneHourAgo } },
+    });
+    if (recentVoiceCount >= 20) {
+      return NextResponse.json({ error: 'أنت مسجل كتير. استنى شوية' }, { status: 429 });
+    }
+
+    // Upload voice to storage (Supabase Storage or base64 fallback)
+    const messageId = `msg_${Date.now()}_${user.id.slice(0, 8)}`;
+    const uploadResult = await uploadVoice(voiceData, messageId, roomId, user.id);
+
     const message_entry = await db.chatMessage.create({
       data: {
         roomId,
         senderId: user.id,
         messageType: 'voice',
-        voiceUrl: voiceData,
+        voiceUrl: uploadResult.url,
         voiceDuration: duration || 0,
       },
     });
@@ -102,6 +117,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
     }, { status: 201 });
   } catch (error) {
     console.error('Voice POST error:', error);
-    return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });
+    const msg = error instanceof Error ? error.message : 'حصل خطأ';
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

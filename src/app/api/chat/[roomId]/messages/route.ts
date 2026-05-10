@@ -27,10 +27,19 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
       return NextResponse.json({ error: 'مش مسموح' }, { status: 403 });
     }
 
+    // Mark messages from the other person as read
+    await db.chatMessage.updateMany({
+      where: { roomId, senderId: { not: user.id }, read: false },
+      data: { read: true },
+    });
+
     const messages = await db.chatMessage.findMany({
       where: { roomId },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: 'desc' },
+      take: 200,
     });
+    // Return in chronological order
+    messages.reverse();
 
     // Fetch profiles separately
     const [patientUser, doctorUser] = await Promise.all([
@@ -180,6 +189,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
     const { content } = body;
 
     if (!content) return NextResponse.json({ error: 'اكتب رسالة' }, { status: 400 });
+    if (content.length > 5000) return NextResponse.json({ error: 'الرسالة طويلة أوي. الحد الأقصى 5000 حرف' }, { status: 400 });
+
+    // Rate limit: max 30 messages per hour per user per room
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const recentCount = await db.chatMessage.count({
+      where: { roomId, senderId: user.id, createdAt: { gte: oneHourAgo } },
+    });
+    if (recentCount >= 30) {
+      return NextResponse.json({ error: 'أنت بتقصد كتير. استنى شوية وبعدين كمّل' }, { status: 429 });
+    }
 
     const message = await db.chatMessage.create({
       data: {

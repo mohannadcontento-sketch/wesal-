@@ -7,13 +7,14 @@ export async function GET(req: Request) {
     const user = await getUserFromSession(req);
     if (!user) return NextResponse.json({ error: 'سجل دخول' }, { status: 401 });
 
-    // Get all chat rooms where user is patient or doctor
+    // Get chat rooms where user is patient or doctor AND has at least 1 message
     const rooms = await db.chatRoom.findMany({
       where: {
         OR: [
           { patientId: user.id },
           { doctorId: user.id },
         ],
+        messages: { some: {} },
       },
       include: {
         appointment: {
