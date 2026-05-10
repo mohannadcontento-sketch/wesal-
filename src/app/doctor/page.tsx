@@ -29,6 +29,7 @@ interface Appointment {
 
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   return d.toLocaleDateString('ar-EG', {
     weekday: 'long',
     year: 'numeric',
@@ -36,12 +37,15 @@ function formatDate(dateStr: string): string {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: tz,
   });
 }
 
 function timeUntil(dateStr: string): string {
   const now = new Date();
   const date = new Date(dateStr);
+  // Both are UTC-based Date objects, difference is always correct
+  // regardless of user timezone
   const diffMs = date.getTime() - now.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);

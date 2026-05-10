@@ -93,15 +93,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
         sessionMessage = 'انتهت الجلسة';
       } else if (now < windowStart) {
         patientCanSend = false;
-        const options: Intl.DateTimeFormatOptions = {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        };
-        sessionMessage = `ميعاد الجلسة: ${apptDate.toLocaleDateString('ar-EG', options)}`;
+        // Format time in UTC ISO so the client can display in user's local timezone
+        sessionMessage = `appointment_time:${apptDate.toISOString()}`;
       } else if (now > windowEnd) {
         patientCanSend = false;
         sessionMessage = 'انتهى وقت الجلسة';

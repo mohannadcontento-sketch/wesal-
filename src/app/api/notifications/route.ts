@@ -47,6 +47,7 @@ export async function GET(req: Request) {
           hour: '2-digit',
           minute: '2-digit',
         };
+        // Use UTC for notification text - will be displayed in user's timezone on client
         const timeStr = appt.appointmentDate.toLocaleTimeString('ar-EG', options);
 
         // Notify the patient

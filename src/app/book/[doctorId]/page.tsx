@@ -55,7 +55,9 @@ export default function BookDoctorPage({ params }: { params: Promise<{ doctorId:
 
     setLoading(true);
     try {
-      const appointmentDate = `${date}T${time}:00`;
+      // Convert local time to UTC ISO string for correct timezone handling
+      const localDate = new Date(`${date}T${time}:00`);
+      const appointmentDate = localDate.toISOString();
       const res = await fetch('/api/appointments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

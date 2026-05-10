@@ -395,12 +395,32 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
     }
   };
 
+  // Format session message - converts UTC ISO to user's local timezone
+  const formatSessionMessage = (msg: string) => {
+    if (msg.startsWith('appointment_time:')) {
+      const isoStr = msg.replace('appointment_time:', '');
+      const d = new Date(isoStr);
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      return d.toLocaleDateString('ar-EG', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: tz,
+      });
+    }
+    return msg;
+  };
+
   const formatTime = (date: string) => {
     const d = new Date(date);
-    const hours = d.getHours();
-    const mins = d.getMinutes().toString().padStart(2, '0');
-    if (hours < 12) return `${hours}:${mins} ص`;
-    return `${hours - 12}:${mins} م`;
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const hours = parseInt(d.toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: tz }));
+    const mins = d.toLocaleString('en-US', { minute: '2-digit', timeZone: tz });
+    if (hours < 12) return `${hours === 0 ? 12 : hours}:${mins} ص`;
+    return `${hours === 12 ? 12 : hours - 12}:${mins} م`;
   };
 
   const formatRecordingTime = (seconds: number) => {
@@ -505,7 +525,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
                 <span className="material-symbols-outlined text-xs">
                   {roomInfo.appointment.status === 'pending' ? 'schedule' : roomInfo.patientCanSend ? 'video_camera_front' : 'lock_clock'}
                 </span>
-                {roomInfo.sessionMessage}
+                {formatSessionMessage(roomInfo.sessionMessage)}
               </span>
             )}
             {!roomInfo?.isPatient && (
@@ -533,7 +553,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
       {roomInfo?.isPatient && roomInfo?.appointment && !roomInfo?.patientCanSend && (
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5 flex items-center gap-2">
           <span className="material-symbols-outlined text-amber-600 text-lg">info</span>
-          <span className="text-xs text-amber-700 font-medium">{roomInfo.sessionMessage}</span>
+          <span className="text-xs text-amber-700 font-medium">{formatSessionMessage(roomInfo.sessionMessage)}</span>
         </div>
       )}
 
