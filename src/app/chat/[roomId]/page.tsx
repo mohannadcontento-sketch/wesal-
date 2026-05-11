@@ -423,26 +423,30 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
                       onMouseLeave={handleLongPressEnd}
                     >
                       {msg.messageType === 'text' && (
-                        <div className={`relative px-2.5 sm:px-3 pt-1.5 pb-1 shadow-sm ${
-                          isMe ? 'bg-primary text-on-primary rounded-2xl rounded-tr-sm' : 'bg-surface-bright text-on-surface rounded-2xl rounded-tl-sm'
+                        <div className={`relative shadow-sm ${
+                          isMe
+                            ? 'bg-primary text-on-primary rounded-2xl rounded-tr-sm'
+                            : 'bg-surface-bright text-on-surface rounded-2xl rounded-tl-sm border border-surface-container/50'
                         }`}>
                           {!isMe && showAvatar && (
-                            <p className="text-[10px] sm:text-[11px] font-semibold text-wesal-sky mb-0.5">{senderName}</p>
+                            <p className="text-[10px] sm:text-[11px] font-semibold text-wesal-sky px-3 pt-2 pb-0.5">{senderName}</p>
                           )}
 
-                          {/* Message text - proper wrapping */}
-                          <p className="text-[13.5px] sm:text-[14.5px] leading-relaxed sm:leading-[20px] whitespace-pre-wrap break-words [overflow-wrap:anywhere] min-w-0">
-                            {msg.content}
-                          </p>
+                          {/* Message text + time inline */}
+                          <div className={`px-3 py-2 ${!isMe && showAvatar ? 'pt-0.5' : ''}`}>
+                            <p className="text-[14px] sm:text-[15px] leading-[1.75] sm:leading-[1.8] whitespace-pre-wrap break-words [overflow-wrap:break-word] [word-break:break-word]">
+                              {msg.content}
+                            </p>
 
-                          {/* Time + status - below text */}
-                          <div className={`flex items-center justify-end gap-1 mt-0.5 -mb-0.5`}>
-                            <span className={`text-[9px] sm:text-[10px] leading-none ${isMe ? 'text-on-primary/60' : 'text-on-surface-variant'}`}>
-                              {formatTime(msg.createdAt)}
-                            </span>
-                            {isMe && (
-                              <span className={`material-symbols-outlined ${isTemp ? 'text-on-primary/40' : 'text-on-primary/70'}`} style={{ fontSize: 14 }}>done_all</span>
-                            )}
+                            {/* Time + status - bottom right, compact */}
+                            <div className="flex items-center justify-end gap-0.5 -mt-0.5">
+                              <span className={`text-[10px] sm:text-[10px] leading-none ${isMe ? 'text-on-primary/50' : 'text-on-surface-variant/60'}`}>
+                                {formatTime(msg.createdAt)}
+                              </span>
+                              {isMe && (
+                                <span className={`material-symbols-outlined ${isTemp ? 'text-on-primary/30' : 'text-on-primary/60'}`} style={{ fontSize: 15 }}>done_all</span>
+                              )}
+                            </div>
                           </div>
 
                           {/* Delete indicator on hover / after long press */}
