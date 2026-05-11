@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getUserFromSession } from '@/lib/auth/session';
-import { decryptMessage, isEncrypted } from '@/lib/chat-encryption';
+import { decryptMessage } from '@/lib/chat-encryption';
 
 export async function GET(req: Request) {
   try {
@@ -64,12 +64,10 @@ export async function GET(req: Request) {
         const lastMessage = room.messages[0] || null;
         const unreadCount = room._count.messages;
 
-        // Decrypt message content for preview
+        // Always try to decrypt message content for preview
         let previewContent: string | null = null;
-        if (lastMessage?.content) {
-          previewContent = isEncrypted(lastMessage.content)
-            ? decryptMessage(lastMessage.content)
-            : lastMessage.content;
+        if (lastMessage?.content && lastMessage.messageType === 'text') {
+          previewContent = decryptMessage(lastMessage.content);
         }
 
         return {

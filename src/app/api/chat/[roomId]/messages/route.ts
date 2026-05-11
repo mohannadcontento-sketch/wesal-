@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getUserFromSession } from '@/lib/auth/session';
-import { encryptMessage, decryptMessage, isEncrypted } from '@/lib/chat-encryption';
+import { decryptMessage, isEncrypted } from '@/lib/chat-encryption';
 
 export async function GET(req: Request, { params }: { params: Promise<{ roomId: string }> }) {
   try {
@@ -61,12 +61,16 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
       avatarUrl: doctorProfile?.avatarUrl,
     };
 
-    // Decrypt message contents
+    // Decrypt ALL text message contents
     const messagesWithSender = messages.map((msg) => {
       let decryptedContent = msg.content;
-      if (msg.content && isEncrypted(msg.content)) {
+
+      if (msg.messageType === 'text' && msg.content) {
+        // Always try to decrypt text messages - decryptMessage handles
+        // both encrypted and plain text gracefully
         decryptedContent = decryptMessage(msg.content);
       }
+
       return {
         ...msg,
         content: decryptedContent,
@@ -104,6 +108,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
         patientCanSend = false;
         sessionMessage = 'انتهى وقت الجلسة';
       }
+    }
+
+    // If no appointment linked (admin chat), patientCanSend stays true for admin
+    // For non-admin users without appointment, they can always send
+    if (!isAdmin && !isPatient && !appointment) {
+      patientCanSend = true;
     }
 
     // Check if room is closed
@@ -205,7 +215,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
       return NextResponse.json({ error: 'أنت بتقصد كتير. استنى شوية وبعدين كمّل' }, { status: 429 });
     }
 
-    // Encrypt message content before storing
+    // Encrypt message content before storing (new format with prefix)
+    const { encryptMessage } = await import('@/lib/chat-encryption');
     const encryptedContent = encryptMessage(content);
 
     const message = await db.chatMessage.create({

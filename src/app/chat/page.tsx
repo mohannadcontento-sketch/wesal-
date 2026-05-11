@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { UserAvatar } from '@/components/avatars/UserAvatar';
@@ -44,55 +43,40 @@ function timeAgo(dateStr: string): string {
   const diffDays = Math.floor(diffMs / 86400000);
 
   if (diffMins < 1) return 'الآن';
-  if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
-  if (diffHours < 24) return `منذ ${diffHours} ساعة`;
-  if (diffDays < 7) return `منذ ${diffDays} يوم`;
-  return date.toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' });
-}
+  if (diffMins < 60) return `${diffMins} د`;
 
-function getStatusLabel(status: string): { label: string; color: string } {
-  switch (status) {
-    case 'pending':
-      return { label: 'في انتظار التأكيد', color: 'text-amber-600 bg-amber-50 border-amber-200' };
-    case 'confirmed':
-      return { label: 'جلسة مؤكدة', color: 'text-emerald-600 bg-emerald-50 border-emerald-200' };
-    case 'completed':
-      return { label: 'مكتمل', color: 'text-blue-600 bg-blue-50 border-blue-200' };
-    case 'cancelled':
-      return { label: 'ملغي', color: 'text-red-600 bg-red-50 border-red-200' };
-    default:
-      return { label: '', color: '' };
+  // Check if same day
+  if (diffHours < 24 && date.getDate() === now.getDate()) {
+    const hours = date.getHours();
+    const mins = date.getMinutes().toString().padStart(2, '0');
+    return `${hours === 0 ? 12 : hours > 12 ? hours - 12 : hours}:${mins} ${hours >= 12 ? 'م' : 'ص'}`;
   }
+
+  if (diffDays < 7) return `أمس`;
+
+  return date.toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' });
 }
 
 export default function ChatListPage() {
   const { user } = useAuth();
-  const router = useRouter();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
-    if (user) {
-      fetchRooms();
-    } else if (!user) {
-      setLoading(false);
-    }
+    if (user) fetchRooms();
+    else if (!user) setLoading(false);
   }, [user]);
 
   const fetchRooms = async () => {
     try {
       const res = await fetch('/api/chat/rooms');
       const data = await res.json();
-      if (res.ok) {
-        setRooms(data.rooms || []);
-      }
-    } catch {
-      // ignore
-    } finally {
-      setLoading(false);
-    }
+      if (res.ok) setRooms(data.rooms || []);
+    } catch { /* ignore */ }
+    finally { setLoading(false); }
   };
 
   const deleteRoom = async (roomId: string) => {
@@ -103,31 +87,37 @@ export default function ChatListPage() {
         setRooms(prev => prev.filter(r => r.id !== roomId));
         toast.success('تم حذف المحادثة');
         setShowConfirm(null);
-      } else {
-        toast.error('مش قادر يحذف المحادثة');
-      }
-    } catch {
-      toast.error('حصل خطأ');
-    } finally {
-      setDeletingId(null);
-    }
+      } else toast.error('مش قادر يحذف المحادثة');
+    } catch { toast.error('حصل خطأ'); }
+    finally { setDeletingId(null); }
   };
+
+  const filteredRooms = search
+    ? rooms.filter(r => r.otherName.includes(search) || (r.otherSpecialty && r.otherSpecialty.includes(search)))
+    : rooms;
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-wesal-cream pt-14 pb-24 md:pb-8 md:pr-[272px]">
-        <div className="max-w-2xl mx-auto px-4 pt-6">
-          <div className="animate-pulse space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center gap-3 p-4 bg-white rounded-2xl">
-                <div className="w-12 h-12 bg-wesal-ice rounded-full" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-wesal-ice rounded w-1/3" />
-                  <div className="h-3 bg-wesal-ice rounded w-2/3" />
-                </div>
-              </div>
-            ))}
+      <div className="min-h-screen bg-white">
+        <header className="bg-[#075E54] text-white px-4 py-3 shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/20 rounded-full animate-pulse" />
+            <div className="flex-1">
+              <div className="h-5 bg-white/20 rounded w-24 mb-1" />
+              <div className="h-3 bg-white/10 rounded w-16" />
+            </div>
           </div>
+        </header>
+        <div className="space-y-0 divide-y divide-gray-100">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="flex items-center gap-3 p-3">
+              <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-1/3" />
+                <div className="h-3 bg-gray-100 rounded w-2/3" />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -135,64 +125,101 @@ export default function ChatListPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-wesal-cream pt-14 pb-24 md:pb-8 md:pr-[272px]">
-        <div className="max-w-2xl mx-auto px-4 pt-6">
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-wesal-ice">
-              <span className="material-symbols-outlined text-3xl text-wesal-dark">lock</span>
-            </div>
-            <p className="text-sm text-wesal-medium">سجل دخول الأول عشان توصل للمحادثات</p>
-            <Link href="/login" className="mt-4 px-6 py-2 bg-wesal-dark text-white rounded-xl text-sm font-bold">
-              سجل دخول
-            </Link>
-          </div>
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+        <div className="w-20 h-20 rounded-full bg-[#ECE5DD] flex items-center justify-center mb-4">
+          <span className="material-symbols-outlined text-4xl text-[#075E54]">forum</span>
         </div>
+        <p className="text-sm text-gray-500">سجل دخول الأول عشان توصل للمحادثات</p>
+        <Link href="/login" className="mt-4 px-6 py-2.5 bg-[#25D366] text-white rounded-lg text-sm font-bold">
+          سجل دخول
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-wesal-cream pt-14 pb-24 md:pb-8 md:pr-[272px]">
-      <div className="max-w-2xl mx-auto px-4 pt-6">
-        {/* Page Header */}
-        <div className="mb-5">
-          <h1 className="text-2xl font-bold text-wesal-navy">المحادثات</h1>
-          <p className="text-sm text-wesal-medium mt-1">محادثاتك المحفوظة</p>
-        </div>
+    <div className="min-h-screen bg-[#ECE5DD]">
 
-        {rooms.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-wesal-ice">
-              <span className="material-symbols-outlined text-4xl text-wesal-dark">forum</span>
+      {/* WhatsApp-style Header */}
+      <header className="bg-[#075E54] text-white px-4 py-3 shadow-md sticky top-0 z-30">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+              <span className="material-symbols-outlined text-[22px]">forum</span>
             </div>
-            <p className="text-base font-medium text-wesal-navy">مفيش محادثات لسه</p>
-            <p className="text-sm text-wesal-medium mt-1">احجز موعد مع دكتور وابدأ محادثة</p>
-            <Link
-              href="/doctors"
-              className="mt-4 px-6 py-2.5 bg-wesal-dark text-white rounded-xl text-sm font-bold shadow-lg shadow-wesal-dark/20 hover:bg-wesal-navy transition-all"
-            >
-              تصفح الأطباء
+            <div>
+              <h1 className="text-lg font-semibold">المحادثات</h1>
+              <p className="text-[11px] text-green-200">{rooms.length} محادثة</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1">
+            <Link href="/doctors" className="p-2 hover:bg-white/10 rounded-full transition-colors" title="الأطباء">
+              <span className="material-symbols-outlined text-[22px]">search</span>
             </Link>
           </div>
+        </div>
+      </header>
+
+      {/* Search Bar */}
+      <div className="bg-white px-3 py-2 shadow-sm sticky top-[56px] z-20">
+        <div className="flex items-center gap-2 bg-[#F0F0F0] rounded-full px-4 py-2">
+          <span className="material-symbols-outlined text-gray-400 text-[20px]">search</span>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="ابحث في المحادثات..."
+            className="flex-1 bg-transparent border-none outline-none text-sm text-[#111B21] placeholder:text-gray-400"
+          />
+          {search && (
+            <button onClick={() => setSearch('')} className="text-gray-400 hover:text-gray-600">
+              <span className="material-symbols-outlined text-[18px]">close</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Chat List */}
+      <div className="bg-white">
+        {filteredRooms.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+            <div className="w-16 h-16 rounded-full bg-[#ECE5DD] flex items-center justify-center mb-3">
+              <span className="material-symbols-outlined text-3xl text-[#075E54]">chat_bubble_outline</span>
+            </div>
+            <p className="text-sm font-medium text-[#111B21]">
+              {search ? 'مفيش نتائج' : 'مفيش محادثات لسه'}
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              {search ? 'جرب تبحث باسم مختلف' : 'احجز موعد مع دكتور وابدأ محادثة'}
+            </p>
+            {!search && (
+              <Link
+                href="/doctors"
+                className="mt-4 px-5 py-2 bg-[#25D366] text-white rounded-full text-sm font-bold shadow-md hover:bg-[#1EBE5A] transition-colors"
+              >
+                تصفح الأطباء
+              </Link>
+            )}
+          </div>
         ) : (
-          <div className="space-y-2">
-            {rooms.map((room) => {
-              const statusInfo = room.appointment ? getStatusLabel(room.appointment.status) : null;
-              const preview = room.lastMessage
-                ? room.lastMessage.messageType === 'voice'
-                  ? 'رسالة صوتية'
-                  : room.lastMessage.content && room.lastMessage.content.length > 40
-                    ? room.lastMessage.content.substring(0, 40) + '...'
-                    : room.lastMessage.content || ''
-                : '';
+          <div className="divide-y divide-gray-50">
+            {filteredRooms.map((room) => {
               const isSentByMe = room.lastMessage?.senderId === user?.userId;
               const isConfirming = showConfirm === room.id;
 
+              const preview = room.lastMessage
+                ? room.lastMessage.messageType === 'voice'
+                  ? 'رسالة صوتية'
+                  : room.lastMessage.content && room.lastMessage.content.length > 45
+                    ? room.lastMessage.content.substring(0, 45) + '...'
+                    : room.lastMessage.content || ''
+                : '';
+
               return (
-                <div key={room.id} className="relative">
+                <div key={room.id} className="relative group">
                   <Link
                     href={`/chat/${room.id}`}
-                    className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-wesal-ice/50 hover:border-wesal-dark/20 hover:shadow-md transition-all group active:scale-[0.98]"
+                    className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors active:bg-gray-100"
                   >
                     {/* Avatar */}
                     <div className="relative shrink-0">
@@ -200,71 +227,57 @@ export default function ChatListPage() {
                         avatarUrl={room.otherAvatar}
                         username={room.otherName}
                         size="lg"
-                        className="!w-12 !h-12"
+                        className="!w-[50px] !h-[50px]"
                       />
-                      {statusInfo && room.appointment?.status === 'confirmed' && (
-                        <div className="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full" />
-                      )}
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#25D366] border-2 border-white rounded-full" />
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 border-b border-gray-100 pb-2.5">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 min-w-0">
-                          <span className="text-sm font-bold text-wesal-navy truncate">
+                          <span className="text-[15px] font-semibold text-[#111B21] truncate">
                             {room.otherName}
                           </span>
                           {room.otherRole === 'doctor' && room.isVerified && (
-                            <span className="material-symbols-outlined text-blue-500 text-sm filled">verified</span>
+                            <span className="material-symbols-outlined text-[#25D366] text-sm filled">verified</span>
                           )}
                           {room.status === 'closed' && (
                             <span className="text-[9px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">مقفلة</span>
                           )}
                         </div>
                         {room.lastMessage && (
-                          <span className="text-[11px] text-wesal-medium shrink-0">
+                          <span className="text-[11px] text-gray-500 shrink-0">
                             {timeAgo(room.lastMessage.createdAt)}
                           </span>
                         )}
                       </div>
 
                       {room.otherSpecialty && (
-                        <p className="text-[11px] text-wesal-medium mt-0.5">{room.otherSpecialty}</p>
+                        <p className="text-[11px] text-[#25D366] mt-0.5 font-medium">{room.otherSpecialty}</p>
                       )}
 
-                      <div className="flex items-center justify-between gap-2 mt-1">
+                      <div className="flex items-center justify-between gap-2 mt-0.5">
                         <div className="flex items-center gap-1 min-w-0">
                           {room.lastMessage?.messageType === 'voice' && (
-                            <span className="material-symbols-outlined text-wesal-medium text-sm shrink-0">mic</span>
+                            <span className="material-symbols-outlined text-gray-400 text-sm shrink-0">mic</span>
                           )}
-                          <p className={`text-xs truncate ${isSentByMe ? 'text-wesal-dark/60' : 'text-wesal-medium'}`}>
-                            {room.lastMessage?.messageType === 'voice' ? 'رسالة صوتية' : preview}
+                          <p className={`text-[13px] truncate ${isSentByMe ? 'text-gray-500' : 'text-gray-600'}`}>
+                            {preview}
                           </p>
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0">
                           {room.unreadCount > 0 && (
-                            <span className="min-w-[20px] h-5 flex items-center justify-center bg-wesal-dark rounded-full text-[10px] font-bold text-white px-1.5">
+                            <span className="min-w-[20px] h-5 flex items-center justify-center bg-[#25D366] rounded-full text-[10px] font-bold text-white px-1.5">
                               {room.unreadCount > 9 ? '9+' : room.unreadCount}
                             </span>
                           )}
                         </div>
                       </div>
-
-                      {/* Status badge */}
-                      {statusInfo && statusInfo.label && (
-                        <span className={`inline-block mt-1.5 text-[10px] font-medium px-2 py-0.5 rounded-full border ${statusInfo.color}`}>
-                          {statusInfo.label}
-                        </span>
-                      )}
                     </div>
-
-                    {/* Arrow */}
-                    <svg className="w-4 h-4 text-wesal-medium/30 group-hover:text-wesal-dark transition-colors shrink-0 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
                   </Link>
 
-                  {/* Delete button (appears on hover/tap) */}
+                  {/* Delete button */}
                   <button
                     onClick={(e) => {
                       e.preventDefault();
@@ -276,19 +289,19 @@ export default function ChatListPage() {
                         setTimeout(() => setShowConfirm(null), 3000);
                       }
                     }}
-                    className={`absolute top-1/2 -translate-y-1/2 left-1 z-10 p-2 rounded-full shadow-md transition-all active:scale-90 ${
+                    className={`absolute top-1/2 -translate-y-1/2 left-2 z-10 p-1.5 rounded-full shadow-md transition-all active:scale-90 ${
                       isConfirming
                         ? 'bg-red-500 text-white hover:bg-red-600'
-                        : 'bg-white text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-300 opacity-0 group-hover:opacity-100 focus:opacity-100'
+                        : 'bg-white text-gray-400 hover:text-red-500 border border-gray-200 opacity-0 group-hover:opacity-100'
                     }`}
-                    title={isConfirming ? 'اضغط مرة تانية للحذف' : 'حذف المحادثة'}
+                    title={isConfirming ? 'اضغط مرة تانية للحذف' : 'حذف'}
                   >
                     {deletingId === room.id ? (
-                      <span className="material-symbols-outlined text-base animate-spin">progress_activity</span>
+                      <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
                     ) : isConfirming ? (
-                      <span className="material-symbols-outlined text-base">delete_forever</span>
+                      <span className="material-symbols-outlined text-[16px]">delete_forever</span>
                     ) : (
-                      <span className="material-symbols-outlined text-base">delete</span>
+                      <span className="material-symbols-outlined text-[16px]">delete_outline</span>
                     )}
                   </button>
                 </div>
@@ -297,6 +310,9 @@ export default function ChatListPage() {
           </div>
         )}
       </div>
+
+      {/* Bottom safe area spacer for mobile */}
+      <div className="h-safe-bottom" />
     </div>
   );
 }

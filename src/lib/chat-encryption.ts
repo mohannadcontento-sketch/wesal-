@@ -5,16 +5,16 @@ import crypto from 'crypto';
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 12;
 const AUTH_TAG_LENGTH = 16;
+const PREFIX = 'enc:v1:';
 
 function getEncryptionKey(): Buffer {
   const secret = process.env.ENCRYPTION_SECRET || 'wesal-chat-encryption-key-2024';
-  // Derive a 32-byte key from the secret using SHA-256
   return crypto.createHash('sha256').update(secret).digest();
 }
 
 /**
  * Encrypt a text message using AES-256-GCM
- * Returns: base64 encoded string (iv:authTag:ciphertext)
+ * Returns: base64 encoded string with prefix to identify encrypted content
  */
 export function encryptMessage(plaintext: string): string {
   try {
@@ -26,11 +26,9 @@ export function encryptMessage(plaintext: string): string {
     encrypted = Buffer.concat([encrypted, cipher.final()]);
     const authTag = cipher.getAuthTag();
 
-    // Format: base64(iv + authTag + ciphertext)
     const combined = Buffer.concat([iv, authTag, encrypted]);
-    return combined.toString('base64');
+    return PREFIX + combined.toString('base64');
   } catch {
-    // If encryption fails, return original text (graceful degradation)
     return plaintext;
   }
 }
@@ -39,12 +37,27 @@ export function encryptMessage(plaintext: string): string {
  * Decrypt a message encrypted with encryptMessage
  * Returns: original plaintext string
  */
-export function decryptMessage(encryptedBase64: string): string {
+export function decryptMessage(cipherText: string): string {
   try {
-    const key = getEncryptionKey();
-    const combined = Buffer.from(encryptedBase64, 'base64');
+    let base64Data = cipherText;
 
-    // Extract IV, auth tag, and ciphertext
+    // Handle both prefixed and non-prefixed formats (backwards compatibility)
+    if (cipherText.startsWith(PREFIX)) {
+      base64Data = cipherText.slice(PREFIX.length);
+    } else {
+      // For old format without prefix, check if it looks like base64
+      // If it doesn't start with our prefix, it's probably not encrypted
+      // or it's plain text - return as is
+      if (cipherText.length < 20) return cipherText;
+    }
+
+    const key = getEncryptionKey();
+    const combined = Buffer.from(base64Data, 'base64');
+
+    // Check minimum viable length for IV + authTag + at least 1 byte ciphertext
+    const minLen = IV_LENGTH + AUTH_TAG_LENGTH + 1;
+    if (combined.length < minLen) return cipherText;
+
     const iv = combined.subarray(0, IV_LENGTH);
     const authTag = combined.subarray(IV_LENGTH, IV_LENGTH + AUTH_TAG_LENGTH);
     const ciphertext = combined.subarray(IV_LENGTH + AUTH_TAG_LENGTH);
@@ -57,20 +70,42 @@ export function decryptMessage(encryptedBase64: string): string {
 
     return decrypted.toString('utf8');
   } catch {
-    // If decryption fails, return original (might not be encrypted)
-    return encryptedBase64;
+    // If decryption fails, return original (might not be encrypted or be plain text)
+    return cipherText;
   }
 }
 
 /**
- * Check if a string appears to be encrypted (base64 with sufficient length)
+ * Check if a string is encrypted content
+ * New format uses 'enc:v1:' prefix for reliable detection
  */
 export function isEncrypted(text: string): boolean {
-  if (!text || text.length < 50) return false;
+  if (!text) return false;
+  // New format has explicit prefix
+  if (text.startsWith(PREFIX)) return true;
+  // Old format: base64 with minimum length check (backwards compat)
+  if (text.length < 50) return false;
   try {
     const buf = Buffer.from(text, 'base64');
     return buf.length >= IV_LENGTH + AUTH_TAG_LENGTH + 1;
   } catch {
     return false;
   }
+}
+
+/**
+ * Check if stored content needs migration from old format
+ */
+export function needsMigration(text: string): boolean {
+  if (!text) return false;
+  // If it's encrypted but doesn't have the prefix, it's old format
+  if (!text.startsWith(PREFIX) && text.length >= 50) {
+    try {
+      const buf = Buffer.from(text, 'base64');
+      return buf.length >= IV_LENGTH + AUTH_TAG_LENGTH + 1;
+    } catch {
+      return false;
+    }
+  }
+  return false;
 }
