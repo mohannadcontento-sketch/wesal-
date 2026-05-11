@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { CommentList } from '@/components/comments/CommentList';
 import { toast } from 'sonner';
@@ -45,6 +46,11 @@ export function PostCard({ post, onDelete }: PostCardProps) {
   const [reportDetails, setReportDetails] = useState('');
   const [reporting, setReporting] = useState(false);
   const [reported, setReported] = useState(false);
+  const [chatLoading, setChatLoading] = useState(false);
+  const router = useRouter();
+
+  const isOwnPost = user && user.userId === post.authorId;
+  const canMessage = user && !isOwnPost;
 
   const timeAgo = (date: string) => {
     const diff = Date.now() - new Date(date).getTime();
@@ -154,6 +160,38 @@ export function PostCard({ post, onDelete }: PostCardProps) {
     }
   };
 
+  const handleMessageAuthor = async () => {
+    if (!user) {
+      toast.error('سجل دخول الأول');
+      return;
+    }
+    if (isOwnPost) return;
+
+    setChatLoading(true);
+    try {
+      const endpoint = user.role === 'admin' ? '/api/chat/admin' : '/api/chat/quick';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetUserId: post.authorId }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        toast.error(data.error || 'حصل خطأ');
+        return;
+      }
+
+      const data = await res.json();
+      toast.success('تم فتح المحادثة');
+      router.push(`/chat/${data.roomId}`);
+    } catch {
+      toast.error('حصل خطأ');
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
   const totalReactions = Object.values(reactions).reduce((a, b) => a + b, 0);
   const isDoctor = post.authorRole === 'doctor';
   const isLiked = userReaction === 'heart' || userReaction === 'like';
@@ -235,6 +273,22 @@ export function PostCard({ post, onDelete }: PostCardProps) {
               )}
               {isDoctor && (
                 <span className="material-symbols-outlined filled text-[16px] text-primary-container">verified</span>
+              )}
+              {/* Message button - visible when logged in and not own post */}
+              {canMessage && (
+                <button
+                  onClick={handleMessageAuthor}
+                  disabled={chatLoading}
+                  className="text-on-surface-variant hover:text-primary-container transition-colors p-0.5 rounded-full hover:bg-surface-container-high disabled:opacity-50"
+                  title={user?.role === 'admin' || isDoctor ? 'محادثة' : 'الشات متاح مع الأطباء بس'}
+                  aria-label="محادثة"
+                >
+                  {chatLoading ? (
+                    <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
+                  ) : (
+                    <span className="material-symbols-outlined text-[16px]">chat_bubble</span>
+                  )}
+                </button>
               )}
             </div>
             <p className="text-xs text-on-surface-variant">

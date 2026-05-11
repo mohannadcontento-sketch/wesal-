@@ -213,6 +213,51 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+
+      {/* Quick Access */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        {/* Users Quick Access */}
+        <Link
+          href="/admin/users"
+          className="bg-white/10 backdrop-blur-[40px] border border-white/40 rounded-xl p-6 shadow-[0_4px_24px_0_rgba(0,43,45,0.05)] hover:shadow-lg hover:border-primary/30 transition-all group cursor-pointer"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-container to-primary flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform">
+                <span className="material-symbols-outlined text-2xl text-on-primary">group</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-primary">إدارة المستخدمين</h3>
+                <p className="text-sm text-on-surface-variant mt-0.5">
+                  {isLoadingStats ? '...' : `${stats.totalUsers} مستخدم مسجل`}
+                </p>
+              </div>
+            </div>
+            <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary group-hover:-translate-x-1 transition-all">chevron_left</span>
+          </div>
+        </Link>
+
+        {/* Verification Quick Access */}
+        <Link
+          href="/admin/verification"
+          className="bg-white/10 backdrop-blur-[40px] border border-white/40 rounded-xl p-6 shadow-[0_4px_24px_0_rgba(0,43,45,0.05)] hover:shadow-lg hover:border-primary/30 transition-all group cursor-pointer"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-tertiary-fixed to-primary-container flex items-center justify-center shadow-lg shadow-primary-container/20 group-hover:scale-105 transition-transform">
+                <span className="material-symbols-outlined text-2xl text-on-primary">verified_user</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-primary">طلبات التوثيق</h3>
+                <p className="text-sm text-on-surface-variant mt-0.5">
+                  {isLoadingStats ? '...' : `${stats.pendingVerifications} طلب معلق`}
+                </p>
+              </div>
+            </div>
+            <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary group-hover:-translate-x-1 transition-all">chevron_left</span>
+          </div>
+        </Link>
+      </div>
     </div>
   );
 }

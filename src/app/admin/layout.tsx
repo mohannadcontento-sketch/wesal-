@@ -7,8 +7,8 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 const navItems = [
-  { label: 'طلبات التحقق', href: '/admin', icon: 'verified_user' },
-  { label: 'إدارة المستخدمين', href: '/admin/verification', icon: 'group' },
+  { label: 'طلبات التحقق', href: '/admin/verification', icon: 'verified_user' },
+  { label: 'إدارة المستخدمين', href: '/admin/users', icon: 'group' },
   { label: 'إدارة الفعاليات', href: '/admin/events', icon: 'event' },
   { label: 'البلاغات', href: '/admin/reports', icon: 'report' },
   { label: 'إعدادات النظام', href: '/admin/settings', icon: 'settings' },
