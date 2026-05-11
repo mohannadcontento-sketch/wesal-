@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getUserFromSession } from '@/lib/auth/session';
-import { decryptMessage, isEncrypted } from '@/lib/chat-encryption';
+import { decryptMessage } from '@/lib/chat-encryption';
 
 export async function GET(req: Request, { params }: { params: Promise<{ roomId: string }> }) {
   try {
@@ -66,8 +66,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
       let decryptedContent = msg.content;
 
       if (msg.messageType === 'text' && msg.content) {
-        // Always try to decrypt text messages - decryptMessage handles
-        // both encrypted and plain text gracefully
         decryptedContent = decryptMessage(msg.content);
       }
 
@@ -85,7 +83,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
     let patientCanSend = true;
     let sessionMessage = '';
 
-    // Admin can always send, no restrictions
     if (!isAdmin && isPatient && appointment && appointment.appointmentDate) {
       const apptDate = new Date(appointment.appointmentDate);
       const now = new Date();
@@ -110,13 +107,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
       }
     }
 
-    // If no appointment linked (admin chat), patientCanSend stays true for admin
-    // For non-admin users without appointment, they can always send
     if (!isAdmin && !isPatient && !appointment) {
       patientCanSend = true;
     }
 
-    // Check if room is closed
     const isRoomClosed = room.status === 'closed';
     const canSend = isAdmin ? true : (!isRoomClosed && (!isPatient || patientCanSend));
 
@@ -161,18 +155,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
     });
     if (!room) return NextResponse.json({ error: 'الشات مش موجود' }, { status: 404 });
 
-    // Check access
     const isAdmin = user.role === 'admin';
     if (room.patientId !== user.id && room.doctorId !== user.id && !isAdmin) {
       return NextResponse.json({ error: 'مش مسموح' }, { status: 403 });
     }
 
-    // Check room is not closed
     if (room.status === 'closed' && !isAdmin) {
       return NextResponse.json({ error: 'المحادثة مقفلة. مش تقدر تبعت رسالة' }, { status: 403 });
     }
 
-    // Patient session window check
     const isPatient = user.id === room.patientId;
     if (!isAdmin && isPatient && room.appointment) {
       const appointment = room.appointment;
@@ -206,7 +197,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
     if (!content) return NextResponse.json({ error: 'اكتب رسالة' }, { status: 400 });
     if (content.length > 5000) return NextResponse.json({ error: 'الرسالة طويلة أوي. الحد الأقصى 5000 حرف' }, { status: 400 });
 
-    // Rate limit: 30 msgs/hour
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
     const recentCount = await db.chatMessage.count({
       where: { roomId, senderId: user.id, createdAt: { gte: oneHourAgo } },
@@ -215,7 +205,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
       return NextResponse.json({ error: 'أنت بتقصد كتير. استنى شوية وبعدين كمّل' }, { status: 429 });
     }
 
-    // Encrypt message content before storing (new format with prefix)
     const { encryptMessage } = await import('@/lib/chat-encryption');
     const encryptedContent = encryptMessage(content);
 
@@ -236,7 +225,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
     return NextResponse.json({
       message: {
         ...message,
-        content, // Return decrypted content to display
+        content,
         createdAt: message.createdAt.toISOString(),
         sender: {
           name: sender?.profile?.realName || sender?.profile?.username || 'مستخدم',
@@ -246,6 +235,58 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
     }, { status: 201 });
   } catch (error) {
     console.error('Chat message POST error:', error);
+    return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });
+  }
+}
+
+// DELETE /api/chat/[roomId]/messages - Delete a single message
+// messageId is passed in the request body
+export async function DELETE(req: Request, { params }: { params: Promise<{ roomId: string }> }) {
+  try {
+    const user = await getUserFromSession(req);
+    if (!user) return NextResponse.json({ error: 'سجل دخول' }, { status: 401 });
+
+    const { roomId } = await params;
+    const body = await req.json();
+    const { messageId } = body;
+
+    if (!messageId) {
+      return NextResponse.json({ error: 'حدد الرسالة' }, { status: 400 });
+    }
+
+    // Find the room
+    const room = await db.chatRoom.findUnique({
+      where: { id: roomId },
+    });
+
+    if (!room) return NextResponse.json({ error: 'الشات مش موجود' }, { status: 404 });
+
+    // Check access
+    if (room.patientId !== user.id && room.doctorId !== user.id && user.role !== 'admin') {
+      return NextResponse.json({ error: 'مش مسموح' }, { status: 403 });
+    }
+
+    // Find the message
+    const message = await db.chatMessage.findUnique({
+      where: { id: messageId },
+    });
+
+    if (!message || message.roomId !== roomId) {
+      return NextResponse.json({ error: 'الرسالة مش موجودة' }, { status: 404 });
+    }
+
+    // Only sender or admin can delete
+    if (message.senderId !== user.id && user.role !== 'admin') {
+      return NextResponse.json({ error: 'مش مسموح تحذف الرسالة دي' }, { status: 403 });
+    }
+
+    await db.chatMessage.delete({
+      where: { id: messageId },
+    });
+
+    return NextResponse.json({ message: 'تم حذف الرسالة', deletedMessageId: messageId });
+  } catch (error) {
+    console.error('Delete message error:', error);
     return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });
   }
 }

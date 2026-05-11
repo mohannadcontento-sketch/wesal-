@@ -51,7 +51,7 @@ function timeAgo(dateStr: string): string {
     return `${hours === 0 ? 12 : hours > 12 ? hours - 12 : hours}:${mins} ${hours >= 12 ? 'م' : 'ص'}`;
   }
 
-  if (diffDays < 7) return `أمس`;
+  if (diffDays < 7) return 'أمس';
 
   return date.toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' });
 }
@@ -61,7 +61,7 @@ export default function ChatListPage() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [showConfirm, setShowConfirm] = useState<string | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export default function ChatListPage() {
       if (res.ok) {
         setRooms(prev => prev.filter(r => r.id !== roomId));
         toast.success('تم حذف المحادثة');
-        setShowConfirm(null);
+        setSelectedRoom(null);
       } else toast.error('مش قادر يحذف المحادثة');
     } catch { toast.error('حصل خطأ'); }
     finally { setDeletingId(null); }
@@ -202,7 +202,6 @@ export default function ChatListPage() {
           <div className="divide-y divide-surface-container-low">
             {filteredRooms.map((room) => {
               const isSentByMe = room.lastMessage?.senderId === user?.userId;
-              const isConfirming = showConfirm === room.id;
 
               const preview = room.lastMessage
                 ? room.lastMessage.messageType === 'voice'
@@ -213,7 +212,7 @@ export default function ChatListPage() {
                 : '';
 
               return (
-                <div key={room.id} className="relative">
+                <div key={room.id} className="relative group/room">
                   <Link
                     href={`/chat/${room.id}`}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-low/50 transition-colors active:bg-surface-container-low"
@@ -269,36 +268,21 @@ export default function ChatListPage() {
                       </div>
                     </div>
 
-                    {/* Chevron */}
+                    {/* Chevron - desktop only */}
                     <span className="material-symbols-outlined text-on-surface-variant/30 text-lg shrink-0 sm:block hidden">chevron_left</span>
                   </Link>
 
-                  {/* Delete button - always visible on mobile, hover on desktop */}
+                  {/* Delete button - swipe hint icon on mobile, hover on desktop */}
                   <button
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      if (isConfirming) {
-                        deleteRoom(room.id);
-                      } else {
-                        setShowConfirm(room.id);
-                        setTimeout(() => setShowConfirm(null), 3000);
-                      }
+                      setSelectedRoom(room);
                     }}
-                    className={`absolute top-1/2 -translate-y-1/2 left-2 z-10 p-1.5 rounded-full shadow-md transition-all active:scale-90 ${
-                      isConfirming
-                        ? 'bg-error text-on-error'
-                        : 'bg-surface-bright text-on-surface-variant border border-surface-container hover:text-error hover:border-error/30 sm:opacity-0 sm:group-hover:opacity-100'
-                    }`}
-                    title={isConfirming ? 'اضغط مرة تانية للحذف' : 'حذف'}
+                    className="absolute top-1/2 -translate-y-1/2 left-1 z-10 w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant/40 hover:text-error hover:bg-error-container transition-all active:scale-90 sm:opacity-0 sm:group-hover/room:opacity-100"
+                    title="حذف المحادثة"
                   >
-                    {deletingId === room.id ? (
-                      <span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>
-                    ) : isConfirming ? (
-                      <span className="material-symbols-outlined text-[16px]">delete_forever</span>
-                    ) : (
-                      <span className="material-symbols-outlined text-[16px]">delete_outline</span>
-                    )}
+                    <span className="material-symbols-outlined text-[18px]">delete_outline</span>
                   </button>
                 </div>
               );
@@ -306,6 +290,66 @@ export default function ChatListPage() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Bottom Sheet */}
+      {selectedRoom && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedRoom(null)} />
+          <div className="relative z-10 w-full max-w-lg bg-surface-bright rounded-t-2xl shadow-2xl animate-slide-up overflow-hidden">
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 rounded-full bg-surface-container-high" />
+            </div>
+
+            {/* Room info */}
+            <div className="px-5 py-3 border-b border-surface-container">
+              <p className="text-sm text-on-surface-variant font-medium mb-2">حذف محادثة</p>
+              <div className="flex items-center gap-3">
+                <UserAvatar
+                  avatarUrl={selectedRoom.otherAvatar}
+                  username={selectedRoom.otherName}
+                  size="sm"
+                  className="!w-10 !h-10"
+                />
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-on-surface truncate">{selectedRoom.otherName}</p>
+                  <p className="text-[11px] text-on-surface-variant">المحادثة هتمسح نهائياً مع كل الرسائل</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="p-2">
+              <button
+                onClick={() => deleteRoom(selectedRoom.id)}
+                disabled={deletingId === selectedRoom.id}
+                className="flex items-center gap-3 w-full px-4 py-3.5 text-sm font-medium text-error hover:bg-error-container rounded-xl transition-colors active:scale-[0.98] disabled:opacity-50"
+              >
+                <div className="w-9 h-9 rounded-full bg-error/10 flex items-center justify-center shrink-0">
+                  {deletingId === selectedRoom.id ? (
+                    <span className="material-symbols-outlined text-error text-xl animate-spin">progress_activity</span>
+                  ) : (
+                    <span className="material-symbols-outlined text-error text-xl">delete_forever</span>
+                  )}
+                </div>
+                <span>حذف المحادثة</span>
+              </button>
+              <button
+                onClick={() => setSelectedRoom(null)}
+                className="flex items-center gap-3 w-full px-4 py-3.5 text-sm font-medium text-on-surface hover:bg-surface-container-low rounded-xl transition-colors active:scale-[0.98]"
+              >
+                <div className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-on-surface-variant text-xl">close</span>
+                </div>
+                إلغاء
+              </button>
+            </div>
+
+            {/* Safe area */}
+            <div className="pb-safe-bottom" />
+          </div>
+        </div>
+      )}
 
       {/* Bottom safe area */}
       <div className="pb-safe-bottom" />

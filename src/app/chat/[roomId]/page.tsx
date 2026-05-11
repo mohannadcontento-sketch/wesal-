@@ -36,6 +36,8 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
   const [playbackProgress, setPlaybackProgress] = useState(0);
   const [uploadProgress, setUploadProgress] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const [deletingMessage, setDeletingMessage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const recordStartTimeRef = useRef<number>(0);
@@ -46,6 +48,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const progressAnimRef = useRef<number>(0);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const otherPerson = (() => {
     if (!roomInfo || !user) return { name: 'الدكتور', avatarUrl: null };
@@ -87,6 +90,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
       if (recordTimerRef.current) clearInterval(recordTimerRef.current);
       if (autoStopTimerRef.current) clearTimeout(autoStopTimerRef.current);
       if (progressAnimRef.current) cancelAnimationFrame(progressAnimRef.current);
+      if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
       if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
         mediaRecorderRef.current.stream.getTracks().forEach((t) => t.stop());
         mediaRecorderRef.current.stop(); mediaRecorderRef.current = null;
@@ -109,6 +113,34 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
         else toast.error('حصل خطأ');
       }
     } catch { toast.error('حصل خطأ'); }
+  };
+
+  const deleteMessage = async (messageId: string) => {
+    setDeletingMessage(messageId);
+    try {
+      const res = await fetch(`/api/chat/${roomId}/messages`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messageId }) });
+      if (res.ok) {
+        setMessages(prev => prev.filter(m => m.id !== messageId));
+        toast.success('تم حذف الرسالة');
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || 'مش قادر يحذف الرسالة');
+      }
+    } catch { toast.error('حصل خطأ'); }
+    finally { setDeletingMessage(null); setSelectedMessage(null); }
+  };
+
+  const handleLongPressStart = (msg: Message) => {
+    longPressTimerRef.current = setTimeout(() => {
+      setSelectedMessage(msg);
+    }, 500);
+  };
+
+  const handleLongPressEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
   };
 
   const sendText = async () => {
@@ -165,7 +197,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current?.state !== 'inactive') mediaRecorderRef.current?.stop();
+    if (mediaRecorderRef.current?.state !== 'inactive') mediaRecorderRef.current.stop();
     setRecording(false);
     if (autoStopTimerRef.current) { clearTimeout(autoStopTimerRef.current); autoStopTimerRef.current = null; }
   };
@@ -370,9 +402,10 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
               const msgIndex = messages.findIndex(m => m.id === msg.id);
               const prevMsg = msgIndex > 0 ? messages[msgIndex - 1] : null;
               const showAvatar = !prevMsg || prevMsg.senderId !== msg.senderId;
+              const isDeleting = deletingMessage === msg.id;
 
               return (
-                <div key={msg.id} className={`flex ${isMe ? 'justify-start' : 'justify-end'} mb-1`}>
+                <div key={msg.id} className={`flex ${isMe ? 'justify-start' : 'justify-end'} mb-1 group/msg`}>
                   <div className={`flex items-end gap-1 sm:gap-1.5 max-w-[85%] sm:max-w-[75%] ${isMe ? 'flex-row' : 'flex-row-reverse'}`}>
 
                     {!isMe && (
@@ -381,7 +414,14 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
                       </div>
                     )}
 
-                    <div className={`relative ${isMe ? 'order-1' : ''}`}>
+                    <div className={`relative ${isMe ? 'order-1' : ''} transition-transform duration-150 active:scale-[0.98]`}
+                      onTouchStart={(msg.messageType !== 'text' || isTemp) ? undefined : () => handleLongPressStart(msg)}
+                      onTouchEnd={handleLongPressEnd}
+                      onTouchMove={handleLongPressEnd}
+                      onMouseDown={(msg.messageType !== 'text' || isTemp) ? undefined : () => handleLongPressStart(msg)}
+                      onMouseUp={handleLongPressEnd}
+                      onMouseLeave={handleLongPressEnd}
+                    >
                       {msg.messageType === 'text' && (
                         <div className={`relative px-2.5 sm:px-3 pt-1.5 pb-1 shadow-sm ${
                           isMe ? 'bg-primary text-on-primary rounded-2xl rounded-tr-sm' : 'bg-surface-bright text-on-surface rounded-2xl rounded-tl-sm'
@@ -389,15 +429,28 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
                           {!isMe && showAvatar && (
                             <p className="text-[10px] sm:text-[11px] font-semibold text-wesal-sky mb-0.5">{senderName}</p>
                           )}
-                          <div className="flex items-end gap-1.5">
-                            <p className="text-[13.5px] sm:text-[14.5px] leading-[18px] sm:leading-[19px] whitespace-pre-wrap break-words">{msg.content}</p>
-                            <span className="flex items-center gap-0.5 shrink-0 translate-y-[2px]">
-                              <span className={`text-[9px] sm:text-[10px] leading-none ${isMe ? 'text-on-primary/60' : 'text-on-surface-variant'}`}>{formatTime(msg.createdAt)}</span>
-                              {isMe && (
-                                <span className={`material-symbols-outlined ${isTemp ? 'text-on-primary/40' : 'text-on-primary/70'}`} style={{ fontSize: 14 }}>done_all</span>
-                              )}
+
+                          {/* Message text - proper wrapping */}
+                          <p className="text-[13.5px] sm:text-[14.5px] leading-relaxed sm:leading-[20px] whitespace-pre-wrap break-words [overflow-wrap:anywhere] min-w-0">
+                            {msg.content}
+                          </p>
+
+                          {/* Time + status - below text */}
+                          <div className={`flex items-center justify-end gap-1 mt-0.5 -mb-0.5`}>
+                            <span className={`text-[9px] sm:text-[10px] leading-none ${isMe ? 'text-on-primary/60' : 'text-on-surface-variant'}`}>
+                              {formatTime(msg.createdAt)}
                             </span>
+                            {isMe && (
+                              <span className={`material-symbols-outlined ${isTemp ? 'text-on-primary/40' : 'text-on-primary/70'}`} style={{ fontSize: 14 }}>done_all</span>
+                            )}
                           </div>
+
+                          {/* Delete indicator on hover / after long press */}
+                          {isDeleting && (
+                            <div className="absolute inset-0 bg-on-surface/20 rounded-2xl flex items-center justify-center">
+                              <span className="material-symbols-outlined text-on-surface animate-spin text-2xl">progress_activity</span>
+                            </div>
+                          )}
                         </div>
                       )}
 
@@ -469,6 +522,61 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
 
         <div ref={messagesEndRef} />
       </main>
+
+      {/* Message Action Bottom Sheet */}
+      {selectedMessage && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedMessage(null)} />
+          <div className="relative z-10 w-full max-w-lg bg-surface-bright rounded-t-2xl shadow-2xl animate-slide-up overflow-hidden">
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 rounded-full bg-surface-container-high" />
+            </div>
+
+            {/* Message preview */}
+            <div className="px-5 py-3 border-b border-surface-container">
+              <p className="text-sm text-on-surface-variant font-medium mb-1">رسالة</p>
+              <p className="text-sm text-on-surface leading-relaxed line-clamp-3 whitespace-pre-wrap">
+                {selectedMessage.messageType === 'voice' ? 'رسالة صوتية' : selectedMessage.content}
+              </p>
+              <p className="text-[11px] text-on-surface-variant/60 mt-1">{formatTime(selectedMessage.createdAt)}</p>
+            </div>
+
+            {/* Actions */}
+            <div className="p-2">
+              {isSentByMe(selectedMessage.senderId) && (
+                <button
+                  onClick={() => deleteMessage(selectedMessage.id)}
+                  disabled={deletingMessage === selectedMessage.id}
+                  className="flex items-center gap-3 w-full px-4 py-3.5 text-sm font-medium text-error hover:bg-error-container rounded-xl transition-colors active:scale-[0.98] disabled:opacity-50"
+                >
+                  <div className="w-9 h-9 rounded-full bg-error/10 flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-error text-xl">delete</span>
+                  </div>
+                  <div className="text-right">
+                    <span>حذف الرسالة</span>
+                    {deletingMessage === selectedMessage.id && (
+                      <span className="material-symbols-outlined text-error text-lg animate-spin mr-2 align-middle">progress_activity</span>
+                    )}
+                  </div>
+                </button>
+              )}
+              <button
+                onClick={() => setSelectedMessage(null)}
+                className="flex items-center gap-3 w-full px-4 py-3.5 text-sm font-medium text-on-surface hover:bg-surface-container-low rounded-xl transition-colors active:scale-[0.98]"
+              >
+                <div className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-on-surface-variant text-xl">close</span>
+                </div>
+                إلغاء
+              </button>
+            </div>
+
+            {/* Safe area */}
+            <div className="pb-safe-bottom" />
+          </div>
+        </div>
+      )}
 
       {/* Recording bar */}
       {recording && (
