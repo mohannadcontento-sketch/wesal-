@@ -43,6 +43,8 @@ interface RoomInfo {
   patientCanSend: boolean;
   sessionMessage: string;
   isPatient: boolean;
+  isAdmin?: boolean;
+  isClosed?: boolean;
 }
 
 const MAX_RECORDING_SECONDS = 300; // 5 minutes
@@ -130,7 +132,32 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
     };
   }, []);
 
-  const patientBlocked = roomInfo?.isPatient && !roomInfo?.patientCanSend;
+  const patientBlocked = !roomInfo?.patientCanSend;
+  const [showMenu, setShowMenu] = useState(false);
+  const [roomAction, setRoomAction] = useState<string | null>(null);
+
+  const handleRoomAction = async (action: 'close' | 'open' | 'delete') => {
+    try {
+      if (action === 'delete') {
+        const res = await fetch(`/api/chat/rooms/${roomId}`, { method: 'DELETE' });
+        if (res.ok) {
+          toast.success('تم حذف المحادثة');
+          window.location.href = '/chat';
+        } else toast.error('مش قادر يحذف');
+      } else {
+        const res = await fetch(`/api/chat/rooms/${roomId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: action === 'close' ? 'closed' : 'open' }),
+        });
+        if (res.ok) {
+          toast.success(action === 'close' ? 'تم إغلاق المحادثة' : 'تم فتح المحادثة');
+          fetchMessages();
+        } else toast.error('حصل خطأ');
+      }
+    } catch { toast.error('حصل خطأ'); }
+    setShowMenu(false);
+  };
 
   const sendText = async () => {
     if (!text.trim() || sending || patientBlocked) return;
@@ -546,14 +573,74 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
               <span className="material-symbols-outlined text-xl">event_available</span>
             </Link>
           )}
+          {/* More options menu */}
+          <div className="relative">
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="p-2 rounded-full hover:bg-wesal-ice transition-colors text-wesal-dark"
+              aria-label="خيارات"
+            >
+              <span className="material-symbols-outlined text-xl">more_vert</span>
+            </button>
+            {showMenu && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
+                <div className="absolute top-full left-0 mt-1 z-50 bg-white border border-wesal-ice rounded-xl shadow-lg py-1 min-w-[160px]">
+                  {roomInfo?.isClosed ? (
+                    <button
+                      onClick={() => handleRoomAction('open')}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-wesal-dark hover:bg-wesal-ice transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-lg text-emerald-600">lock_open</span>
+                      فتح المحادثة
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleRoomAction('close')}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-wesal-dark hover:bg-wesal-ice transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-lg text-amber-600">lock</span>
+                      إغلاق المحادثة
+                    </button>
+                  )}
+                  <hr className="border-wesal-ice my-1" />
+                  <button
+                    onClick={() => handleRoomAction('delete')}
+                    className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-lg">delete</span>
+                    حذف المحادثة
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
       {/* Session info banner for patient */}
-      {roomInfo?.isPatient && roomInfo?.appointment && !roomInfo?.patientCanSend && (
+      {roomInfo?.isPatient && roomInfo?.appointment && !roomInfo?.patientCanSend && !roomInfo?.isClosed && (
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5 flex items-center gap-2">
           <span className="material-symbols-outlined text-amber-600 text-lg">info</span>
           <span className="text-xs text-amber-700 font-medium">{formatSessionMessage(roomInfo.sessionMessage)}</span>
+        </div>
+      )}
+
+      {/* Closed room banner */}
+      {roomInfo?.isClosed && (
+        <div className="bg-gray-100 border-b border-gray-200 px-4 py-2.5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-gray-500 text-lg">lock</span>
+            <span className="text-xs text-gray-600 font-medium">المحادثة مقفلة</span>
+          </div>
+          {!roomInfo?.isAdmin && (
+            <button
+              onClick={() => handleRoomAction('open')}
+              className="text-xs text-wesal-dark font-bold hover:underline"
+            >
+              فتح
+            </button>
+          )}
         </div>
       )}
 
@@ -772,8 +859,8 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
               onChange={(e) => setText(e.target.value)}
               onKeyDown={handleKeyDown}
               onInput={handleTextareaInput}
-              disabled={recording || patientBlocked}
-              placeholder={patientBlocked ? 'مش متقدر تبعت رسالة دلوقتي...' : 'اكتب رسالة...'}
+              disabled={recording || patientBlocked || roomInfo?.isClosed}
+              placeholder={roomInfo?.isClosed ? 'المحادثة مقفلة...' : patientBlocked ? 'مش متقدر تبعت رسالة دلوقتي...' : 'اكتب رسالة...'}
             />
             <button aria-label="إضافة رموز تعبيرية" className="p-2.5 text-wesal-medium hover:text-wesal-dark transition-colors">
               <span className="material-symbols-outlined text-xl">mood</span>
@@ -784,12 +871,12 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
           <div className="flex gap-1.5 mb-1">
             <button
               aria-label={recording ? 'إيقاف التسجيل' : 'تسجيل صوتي'}
-              onClick={recording ? stopRecording : (patientBlocked ? undefined : startRecording)}
-              disabled={patientBlocked && !recording}
+              onClick={recording ? stopRecording : ((patientBlocked || roomInfo?.isClosed) ? undefined : startRecording)}
+              disabled={(patientBlocked || roomInfo?.isClosed) && !recording}
               className={`p-2.5 rounded-full transition-all active:scale-90 ${
                 recording
                   ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/30'
-                  : patientBlocked
+                  : (patientBlocked || roomInfo?.isClosed)
                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     : 'bg-wesal-ice text-wesal-dark hover:bg-wesal-sky/30'
               }`}
@@ -799,7 +886,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
             <button
               aria-label="إرسال"
               onClick={sendText}
-              disabled={!text.trim() || sending || recording || patientBlocked}
+              disabled={!text.trim() || sending || recording || patientBlocked || roomInfo?.isClosed}
               className="p-2.5 rounded-full bg-wesal-dark text-white hover:bg-wesal-navy shadow-md transition-all active:scale-90 disabled:opacity-40"
             >
               <span className="material-symbols-outlined text-xl rotate-180 filled">send</span>

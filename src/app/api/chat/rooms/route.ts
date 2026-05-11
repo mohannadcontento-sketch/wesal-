@@ -1,20 +1,21 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getUserFromSession } from '@/lib/auth/session';
+import { decryptMessage, isEncrypted } from '@/lib/chat-encryption';
 
 export async function GET(req: Request) {
   try {
     const user = await getUserFromSession(req);
     if (!user) return NextResponse.json({ error: 'سجل دخول' }, { status: 401 });
 
-    // Get chat rooms where user is patient or doctor
-    // Include rooms even without messages (created from bookings)
+    // Get chat rooms where user is participant AND has at least 1 message
     const rooms = await db.chatRoom.findMany({
       where: {
         OR: [
           { patientId: user.id },
           { doctorId: user.id },
         ],
+        messages: { some: {} },
       },
       include: {
         appointment: {
@@ -63,6 +64,14 @@ export async function GET(req: Request) {
         const lastMessage = room.messages[0] || null;
         const unreadCount = room._count.messages;
 
+        // Decrypt message content for preview
+        let previewContent: string | null = null;
+        if (lastMessage?.content) {
+          previewContent = isEncrypted(lastMessage.content)
+            ? decryptMessage(lastMessage.content)
+            : lastMessage.content;
+        }
+
         return {
           id: room.id,
           otherUserId,
@@ -73,13 +82,14 @@ export async function GET(req: Request) {
           isVerified,
           lastMessage: lastMessage ? {
             id: lastMessage.id,
-            content: lastMessage.content,
+            content: previewContent,
             messageType: lastMessage.messageType,
             createdAt: lastMessage.createdAt.toISOString(),
             senderId: lastMessage.senderId,
           } : null,
           unreadCount,
           appointment: room.appointment || null,
+          status: room.status,
           createdAt: room.createdAt.toISOString(),
         };
       })

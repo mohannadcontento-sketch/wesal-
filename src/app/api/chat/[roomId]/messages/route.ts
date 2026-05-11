@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getUserFromSession } from '@/lib/auth/session';
+import { encryptMessage, decryptMessage, isEncrypted } from '@/lib/chat-encryption';
 
 export async function GET(req: Request, { params }: { params: Promise<{ roomId: string }> }) {
   try {
@@ -23,7 +24,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
     });
     if (!room) return NextResponse.json({ error: 'الشات مش موجود' }, { status: 404 });
 
-    if (room.patientId !== user.id && room.doctorId !== user.id) {
+    // Check access: participant OR admin
+    const isAdmin = user.role === 'admin';
+    if (room.patientId !== user.id && room.doctorId !== user.id && !isAdmin) {
       return NextResponse.json({ error: 'مش مسموح' }, { status: 403 });
     }
 
@@ -38,16 +41,14 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
       orderBy: { createdAt: 'desc' },
       take: 200,
     });
-    // Return in chronological order
     messages.reverse();
 
-    // Fetch profiles separately
+    // Fetch profiles
     const [patientUser, doctorUser] = await Promise.all([
       db.user.findUnique({ where: { id: room.patientId }, include: { profile: true } }),
       db.user.findUnique({ where: { id: room.doctorId }, include: { profile: true } }),
     ]);
 
-    // Build a sender lookup map
     const senderMap: Record<string, { name: string; avatarUrl?: string | null }> = {};
     const patientProfile = patientUser?.profile;
     const doctorProfile = doctorUser?.profile;
@@ -60,17 +61,23 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
       avatarUrl: doctorProfile?.avatarUrl,
     };
 
-    // Attach sender info to each message
-    const messagesWithSender = messages.map((msg) => ({
-      ...msg,
-      createdAt: msg.createdAt.toISOString(),
-      sender: senderMap[msg.senderId] || { name: 'مجهول' },
-    }));
+    // Decrypt message contents
+    const messagesWithSender = messages.map((msg) => {
+      let decryptedContent = msg.content;
+      if (msg.content && isEncrypted(msg.content)) {
+        decryptedContent = decryptMessage(msg.content);
+      }
+      return {
+        ...msg,
+        content: decryptedContent,
+        createdAt: msg.createdAt.toISOString(),
+        sender: senderMap[msg.senderId] || { name: 'مجهول' },
+      };
+    });
 
-    // Determine if patient can send right now
+    // Session window check
     const appointment = room.appointment;
     const isPatient = user.id === room.patientId;
-    const isAdmin = user.role === 'admin';
     let patientCanSend = true;
     let sessionMessage = '';
 
@@ -78,7 +85,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
     if (!isAdmin && isPatient && appointment && appointment.appointmentDate) {
       const apptDate = new Date(appointment.appointmentDate);
       const now = new Date();
-      // Session window: 15 minutes before to 30 minutes after
       const windowStart = new Date(apptDate.getTime() - 15 * 60 * 1000);
       const windowEnd = new Date(apptDate.getTime() + 30 * 60 * 1000);
 
@@ -93,13 +99,16 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
         sessionMessage = 'انتهت الجلسة';
       } else if (now < windowStart) {
         patientCanSend = false;
-        // Format time in UTC ISO so the client can display in user's local timezone
         sessionMessage = `appointment_time:${apptDate.toISOString()}`;
       } else if (now > windowEnd) {
         patientCanSend = false;
         sessionMessage = 'انتهى وقت الجلسة';
       }
     }
+
+    // Check if room is closed
+    const isRoomClosed = room.status === 'closed';
+    const canSend = isAdmin ? true : (!isRoomClosed && (!isPatient || patientCanSend));
 
     return NextResponse.json({
       messages: messagesWithSender,
@@ -113,10 +122,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ roomId: 
         doctorName: senderMap[room.doctorId].name,
         doctorAvatar: senderMap[room.doctorId].avatarUrl,
         appointment: appointment || null,
-        patientCanSend: isAdmin ? true : patientCanSend,
+        patientCanSend: canSend,
         sessionMessage: isAdmin ? '' : sessionMessage,
         isPatient: isPatient && !isAdmin,
         isAdmin,
+        isClosed: isRoomClosed,
       },
     });
   } catch (error) {
@@ -135,23 +145,25 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
       where: { id: roomId },
       include: {
         appointment: {
-          select: {
-            appointmentDate: true,
-            status: true,
-          },
+          select: { appointmentDate: true, status: true },
         },
       },
     });
     if (!room) return NextResponse.json({ error: 'الشات مش موجود' }, { status: 404 });
 
-    if (room.patientId !== user.id && room.doctorId !== user.id) {
+    // Check access
+    const isAdmin = user.role === 'admin';
+    if (room.patientId !== user.id && room.doctorId !== user.id && !isAdmin) {
       return NextResponse.json({ error: 'مش مسموح' }, { status: 403 });
     }
 
-    // Restrict patient: can only send during session window or if confirmed
-    // Admin and doctor can always send
+    // Check room is not closed
+    if (room.status === 'closed' && !isAdmin) {
+      return NextResponse.json({ error: 'المحادثة مقفلة. مش تقدر تبعت رسالة' }, { status: 403 });
+    }
+
+    // Patient session window check
     const isPatient = user.id === room.patientId;
-    const isAdmin = user.role === 'admin';
     if (!isAdmin && isPatient && room.appointment) {
       const appointment = room.appointment;
       if (appointment.status === 'pending') {
@@ -184,7 +196,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
     if (!content) return NextResponse.json({ error: 'اكتب رسالة' }, { status: 400 });
     if (content.length > 5000) return NextResponse.json({ error: 'الرسالة طويلة أوي. الحد الأقصى 5000 حرف' }, { status: 400 });
 
-    // Rate limit: max 30 messages per hour per user per room
+    // Rate limit: 30 msgs/hour
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
     const recentCount = await db.chatMessage.count({
       where: { roomId, senderId: user.id, createdAt: { gte: oneHourAgo } },
@@ -193,16 +205,18 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
       return NextResponse.json({ error: 'أنت بتقصد كتير. استنى شوية وبعدين كمّل' }, { status: 429 });
     }
 
+    // Encrypt message content before storing
+    const encryptedContent = encryptMessage(content);
+
     const message = await db.chatMessage.create({
       data: {
         roomId,
         senderId: user.id,
         messageType: 'text',
-        content,
+        content: encryptedContent,
       },
     });
 
-    // Fetch sender profile for response
     const sender = await db.user.findUnique({
       where: { id: user.id },
       include: { profile: true },
@@ -211,6 +225,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
     return NextResponse.json({
       message: {
         ...message,
+        content, // Return decrypted content to display
         createdAt: message.createdAt.toISOString(),
         sender: {
           name: sender?.profile?.realName || sender?.profile?.username || 'مستخدم',

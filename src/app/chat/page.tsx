@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import { UserAvatar } from '@/components/avatars/UserAvatar';
 
 interface LastMessage {
@@ -29,6 +31,7 @@ interface Room {
     status: string;
     reason: string;
   } | null;
+  status: string;
   createdAt: string;
 }
 
@@ -64,8 +67,11 @@ function getStatusLabel(status: string): { label: string; color: string } {
 
 export default function ChatListPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showConfirm, setShowConfirm] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -86,6 +92,24 @@ export default function ChatListPage() {
       // ignore
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteRoom = async (roomId: string) => {
+    setDeletingId(roomId);
+    try {
+      const res = await fetch(`/api/chat/rooms/${roomId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setRooms(prev => prev.filter(r => r.id !== roomId));
+        toast.success('تم حذف المحادثة');
+        setShowConfirm(null);
+      } else {
+        toast.error('مش قادر يحذف المحادثة');
+      }
+    } catch {
+      toast.error('حصل خطأ');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -133,7 +157,7 @@ export default function ChatListPage() {
         {/* Page Header */}
         <div className="mb-5">
           <h1 className="text-2xl font-bold text-wesal-navy">المحادثات</h1>
-          <p className="text-sm text-wesal-medium mt-1">محادثاتك المحفوظة مع الأطباء</p>
+          <p className="text-sm text-wesal-medium mt-1">محادثاتك المحفوظة</p>
         </div>
 
         {rooms.length === 0 ? (
@@ -160,80 +184,114 @@ export default function ChatListPage() {
                   : room.lastMessage.content && room.lastMessage.content.length > 40
                     ? room.lastMessage.content.substring(0, 40) + '...'
                     : room.lastMessage.content || ''
-                : 'ابدأ المحادثة...';
-
+                : '';
               const isSentByMe = room.lastMessage?.senderId === user?.userId;
+              const isConfirming = showConfirm === room.id;
 
               return (
-                <Link
-                  key={room.id}
-                  href={`/chat/${room.id}`}
-                  className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-wesal-ice/50 hover:border-wesal-dark/20 hover:shadow-md transition-all group active:scale-[0.98]"
-                >
-                  {/* Avatar with online indicator */}
-                  <div className="relative shrink-0">
-                    <UserAvatar
-                      avatarUrl={room.otherAvatar}
-                      username={room.otherName}
-                      size="lg"
-                      className="!w-12 !h-12"
-                    />
-                    {statusInfo && room.appointment?.status === 'confirmed' && (
-                      <div className="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full" />
-                    )}
-                  </div>
+                <div key={room.id} className="relative">
+                  <Link
+                    href={`/chat/${room.id}`}
+                    className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-wesal-ice/50 hover:border-wesal-dark/20 hover:shadow-md transition-all group active:scale-[0.98]"
+                  >
+                    {/* Avatar */}
+                    <div className="relative shrink-0">
+                      <UserAvatar
+                        avatarUrl={room.otherAvatar}
+                        username={room.otherName}
+                        size="lg"
+                        className="!w-12 !h-12"
+                      />
+                      {statusInfo && room.appointment?.status === 'confirmed' && (
+                        <div className="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full" />
+                      )}
+                    </div>
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="text-sm font-bold text-wesal-navy truncate">
-                          {room.otherName}
-                        </span>
-                        {room.otherRole === 'doctor' && room.isVerified && (
-                          <span className="material-symbols-outlined text-blue-500 text-sm filled">verified</span>
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="text-sm font-bold text-wesal-navy truncate">
+                            {room.otherName}
+                          </span>
+                          {room.otherRole === 'doctor' && room.isVerified && (
+                            <span className="material-symbols-outlined text-blue-500 text-sm filled">verified</span>
+                          )}
+                          {room.status === 'closed' && (
+                            <span className="text-[9px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">مقفلة</span>
+                          )}
+                        </div>
+                        {room.lastMessage && (
+                          <span className="text-[11px] text-wesal-medium shrink-0">
+                            {timeAgo(room.lastMessage.createdAt)}
+                          </span>
                         )}
                       </div>
-                      {room.lastMessage && (
-                        <span className="text-[11px] text-wesal-medium shrink-0">
-                          {timeAgo(room.lastMessage.createdAt)}
+
+                      {room.otherSpecialty && (
+                        <p className="text-[11px] text-wesal-medium mt-0.5">{room.otherSpecialty}</p>
+                      )}
+
+                      <div className="flex items-center justify-between gap-2 mt-1">
+                        <div className="flex items-center gap-1 min-w-0">
+                          {room.lastMessage?.messageType === 'voice' && (
+                            <span className="material-symbols-outlined text-wesal-medium text-sm shrink-0">mic</span>
+                          )}
+                          <p className={`text-xs truncate ${isSentByMe ? 'text-wesal-dark/60' : 'text-wesal-medium'}`}>
+                            {room.lastMessage?.messageType === 'voice' ? 'رسالة صوتية' : preview}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {room.unreadCount > 0 && (
+                            <span className="min-w-[20px] h-5 flex items-center justify-center bg-wesal-dark rounded-full text-[10px] font-bold text-white px-1.5">
+                              {room.unreadCount > 9 ? '9+' : room.unreadCount}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Status badge */}
+                      {statusInfo && statusInfo.label && (
+                        <span className={`inline-block mt-1.5 text-[10px] font-medium px-2 py-0.5 rounded-full border ${statusInfo.color}`}>
+                          {statusInfo.label}
                         </span>
                       )}
                     </div>
 
-                    {room.otherSpecialty && (
-                      <p className="text-[11px] text-wesal-medium mt-0.5">{room.otherSpecialty}</p>
+                    {/* Arrow */}
+                    <svg className="w-4 h-4 text-wesal-medium/30 group-hover:text-wesal-dark transition-colors shrink-0 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+
+                  {/* Delete button (appears on hover/tap) */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (isConfirming) {
+                        deleteRoom(room.id);
+                      } else {
+                        setShowConfirm(room.id);
+                        setTimeout(() => setShowConfirm(null), 3000);
+                      }
+                    }}
+                    className={`absolute top-1/2 -translate-y-1/2 left-1 z-10 p-2 rounded-full shadow-md transition-all active:scale-90 ${
+                      isConfirming
+                        ? 'bg-red-500 text-white hover:bg-red-600'
+                        : 'bg-white text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-300 opacity-0 group-hover:opacity-100 focus:opacity-100'
+                    }`}
+                    title={isConfirming ? 'اضغط مرة تانية للحذف' : 'حذف المحادثة'}
+                  >
+                    {deletingId === room.id ? (
+                      <span className="material-symbols-outlined text-base animate-spin">progress_activity</span>
+                    ) : isConfirming ? (
+                      <span className="material-symbols-outlined text-base">delete_forever</span>
+                    ) : (
+                      <span className="material-symbols-outlined text-base">delete</span>
                     )}
-
-                    <div className="flex items-center justify-between gap-2 mt-1">
-                      <div className="flex items-center gap-1 min-w-0">
-                        {room.lastMessage?.messageType === 'voice' && (
-                          <span className="material-symbols-outlined text-wesal-medium text-sm shrink-0">mic</span>
-                        )}
-                        <p className={`text-xs truncate ${isSentByMe ? 'text-wesal-dark/60' : 'text-wesal-medium'}`}>
-                          {room.lastMessage?.messageType === 'voice' ? 'رسالة صوتية' : preview}
-                        </p>
-                      </div>
-                      {room.unreadCount > 0 && (
-                        <span className="shrink-0 min-w-[20px] h-5 flex items-center justify-center bg-wesal-dark rounded-full text-[10px] font-bold text-white px-1.5">
-                          {room.unreadCount > 9 ? '9+' : room.unreadCount}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Status badge */}
-                    {statusInfo && statusInfo.label && (
-                      <span className={`inline-block mt-1.5 text-[10px] font-medium px-2 py-0.5 rounded-full border ${statusInfo.color}`}>
-                        {statusInfo.label}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Arrow - use simple SVG instead of material icon for reliability */}
-                  <svg className="w-4 h-4 text-wesal-medium/30 group-hover:text-wesal-dark transition-colors shrink-0 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
+                  </button>
+                </div>
               );
             })}
           </div>

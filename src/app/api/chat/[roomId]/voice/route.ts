@@ -54,12 +54,19 @@ export async function POST(req: Request, { params }: { params: Promise<{ roomId:
     const room = await db.chatRoom.findUnique({ where: { id: roomId } });
     if (!room) return NextResponse.json({ error: 'الشات مش موجود' }, { status: 404 });
 
-    if (room.patientId !== user.id && room.doctorId !== user.id) {
+    // Check access: participant OR admin
+    const isAdmin = user.role === 'admin';
+    if (room.patientId !== user.id && room.doctorId !== user.id && !isAdmin) {
       return NextResponse.json({ error: 'مش مسموح' }, { status: 403 });
     }
 
+    // Check room is not closed
+    if (room.status === 'closed' && !isAdmin) {
+      return NextResponse.json({ error: 'المحادثة مقفلة. مش تقدر تبعت رسالة صوتية' }, { status: 403 });
+    }
+
     // Check patient restriction (admin can always send)
-    if (user.role !== 'admin') {
+    if (!isAdmin) {
       const { canSend, message } = await checkPatientCanSend(user.id, room);
       if (!canSend) {
         return NextResponse.json({ error: message }, { status: 403 });
