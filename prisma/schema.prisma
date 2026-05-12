@@ -32,6 +32,8 @@ model User {
   reputationGiven  ReputationLog[] @relation("ReputationGiven")
   verificationRequests VerificationRequest[]
   reportsFiled      Report[]        @relation("ReportsFiled")
+  supporterProfile  Supporter?
+  supporterBookings SupporterBooking[] @relation("UserBookings")
 }
 
 model Profile {
@@ -142,6 +144,7 @@ model ChatRoom {
   createdAt     DateTime @default(now())
   messages      ChatMessage[]
   appointment   Appointment?
+  supporterBooking  SupporterBooking?
 }
 
 model ChatMessage {
@@ -156,6 +159,40 @@ model ChatMessage {
   createdAt     DateTime @default(now())
   chatRoom      ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
   sender        User     @relation("SentMessages", fields: [senderId], references: [id])
+}
+
+model Supporter {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  bio           String?
+  specialty     String   @default("دعم نفسي")
+  experience    String?  @default("")
+  certificates  String   @default("[]")  // JSON array of certificate names
+  avatarUrl     String?
+  rating        Float    @default(0)
+  totalSessions Int      @default(0)
+  status        String   @default("pending")  // pending, approved, rejected, suspended
+  available     Boolean  @default(true)
+  reviewedBy    String?
+  reviewNotes   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookings      SupporterBooking[]
+}
+
+model SupporterBooking {
+  id              String   @id @default(cuid())
+  supporterId     String
+  userId          String
+  scheduledDate   DateTime
+  status          String   @default("upcoming")  // upcoming, active, completed, cancelled
+  notes           String?
+  chatRoomId      String?  @unique
+  createdAt       DateTime @default(now())
+  supporter       Supporter @relation(fields: [supporterId], references: [id], onDelete: Cascade)
+  user            User      @relation("UserBookings", fields: [userId], references: [id], onDelete: Cascade)
+  chatRoom        ChatRoom? @relation(fields: [chatRoomId], references: [id])
 }
 
 model Bookmark {

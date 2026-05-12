@@ -26,6 +26,13 @@ export async function GET(req: Request) {
             reason: true,
           },
         },
+        supporterBooking: {
+          select: {
+            id: true,
+            scheduledDate: true,
+            status: true,
+          },
+        },
         messages: {
           orderBy: { createdAt: 'desc' },
           take: 1,

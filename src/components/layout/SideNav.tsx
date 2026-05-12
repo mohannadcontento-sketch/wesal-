@@ -14,6 +14,7 @@ export function SideNav() {
   const navItems = [
     { href: '/', label: 'الرئيسية', icon: 'home' },
     { href: '/doctors', label: 'الأطباء', icon: 'medical_services' },
+    { href: '/supporters', label: 'الداعمون', icon: 'volunteer_activism' },
     { href: '/events', label: 'الفعاليات', icon: 'event' },
     { href: '/bookmarks', label: 'المحفوظات', icon: 'bookmark' },
     { href: '/notifications', label: 'التنبيهات', icon: 'notifications' },
