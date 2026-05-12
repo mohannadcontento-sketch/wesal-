@@ -35,9 +35,19 @@ export async function POST(req: Request) {
       );
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       return NextResponse.json(
-        { error: 'كلمة المرور لازم تكون 6 أحرف على الأقل' },
+        { error: 'كلمة المرور لازم تكون 8 أحرف على الأقل وتحتوي أرقام وحروف' },
+        { status: 400 }
+      );
+    }
+
+    // Basic password complexity check
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    if (!hasLetter || !hasNumber) {
+      return NextResponse.json(
+        { error: 'كلمة المرور لازم تحتوي حروف وأرقام' },
         { status: 400 }
       );
     }
@@ -140,7 +150,9 @@ export async function POST(req: Request) {
               specialty: specialty || 'دعم نفسي',
               experience: experience || '',
               certificates: typeof certificates === 'string' ? certificates : JSON.stringify(certificates || []),
+              certificateFiles: JSON.stringify([]),
               status: 'pending',
+              source: 'application',
             },
           },
         } : {}),

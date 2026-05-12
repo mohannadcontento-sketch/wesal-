@@ -32,11 +32,17 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       },
     });
 
-    // When approving: update user role to 'trusted'
+    // When approving: update user role to 'supporter'
     if (status === 'approved') {
       await db.user.update({
         where: { id: supporter.userId },
-        data: { role: 'trusted' },
+        data: { role: 'supporter' },
+      });
+
+      // Also update profile verification
+      await db.profile.updateMany({
+        where: { userId: supporter.userId },
+        data: { isVerified: true, verifiedAt: new Date() },
       });
 
       // Send notification
@@ -44,8 +50,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         data: {
           userId: supporter.userId,
           type: 'supporter',
-          title: 'تم قبولك كداعم! 🌟',
-          body: 'مبروك! حسابك بقى داعم معتمد في وصال',
+          title: 'تم قبولك كداعم!',
+          body: 'مبروك! حسابك بقى داعم معتمد في وصال. دلوقتي تقدر تستقبل طلبات الدعم.',
         },
       });
     }
@@ -62,8 +68,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       });
     }
 
-    // When suspending: send notification
+    // When suspending: send notification + revert role
     if (status === 'suspended') {
+      await db.user.update({
+        where: { id: supporter.userId },
+        data: { role: 'user' },
+      });
+
       await db.notification.create({
         data: {
           userId: supporter.userId,

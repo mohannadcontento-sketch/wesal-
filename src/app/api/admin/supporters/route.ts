@@ -43,7 +43,13 @@ export async function GET(req: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json({ supporters });
+    const supportersWithFiles = supporters.map((s) => ({
+      ...s,
+      certificateFiles: JSON.parse(s.certificateFiles || '[]'),
+      certificates: JSON.parse(s.certificates || '[]'),
+    }));
+
+    return NextResponse.json({ supporters: supportersWithFiles });
   } catch (error) {
     console.error('Admin supporters GET error:', error);
     return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });

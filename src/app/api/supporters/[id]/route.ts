@@ -8,6 +8,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await getUserFromSession(req);
+    if (!user) return NextResponse.json({ error: 'سجل دخول' }, { status: 401 });
+
     const { id } = await params;
 
     const supporter = await db.supporter.findUnique({
@@ -26,7 +29,6 @@ export async function GET(
 
     return NextResponse.json({
       id: supporter.id,
-      userId: supporter.userId,
       name: profile?.realName || profile?.username || 'داعم',
       avatarUrl: supporter.avatarUrl || profile?.avatarUrl || null,
       bio: supporter.bio,

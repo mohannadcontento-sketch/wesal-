@@ -119,7 +119,7 @@ export function Navbar() {
                 <div>
                   <div className="text-sm font-semibold">{user.realName}</div>
                   <div className="text-xs text-muted-foreground">
-                    <BadgeIcon badge={user.badge} className="text-sm align-middle" /> {user.role === 'doctor' ? 'طبيب' : 'عضو'}
+                    <BadgeIcon badge={user.badge} className="text-sm align-middle" /> {user.role === 'doctor' ? 'طبيب' : user.role === 'supporter' ? 'داعم' : user.role === 'admin' ? 'مدير' : 'عضو'}
                   </div>
                 </div>
               </Link>

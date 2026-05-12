@@ -259,6 +259,28 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 </div>
               </div>
 
+              {/* Supporter Eligibility Banner */}
+              {isOwnProfile && profile.reputationScore >= 200 && !profile.isVerified && (
+                <div className="mt-4 mb-2 bg-gradient-to-l from-emerald-50 to-primary-container/20 border border-emerald-200 rounded-2xl p-4 flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary-container/30 flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-primary">volunteer_activism</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-on-surface">أنت مؤهل لتكون داعم!</p>
+                    <p className="text-xs text-on-surface-variant mt-1">
+                      بما إنك وصلت لـ {profile.reputationScore} نقطة سمعة، تقدر تقدم كداعم في المنصة
+                    </p>
+                    <Link
+                      href="/supporters/apply"
+                      className="inline-flex items-center gap-1.5 mt-2 px-4 py-1.5 bg-primary text-on-primary rounded-lg text-xs font-bold hover:opacity-90 transition-opacity"
+                    >
+                      <span className="material-symbols-outlined text-sm">arrow_back</span>
+                      قدم الآن
+                    </Link>
+                  </div>
+                </div>
+              )}
+
               {/* Edit Button */}
               {isOwnProfile && (
                 <div className="flex gap-3 pb-2">

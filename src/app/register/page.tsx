@@ -49,8 +49,8 @@ export default function RegisterPage() {
 
   const handleUserRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (userForm.password.length < 6) {
-      setErrorMsg('كلمة المرور لازم تكون 6 أحرف على الأقل');
+    if (userForm.password.length < 8) {
+      setErrorMsg('كلمة المرور لازم تكون 8 أحرف على الأقل وتحتوي أرقام وحروف');
       return;
     }
     setLoading(true);
@@ -74,8 +74,8 @@ export default function RegisterPage() {
 
   const handleDoctorRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (doctorForm.password.length < 6) {
-      setErrorMsg('كلمة المرور لازم تكون 6 أحرف على الأقل');
+    if (doctorForm.password.length < 8) {
+      setErrorMsg('كلمة المرور لازم تكون 8 أحرف على الأقل وتحتوي أرقام وحروف');
       return;
     }
     setLoading(true);
@@ -99,8 +99,8 @@ export default function RegisterPage() {
 
   const handleSupporterRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (supporterForm.password.length < 6) {
-      setErrorMsg('كلمة المرور لازم تكون 6 أحرف على الأقل');
+    if (supporterForm.password.length < 8) {
+      setErrorMsg('كلمة المرور لازم تكون 8 أحرف على الأقل وتحتوي أرقام وحروف');
       return;
     }
     if (supporterForm.bio.trim().length < 50) {
@@ -372,7 +372,7 @@ export default function RegisterPage() {
                       onChange={(e) => { setUserForm({ ...userForm, password: e.target.value }); setErrorMsg(''); }}
                       className="w-full pl-10 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
                       required
-                      minLength={6}
+                      minLength={8}
                       disabled={loading}
                     />
                     <button
@@ -509,7 +509,7 @@ export default function RegisterPage() {
                     onChange={(e) => { setDoctorForm({ ...doctorForm, password: e.target.value }); setErrorMsg(''); }}
                     className="w-full pl-10 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
                     required
-                    minLength={6}
+                    minLength={8}
                     disabled={loading}
                   />
                   <button
@@ -624,7 +624,7 @@ export default function RegisterPage() {
                       onChange={(e) => { setSupporterForm({ ...supporterForm, password: e.target.value }); setErrorMsg(''); }}
                       className="w-full pl-10 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
                       required
-                      minLength={6}
+                      minLength={8}
                       disabled={loading}
                     />
                     <button

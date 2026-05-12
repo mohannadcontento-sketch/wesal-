@@ -43,24 +43,23 @@ export function encryptMessage(plaintext: string): string {
  */
 export function decryptMessage(cipherText: string): string {
   try {
-    let base64Data = cipherText;
-
-    // Handle both prefixed and non-prefixed formats (backwards compatibility)
-    if (cipherText.startsWith(PREFIX)) {
-      base64Data = cipherText.slice(PREFIX.length);
-    } else {
-      // For old format without prefix, check if it looks like base64
-      // If it doesn't start with our prefix, it's probably not encrypted
-      // or it's plain text - return as is
-      if (cipherText.length < 20) return cipherText;
+    // Only attempt decryption on content that has our encryption prefix
+    if (!cipherText.startsWith(PREFIX)) {
+      // Content without prefix is not encrypted - return safely
+      // This handles legacy plaintext messages that existed before encryption was enabled
+      return cipherText;
     }
 
+    const base64Data = cipherText.slice(PREFIX.length);
     const key = getEncryptionKey();
     const combined = Buffer.from(base64Data, 'base64');
 
     // Check minimum viable length for IV + authTag + at least 1 byte ciphertext
     const minLen = IV_LENGTH + AUTH_TAG_LENGTH + 1;
-    if (combined.length < minLen) return cipherText;
+    if (combined.length < minLen) {
+      console.error('[ENCRYPTION] Encrypted data too short - possible corruption or tampering');
+      return '[رسالة مشفرة - فشل فك التشفير]';
+    }
 
     const iv = combined.subarray(0, IV_LENGTH);
     const authTag = combined.subarray(IV_LENGTH, IV_LENGTH + AUTH_TAG_LENGTH);
@@ -73,9 +72,11 @@ export function decryptMessage(cipherText: string): string {
     decrypted = Buffer.concat([decrypted, decipher.final()]);
 
     return decrypted.toString('utf8');
-  } catch {
-    // If decryption fails, return original (might not be encrypted or be plain text)
-    return cipherText;
+  } catch (error) {
+    // Decryption failed - this means the data was tampered with or the key changed
+    // NEVER return the raw cipherText as it could be injected malicious content
+    console.error('[ENCRYPTION] Decryption failed - possible tampering or key mismatch:', error);
+    return '[رسالة مشفرة - فشل فك التشفير]';
   }
 }
 

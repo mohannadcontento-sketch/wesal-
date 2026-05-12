@@ -20,6 +20,7 @@ export interface AuthUser {
 
 function getUserBadge(role: string, reputationTier?: string): string {
   if (role === 'doctor') return 'local_hospital';
+  if (role === 'supporter') return 'volunteer_activism';
   if (role === 'trusted') return 'workspace_premium';
   if (role === 'admin') return 'shield';
   if (reputationTier === 'notable') return 'stars';
@@ -113,13 +114,17 @@ export async function getCurrentUser(req?: Request | NextRequest): Promise<AuthU
     const authUser = await verifySessionToken(token);
     if (!authUser) return null;
 
-    // Verify user still exists and is not disabled
+    // Verify user still exists, is not disabled, and role hasn't changed
     const dbUser = await db.user.findUnique({
       where: { id: authUser.userId },
-      select: { id: true, disabled: true },
+      select: { id: true, disabled: true, role: true },
     });
 
     if (!dbUser || dbUser.disabled) return null;
+
+    // If role has changed in DB (e.g., admin demoted, supporter suspended),
+    // reject the stale JWT to prevent privilege escalation
+    if (dbUser.role !== authUser.role) return null;
 
     return authUser;
   } catch {
