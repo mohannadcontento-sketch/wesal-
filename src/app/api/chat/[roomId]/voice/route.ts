@@ -8,7 +8,7 @@ async function checkPatientCanSend(userId: string, room: { patientId: string; do
   if (userId !== room.patientId) return { canSend: true, message: '' };
 
   // Fetch appointment
-  let appointment = null;
+  let appointment: { appointmentDate: Date; status: string } | null = null;
   if (room.appointmentId) {
     appointment = await db.appointment.findUnique({
       where: { id: room.appointmentId },
@@ -28,18 +28,16 @@ async function checkPatientCanSend(userId: string, room: { patientId: string; do
     return { canSend: false, message: 'انتهت الجلسة' };
   }
 
-  if (appointment.appointmentDate) {
-    const apptDate = new Date(appointment.appointmentDate);
-    const now = new Date();
-    const windowStart = new Date(apptDate.getTime() - 15 * 60 * 1000);
-    const windowEnd = new Date(apptDate.getTime() + 30 * 60 * 1000);
+  const apptDate = new Date(appointment.appointmentDate);
+  const now = new Date();
+  const windowStart = new Date(apptDate.getTime() - 15 * 60 * 1000);
+  const windowEnd = new Date(apptDate.getTime() + 30 * 60 * 1000);
 
-    if (now < windowStart) {
-      return { canSend: false, message: 'الجلسة لسه ما بدأتش. تقدر تبعت 15 دقيقة قبل الموعد' };
-    }
-    if (now > windowEnd) {
-      return { canSend: false, message: 'انتهى وقت الجلسة' };
-    }
+  if (now < windowStart) {
+    return { canSend: false, message: 'الجلسة لسه ما بدأتش. تقدر تبعت 15 دقيقة قبل الموعد' };
+  }
+  if (now > windowEnd) {
+    return { canSend: false, message: 'انتهى وقت الجلسة' };
   }
 
   return { canSend: true, message: '' };

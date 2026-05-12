@@ -53,7 +53,7 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
   const otherPerson = (() => {
     if (!roomInfo || !user) return { name: 'الدكتور', avatarUrl: null };
     if (user.role === 'admin') {
-      return user.id === roomInfo.patientId
+      return user.userId === roomInfo.patientId
         ? { name: roomInfo.doctorName, avatarUrl: roomInfo.doctorAvatar }
         : { name: roomInfo.patientName, avatarUrl: roomInfo.patientAvatar };
     }
@@ -190,14 +190,14 @@ export default function ChatPage({ params }: { params: Promise<{ roomId: string 
         if (el === 270) toast.warning('30 ثانية وبيخلص الوقت');
         if (el === 290) toast.warning('10 ثواني وبيخلص الوقت');
       }, 1000);
-      autoStopTimerRef.current = setTimeout(() => { if (mediaRecorderRef.current?.state !== 'inactive') { toast('وصلت للحد - 5 دقائق'); mediaRecorderRef.current.stop(); setRecording(false); } }, MAX_RECORDING_SECONDS * 1000);
+      autoStopTimerRef.current = setTimeout(() => { if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') { toast('وصلت للحد - 5 دقائق'); mediaRecorderRef.current.stop(); setRecording(false); } }, MAX_RECORDING_SECONDS * 1000);
     } catch (err) {
       toast.error(err instanceof DOMException && err.name === 'NotAllowedError' ? 'سمح بالوصول للميكروفون' : 'مش قادر أصل للميكروفون');
     }
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current?.state !== 'inactive') mediaRecorderRef.current.stop();
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') mediaRecorderRef.current.stop();
     setRecording(false);
     if (autoStopTimerRef.current) { clearTimeout(autoStopTimerRef.current); autoStopTimerRef.current = null; }
   };

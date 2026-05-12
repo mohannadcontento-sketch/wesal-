@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     }
 
     // Verify target user exists
-    const targetUser = await db.user.findUnique({ where: { id: targetUserId } });
+    const targetUser = await db.user.findUnique({ where: { id: targetUserId }, include: { profile: true } });
     if (!targetUser) {
       return NextResponse.json({ error: 'المستخدم مش موجود' }, { status: 404 });
     }
