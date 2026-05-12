@@ -9,13 +9,14 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'غير مصرح' }, { status: 403 });
     }
 
-    const [totalUsers, doctors, posts] = await Promise.all([
+    const [totalUsers, doctors, posts, pendingSupporters] = await Promise.all([
       db.user.count(),
       db.user.count({ where: { role: 'doctor' } }),
       db.post.count(),
+      db.supporter.count({ where: { status: 'pending' } }),
     ]);
 
-    return NextResponse.json({ totalUsers, doctors, posts });
+    return NextResponse.json({ totalUsers, doctors, posts, pendingSupporters });
   } catch (error) {
     console.error('Admin stats error:', error);
     return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });

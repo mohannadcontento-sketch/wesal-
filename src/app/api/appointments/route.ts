@@ -86,14 +86,29 @@ export async function GET(req: Request) {
         ? { doctorId: user.id }
         : { patientId: user.id },
       include: {
-        patient: { include: { profile: true } },
-        doctor: { include: { profile: true } },
-        chatRoom: true,
+        patient: { include: { profile: { select: { realName: true, username: true, avatarUrl: true, specialty: true } } } },
+        doctor: { include: { profile: { select: { realName: true, username: true, avatarUrl: true, specialty: true } } } },
+        chatRoom: { select: { id: true, status: true } },
       },
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json({ appointments });
+    // Strip all sensitive fields from response
+    const safeAppointments = appointments.map(a => ({
+      id: a.id,
+      patientId: a.patientId,
+      doctorId: a.doctorId,
+      appointmentDate: a.appointmentDate,
+      reason: a.reason,
+      status: a.status,
+      chatRoomId: a.chatRoomId,
+      createdAt: a.createdAt,
+      patient: { profile: a.patient.profile },
+      doctor: { profile: a.doctor.profile },
+      chatRoom: a.chatRoom,
+    }));
+
+    return NextResponse.json({ appointments: safeAppointments });
   } catch (error) {
     console.error('Appointments GET error:', error);
     return NextResponse.json({ error: 'حصل خطأ' }, { status: 500 });

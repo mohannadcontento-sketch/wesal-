@@ -4,10 +4,29 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { useState, useEffect } from 'react';
 
 export function SideNav() {
   const pathname = usePathname();
   const { user, loading, logout } = useAuth();
+  const [supporterStatus, setSupporterStatus] = useState<{
+    isSupporter: boolean;
+    status: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    if (user && user.role !== 'admin' && user.role !== 'doctor') {
+      fetch('/api/supporters/apply')
+        .then((r) => r.json())
+        .then((data) => {
+          setSupporterStatus({
+            isSupporter: data.isSupporter || false,
+            status: data.status || null,
+          });
+        })
+        .catch(() => {});
+    }
+  }, [user]);
 
   if (loading || !user) return null;
 
@@ -29,9 +48,24 @@ export function SideNav() {
     ? [{ href: '/doctor', label: 'لوحة الطبيب', icon: 'stethoscope' }]
     : [];
 
+  const hasApprovedSupporter = supporterStatus?.isSupporter && supporterStatus?.status === 'approved';
+
+  const supporterItems = hasApprovedSupporter
+    ? [{ href: '/supporters', label: 'لوحة الداعم', icon: 'volunteer_activism' }]
+    : [];
+
   const adminItems = user.role === 'admin'
     ? [{ href: '/admin', label: 'لوحة الإدارة', icon: 'admin_panel_settings' }]
     : [];
+
+  // Show promotion card if user has enough reputation and is not an approved supporter
+  const showPromoCard =
+    user.role !== 'admin' &&
+    user.role !== 'doctor' &&
+    (user.reputationScore || 0) >= 300 &&
+    !hasApprovedSupporter;
+
+  const hasPendingSupporter = supporterStatus?.isSupporter && supporterStatus?.status === 'pending';
 
   const isActive = (href: string, icon: string) => {
     if (icon === 'person') return pathname.startsWith('/profile');
@@ -103,6 +137,32 @@ export function SideNav() {
           </>
         )}
 
+        {/* ── Supporter Section ── */}
+        {supporterItems.length > 0 && (
+          <>
+            <div className="my-2 mx-2 border-t border-wesal-ice/60" />
+            {supporterItems.map((item) => {
+              const active = pathname.startsWith(item.href) && pathname !== '/supporters';
+              return (
+                <Link
+                  key={item.href + item.label}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${
+                    active
+                      ? 'bg-emerald-100 text-emerald-700 font-semibold shadow-sm'
+                      : 'text-wesal-medium hover:bg-emerald-50 hover:text-emerald-700'
+                  }`}
+                >
+                  <span className={`material-symbols-outlined text-[22px] ${active ? 'filled' : ''}`}>
+                    {item.icon}
+                  </span>
+                  <span className="text-sm">{item.label}</span>
+                </Link>
+              );
+            })}
+          </>
+        )}
+
         {/* ── Admin Section ── */}
         {adminItems.length > 0 && (
           <>
@@ -127,6 +187,33 @@ export function SideNav() {
               );
             })}
           </>
+        )}
+
+        {/* ── Supporter Promotion Card ── */}
+        {showPromoCard && (
+          <div className="mt-4 mx-1">
+            <div className="p-4 rounded-2xl bg-gradient-to-bl from-emerald-500/20 via-emerald-400/10 to-emerald-600/5 border border-emerald-300/30">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="material-symbols-outlined filled text-emerald-600 text-lg">volunteer_activism</span>
+                <span className="text-sm font-bold text-emerald-800">
+                  {hasPendingSupporter ? 'طلبك قيد المراجعة' : 'أنت مؤهل لتكون داعم!'}
+                </span>
+              </div>
+              {hasPendingSupporter ? (
+                <p className="text-xs text-emerald-700/70 leading-relaxed mb-2">
+                  هنراجع طلبك وهنرد عليك في أقرب وقت
+                </p>
+              ) : (
+                <Link
+                  href="/supporters/apply"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold shadow-md hover:bg-emerald-700 transition-colors"
+                >
+                  قدّم الآن
+                  <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward</span>
+                </Link>
+              )}
+            </div>
+          </div>
         )}
       </nav>
 

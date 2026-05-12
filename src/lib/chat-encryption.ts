@@ -8,7 +8,10 @@ const AUTH_TAG_LENGTH = 16;
 const PREFIX = 'enc:v1:';
 
 function getEncryptionKey(): Buffer {
-  const secret = process.env.ENCRYPTION_SECRET || 'wesal-chat-encryption-key-2024';
+  const secret = process.env.ENCRYPTION_SECRET;
+  if (!secret) {
+    throw new Error('ENCRYPTION_SECRET environment variable is required');
+  }
   return crypto.createHash('sha256').update(secret).digest();
 }
 
@@ -28,8 +31,9 @@ export function encryptMessage(plaintext: string): string {
 
     const combined = Buffer.concat([iv, authTag, encrypted]);
     return PREFIX + combined.toString('base64');
-  } catch {
-    return plaintext;
+  } catch (error) {
+    console.error('[ENCRYPTION] Failed to encrypt message - NOT storing plaintext:', error);
+    throw new Error('Message encryption failed');
   }
 }
 

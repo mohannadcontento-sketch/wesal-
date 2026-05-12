@@ -9,16 +9,36 @@ import { toast } from 'sonner';
 import { PageTransition } from '@/components/animations/PageTransition';
 import { ScrollReveal } from '@/components/animations/ScrollReveal';
 
+const SUPPORTER_SPECIALTIES = [
+  'دعم نفسي',
+  'دعم أسري',
+  'دعم أكاديمي',
+  'دعم اجتماعي',
+  'دعم لضحايا العنف',
+  'دعم الإدمان',
+  'أخرى',
+];
+
 export default function RegisterPage() {
   const router = useRouter();
   const { register, user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'user' | 'doctor'>('user');
+  const [activeTab, setActiveTab] = useState<'user' | 'doctor' | 'supporter'>('user');
   const [errorMsg, setErrorMsg] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const [userForm, setUserForm] = useState({ username: '', email: '', phone: '', password: '' });
   const [doctorForm, setDoctorForm] = useState({ realName: '', email: '', phone: '', password: '', specialty: '' });
+  const [supporterForm, setSupporterForm] = useState({
+    realName: '',
+    email: '',
+    phone: '',
+    password: '',
+    specialty: 'دعم نفسي',
+    bio: '',
+    experience: '',
+    certificates: [''] as string[],
+  });
 
   // Redirect if already logged in
   useEffect(() => {
@@ -75,6 +95,70 @@ export default function RegisterPage() {
       setErrorMsg('حصل خطأ، جرب تاني');
       toast.error('حصل خطأ، جرب تاني');
     }
+  };
+
+  const handleSupporterRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (supporterForm.password.length < 6) {
+      setErrorMsg('كلمة المرور لازم تكون 6 أحرف على الأقل');
+      return;
+    }
+    if (supporterForm.bio.trim().length < 50) {
+      setErrorMsg('اكتب نبذة عنك (50 حرف على الأقل)');
+      return;
+    }
+    const validCerts = supporterForm.certificates.filter(c => c.trim().length > 0);
+    if (validCerts.length === 0) {
+      setErrorMsg('لازم تدخل شهادة أو كورس واحد على الأقل');
+      return;
+    }
+    setLoading(true);
+    setErrorMsg('');
+    try {
+      const result = await register({
+        realName: supporterForm.realName,
+        email: supporterForm.email,
+        phone: supporterForm.phone,
+        password: supporterForm.password,
+        specialty: supporterForm.specialty,
+        bio: supporterForm.bio,
+        experience: supporterForm.experience,
+        certificates: JSON.stringify(validCerts),
+        type: 'supporter',
+      });
+      setLoading(false);
+      if (result.success) {
+        toast.success('تم إنشاء الحساب! هنتأكد من إيميلك');
+        router.push(`/verify?email=${encodeURIComponent(supporterForm.email)}`);
+      } else {
+        setErrorMsg(result.error || 'حصل خطأ في التسجيل');
+        toast.error(result.error || 'حصل خطأ في التسجيل');
+      }
+    } catch {
+      setLoading(false);
+      setErrorMsg('حصل خطأ، جرب تاني');
+      toast.error('حصل خطأ، جرب تاني');
+    }
+  };
+
+  // Supporter certificate helpers
+  const addCertificate = () => {
+    if (supporterForm.certificates.length < 10) {
+      setSupporterForm({ ...supporterForm, certificates: [...supporterForm.certificates, ''] });
+    }
+  };
+
+  const removeCertificate = (index: number) => {
+    setSupporterForm({
+      ...supporterForm,
+      certificates: supporterForm.certificates.filter((_, i) => i !== index),
+    });
+  };
+
+  const updateCertificate = (index: number, value: string) => {
+    const updated = [...supporterForm.certificates];
+    updated[index] = value;
+    setSupporterForm({ ...supporterForm, certificates: updated });
   };
 
   if (authLoading) {
@@ -180,7 +264,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => { setActiveTab('user'); setErrorMsg(''); }}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold transition-all duration-300
+              className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-lg text-sm font-bold transition-all duration-300
                 ${activeTab === 'user'
                   ? 'bg-white shadow-md text-wesal-dark'
                   : 'text-wesal-medium hover:text-wesal-dark'
@@ -193,7 +277,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => { setActiveTab('doctor'); setErrorMsg(''); }}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold transition-all duration-300
+              className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-lg text-sm font-bold transition-all duration-300
                 ${activeTab === 'doctor'
                   ? 'bg-white shadow-md text-wesal-dark'
                   : 'text-wesal-medium hover:text-wesal-dark'
@@ -203,10 +287,23 @@ export default function RegisterPage() {
               <span className="material-symbols-outlined text-[20px]">medical_services</span>
               طبيب
             </button>
+            <button
+              type="button"
+              onClick={() => { setActiveTab('supporter'); setErrorMsg(''); }}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-lg text-sm font-bold transition-all duration-300
+                ${activeTab === 'supporter'
+                  ? 'bg-white shadow-md text-wesal-dark'
+                  : 'text-wesal-medium hover:text-wesal-dark'
+                }
+              `}
+            >
+              <span className="material-symbols-outlined text-[20px]">volunteer_activism</span>
+              داعم
+            </button>
           </div>
 
           {/* ── User Form ── */}
-          {activeTab === 'user' ? (
+          {activeTab === 'user' && (
             <form onSubmit={handleUserRegister} className="flex flex-col gap-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Username */}
@@ -323,8 +420,10 @@ export default function RegisterPage() {
                 )}
               </button>
             </form>
-          ) : (
-            /* ── Doctor Form ── */
+          )}
+
+          {/* ── Doctor Form ── */}
+          {activeTab === 'doctor' && (
             <form onSubmit={handleDoctorRegister} className="flex flex-col gap-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Real Name */}
@@ -448,6 +547,215 @@ export default function RegisterPage() {
                 ) : (
                   <>
                     إنشاء حساب دكتور
+                    <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward</span>
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+
+          {/* ── Supporter Form ── */}
+          {activeTab === 'supporter' && (
+            <form onSubmit={handleSupporterRegister} className="flex flex-col gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Real Name */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-wesal-medium">الاسم الحقيقي</label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">badge</span>
+                    <input
+                      placeholder="أحمد محمود"
+                      value={supporterForm.realName}
+                      onChange={(e) => { setSupporterForm({ ...supporterForm, realName: e.target.value }); setErrorMsg(''); }}
+                      className="w-full pl-3 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-wesal-medium">البريد الإلكتروني</label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">mail</span>
+                    <input
+                      type="email"
+                      placeholder="example@email.com"
+                      dir="ltr"
+                      value={supporterForm.email}
+                      onChange={(e) => { setSupporterForm({ ...supporterForm, email: e.target.value }); setErrorMsg(''); }}
+                      className="w-full pl-3 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Phone */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-wesal-medium">رقم الجوال</label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">phone_iphone</span>
+                    <input
+                      type="tel"
+                      placeholder="05X XXX XXXX"
+                      dir="ltr"
+                      value={supporterForm.phone}
+                      onChange={(e) => { setSupporterForm({ ...supporterForm, phone: e.target.value }); setErrorMsg(''); }}
+                      className="w-full pl-3 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-wesal-medium">كلمة المرور</label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">lock</span>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={supporterForm.password}
+                      onChange={(e) => { setSupporterForm({ ...supporterForm, password: e.target.value }); setErrorMsg(''); }}
+                      className="w-full pl-10 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
+                      required
+                      minLength={6}
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-wesal-sky hover:text-wesal-medium transition-colors"
+                      aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
+                    >
+                      <span className="material-symbols-outlined text-[20px]">
+                        {showPassword ? 'visibility' : 'visibility_off'}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Specialty */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-wesal-medium">التخصص</label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-wesal-sky text-[20px]">psychology</span>
+                  <select
+                    value={supporterForm.specialty}
+                    onChange={(e) => setSupporterForm({ ...supporterForm, specialty: e.target.value })}
+                    className="w-full pl-3 pr-10 py-3.5 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-base outline-none transition-all appearance-none disabled:opacity-50"
+                    disabled={loading}
+                  >
+                    {SUPPORTER_SPECIALTIES.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Bio */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-wesal-medium flex items-center justify-between">
+                  <span>نبذة عنك</span>
+                  <span className="text-wesal-sky font-normal">{supporterForm.bio.length}/500</span>
+                </label>
+                <textarea
+                  placeholder="اكتب نبذة عنك وخبراتك ومجالات اللي بتقدم فيها دعم..."
+                  value={supporterForm.bio}
+                  onChange={(e) => { setSupporterForm({ ...supporterForm, bio: e.target.value }); setErrorMsg(''); }}
+                  required
+                  minLength={50}
+                  maxLength={500}
+                  rows={4}
+                  className="w-full bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-sm p-3 resize-none outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50 leading-relaxed"
+                  disabled={loading}
+                />
+              </div>
+
+              {/* Experience */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-wesal-medium">الخبرة (اختياري)</label>
+                <textarea
+                  placeholder="اوصف خبراتك في مجال الدعم النفسي..."
+                  value={supporterForm.experience}
+                  onChange={(e) => { setSupporterForm({ ...supporterForm, experience: e.target.value }); setErrorMsg(''); }}
+                  rows={3}
+                  className="w-full bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-sm p-3 resize-none outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50 leading-relaxed"
+                  disabled={loading}
+                />
+              </div>
+
+              {/* Certificates */}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-medium text-wesal-medium">الشهادات والكورسات</label>
+                  {supporterForm.certificates.length < 10 && (
+                    <button
+                      type="button"
+                      onClick={addCertificate}
+                      className="text-xs text-wesal-dark font-bold hover:underline flex items-center gap-0.5"
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: 14 }}>add</span>
+                      إضافة
+                    </button>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  {supporterForm.certificates.map((cert, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div className="relative flex-1">
+                        <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-wesal-sky text-[18px]">workspace_premium</span>
+                        <input
+                          type="text"
+                          value={cert}
+                          onChange={(e) => updateCertificate(i, e.target.value)}
+                          placeholder={`شهادة أو كورس ${i + 1}`}
+                          className="w-full pl-3 pr-9 py-3 bg-white border border-wesal-ice rounded-xl focus:border-wesal-medium focus:ring-2 focus:ring-wesal-ice text-wesal-navy text-sm outline-none transition-all placeholder:text-wesal-sky/50 disabled:opacity-50"
+                          disabled={loading}
+                        />
+                      </div>
+                      {supporterForm.certificates.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeCertificate(i)}
+                          className="p-2 text-red-400 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-lg">close</span>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Supporter note */}
+              <div className="flex items-start gap-2 mt-2 bg-emerald-50/80 p-3.5 rounded-xl border border-emerald-200/60">
+                <span className="material-symbols-outlined text-emerald-600 text-sm mt-0.5 flex-shrink-0">info</span>
+                <p className="text-xs text-emerald-800/80 leading-relaxed">
+                  هنتحقق من شهاداتك ومؤهلاتك قبل ما حسابك يتفعل كداعم على المنصة. الداعم يقدم دعم واستماع فقط — لا تشخيص ولا علاج.
+                </p>
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-4 w-full py-3.5 px-6 rounded-xl bg-gradient-to-l from-wesal-dark to-wesal-medium text-white text-sm font-bold shadow-lg hover:shadow-xl hover:brightness-110 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+                    جاري التسجيل...
+                  </>
+                ) : (
+                  <>
+                    إنشاء حساب داعم
                     <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward</span>
                   </>
                 )}

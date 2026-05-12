@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { username, email, phone, password, type, realName, specialty } = body;
+    const { username, email, phone, password, type, realName, specialty, bio, experience, certificates } = body;
 
     // Validate required fields
     if (!email || !password || !phone) {
@@ -56,6 +56,35 @@ export async function POST(req: Request) {
       );
     }
 
+    if (type === 'supporter') {
+      if (!realName) {
+        return NextResponse.json(
+          { error: 'الاسم الحقيقي مطلوب للداعمين' },
+          { status: 400 }
+        );
+      }
+      if (!bio || bio.trim().length < 50) {
+        return NextResponse.json(
+          { error: 'اكتب نبذة عنك (50 حرف على الأقل)' },
+          { status: 400 }
+        );
+      }
+      // Validate certificates
+      let parsedCerts: string[] = [];
+      try {
+        parsedCerts = typeof certificates === 'string' ? JSON.parse(certificates) : Array.isArray(certificates) ? certificates : [];
+      } catch {
+        parsedCerts = [];
+      }
+      const validCerts = parsedCerts.filter((c: string) => c.trim().length > 0);
+      if (validCerts.length === 0) {
+        return NextResponse.json(
+          { error: 'لازم تدخل شهادة أو كورس واحد على الأقل' },
+          { status: 400 }
+        );
+      }
+    }
+
     // Check if email already exists
     const existingUser = await db.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -76,6 +105,7 @@ export async function POST(req: Request) {
       }
     }
 
+    // For supporters, role stays 'user' until admin approves
     const role = type === 'doctor' ? 'doctor' : 'user';
 
     // Hash the password
@@ -98,10 +128,22 @@ export async function POST(req: Request) {
         profile: {
           create: {
             username: type === 'user' ? username : null,
-            realName: type === 'doctor' ? realName : username || 'مستخدم',
-            specialty: type === 'doctor' ? specialty : null,
+            realName: type === 'user' ? (username || 'مستخدم') : realName,
+            specialty: (type === 'doctor' || type === 'supporter') ? specialty : null,
           },
         },
+        // Create supporter record for supporter type
+        ...(type === 'supporter' ? {
+          supporterProfile: {
+            create: {
+              bio: bio.trim(),
+              specialty: specialty || 'دعم نفسي',
+              experience: experience || '',
+              certificates: typeof certificates === 'string' ? certificates : JSON.stringify(certificates || []),
+              status: 'pending',
+            },
+          },
+        } : {}),
       },
       include: { profile: true },
     });

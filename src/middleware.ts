@@ -8,7 +8,7 @@ const publicRoutes = ['/', '/login', '/register', '/verify'];
 const authOnlyRoutes = ['/login', '/register', '/verify'];
 
 const AUTH_SECRET = new TextEncoder().encode(
-  process.env.AUTH_SECRET || 'wesal-fallback-secret-change-me'
+  process.env.AUTH_SECRET || (() => { throw new Error('AUTH_SECRET environment variable must be set'); })()
 );
 
 async function getSessionUser(request: NextRequest) {

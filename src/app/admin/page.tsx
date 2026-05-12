@@ -28,6 +28,7 @@ interface DashboardStats {
   doctors: number;
   posts: number;
   pendingVerifications: number;
+  pendingSupporters: number;
 }
 
 export default function AdminPage() {
@@ -39,6 +40,7 @@ export default function AdminPage() {
     doctors: 0,
     posts: 0,
     pendingVerifications: 0,
+    pendingSupporters: 0,
   });
   const [isLoadingStats, setIsLoadingStats] = useState(true);
 
@@ -68,6 +70,7 @@ export default function AdminPage() {
             doctors: data.doctors || prev.doctors,
             posts: data.posts || prev.posts,
             pendingVerifications: data.pendingVerifications || prev.pendingVerifications,
+            pendingSupporters: data.pendingSupporters || prev.pendingSupporters,
           }));
         })
         .catch(() => {
@@ -215,7 +218,7 @@ export default function AdminPage() {
       </div>
 
       {/* Quick Access */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
         {/* Users Quick Access */}
         <Link
           href="/admin/users"
@@ -255,6 +258,27 @@ export default function AdminPage() {
               </div>
             </div>
             <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary group-hover:-translate-x-1 transition-all">chevron_left</span>
+          </div>
+        </Link>
+
+        {/* Supporter Applications Quick Access */}
+        <Link
+          href="/admin/supporters"
+          className="bg-white/10 backdrop-blur-[40px] border border-white/40 rounded-xl p-6 shadow-[0_4px_24px_0_rgba(0,43,45,0.05)] hover:shadow-lg hover:border-emerald-400/30 transition-all group cursor-pointer"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+                <span className="material-symbols-outlined text-2xl text-white">volunteer_activism</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-primary">طلبات الداعمين</h3>
+                <p className="text-sm text-on-surface-variant mt-0.5">
+                  {isLoadingStats ? '...' : `${stats.pendingSupporters} طلب معلق`}
+                </p>
+              </div>
+            </div>
+            <span className="material-symbols-outlined text-on-surface-variant group-hover:text-emerald-600 group-hover:-translate-x-1 transition-all">chevron_left</span>
           </div>
         </Link>
       </div>

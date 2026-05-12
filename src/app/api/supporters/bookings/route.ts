@@ -75,6 +75,11 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: 'مش قادر تعدل الحجز' }, { status: 400 });
     }
 
+    // Only allow cancellation by the user who booked
+    if (status !== 'cancelled') {
+      return NextResponse.json({ error: 'مش مسموح تعدل الحالة دي' }, { status: 400 });
+    }
+
     const updated = await db.supporterBooking.update({
       where: { id: bookingId },
       data: { status },
